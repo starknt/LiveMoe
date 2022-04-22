@@ -1,0 +1,35 @@
+{
+  "application": {
+    "language": "Language",
+    "button": {
+      "min": "Min",
+      "max": "Max",
+      "close": "Close"
+    },
+    "pages": {
+      "navigation": {
+        "main": "Home",
+        "wallpaper": "My",
+        "setting": "Stting",
+        "person": "Person"
+      }
+    }
+  },
+
+  "applicationTray": {
+    "lables": {
+      "main": "Home",
+      "setting": "Setting",
+      "wallpaperNew": "New an Wallpaper",
+      "play": "Play",
+      "pause": "Pause",
+      "next": "Next Wallpaper",
+      "prve": "Prve Wallpaper",
+      "mute": "Mute",
+      "volume": "Volume",
+      "wallpaperDisable": "Disabled",
+      "wallpaperEnable": "Enabled",
+      "quit": "Quit"
+    }
+  }
+}

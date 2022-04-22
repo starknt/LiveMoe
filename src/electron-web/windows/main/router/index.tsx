@@ -1,0 +1,69 @@
+import { Outlet, RouteObject } from 'react-router-dom';
+import Home from './Home';
+import NotMatch from './NotMatch';
+import Wallpaper from './Wallpaper';
+import { Container, Paper, useTheme } from '@mui/material';
+import AppBar from 'electron-web/windows/main/components/AppBar';
+import { useEffect, useRef } from 'react';
+import useUpdate from 'electron-web/hooks/useUpdate';
+
+export function Layout() {
+  const theme = useTheme();
+  const ref = useRef<HTMLDivElement | null>(null);
+  const forceUpdate = useUpdate();
+
+  useEffect(() => {
+    forceUpdate();
+  }, [ref]);
+
+  return (
+    <Paper className="overflow-hidden" sx={{ borderRadius: 'inherit' }}>
+      <AppBar ref={ref} />
+      <Paper
+        style={{
+          borderRadius: 'none',
+          display: 'flex',
+          minHeight: `calc( 100vh - ${
+            ref.current?.getBoundingClientRect().height ?? 70
+          }px )`,
+          marginTop: `${ref.current?.getBoundingClientRect().height ?? 70}px`,
+          backgroundColor:
+            theme.palette.mode === 'light'
+              ? '#f1f3f5'
+              : theme.palette.background.default,
+        }}
+      >
+        <Container>
+          <Outlet />
+        </Container>
+      </Paper>
+    </Paper>
+  );
+}
+
+const routers: RouteObject[] = [
+  {
+    path: '/',
+    element: <Layout />,
+    children: [
+      {
+        element: <Home />,
+      },
+      {
+        index: true,
+        path: 'wallpaper',
+        element: <Wallpaper />,
+      },
+      {
+        path: '*',
+        element: <NotMatch />,
+      },
+    ],
+  },
+  {
+    path: '*',
+    element: <NotMatch />,
+  },
+];
+
+export default routers;

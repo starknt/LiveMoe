@@ -1,0 +1,1 @@
+export { Server as IPCMainServer } from './ipc.electron-main';

@@ -1,0 +1,24 @@
+:root {
+  --app-heigth: 100vh;
+  --app-width: 100vw;
+  --header-height: 28px;
+}
+
+body {
+  width: 100vw;
+  color: #18191c;
+  background-color: transparent;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  max-height: 100vh;
+  overflow: auto;
+  border-radius: 6px;
+  z-index: 99999;
+}
+
+::-webkit-scrollbar {
+  width: 0rem;
+}

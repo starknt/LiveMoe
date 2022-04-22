@@ -1,0 +1,35 @@
+{
+  "application": {
+    "language": "语言",
+    "button": {
+      "min": "最小化",
+      "max": "最大化",
+      "close": "关闭窗口"
+    },
+    "pages": {
+      "navigation": {
+        "main": "主页",
+        "wallpaper": "我的壁纸",
+        "setting": "设置",
+        "person": "Person"
+      }
+    }
+  },
+
+  "applicationTray": {
+    "lables": {
+      "main": "主程序",
+      "setting": "设置",
+      "wallpaperNew": "新建壁纸",
+      "play": "播放",
+      "pause": "暂停",
+      "next": "切换到下一张壁纸",
+      "prev": "切换到上一张壁纸",
+      "mute": "关闭声音",
+      "volume": "打开声音",
+      "wallpaperDisable": "禁用壁纸",
+      "wallpaperEnable": "开启壁纸",
+      "quit": "退出"
+    }
+  }
+}

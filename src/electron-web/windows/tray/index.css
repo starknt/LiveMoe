@@ -1,0 +1,23 @@
+:root {
+  --primary-padding: 5px;
+}
+
+body {
+  height: calc(100vh - 2 * var(--primary-padding));
+  margin: 0;
+  background-color: transparent;
+  overflow: hidden;
+}
+
+#root {
+  --x: 0px;
+  --y: 0px;
+  --width: 260px;
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  width: var(--width);
+  pointer-events: auto;
+  transition: all 0.25s ease-in-out;
+  overflow: hidden;
+}

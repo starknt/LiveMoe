@@ -1,0 +1,55 @@
+.headerWrapper {
+  height: var(--header-height);
+}
+
+.header {
+  position: fixed;
+  width: 100%;
+  height: var(--header-height);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 5px;
+  padding-right: 0;
+  -webkit-app-region: drag;
+  user-select: none;
+  z-index: 9999;
+  color: #fff;
+
+  background-color: #282c34;
+}
+
+.header > .title {
+  padding: 5px 10px;
+  margin: auto;
+}
+
+.header .actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 0;
+  height: 100%;
+  width: fit-content;
+  -webkit-app-region: no-drag;
+}
+
+.header .actions .action {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 44px;
+  position: relative;
+  transition: all 0.25s;
+  -webkit-app-region: no-drag;
+  cursor: default;
+}
+
+.header .actions .action:hover {
+  background-color: rgb(71, 67, 67);
+}
+
+.header .actions .action button {
+  height: 100%;
+}

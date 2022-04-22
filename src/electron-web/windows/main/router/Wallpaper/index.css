@@ -1,0 +1,95 @@
+.lm-wallpaper {
+  margin-top: 2rem;
+  padding-bottom: 2vh;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  overflow: hidden;
+}
+
+.lm-wallpaper-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  grid-auto-rows: minmax(14rem, 1fr);
+  gap: 1em;
+}
+
+.lm-wallpaper-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.lm-wallpaper-item {
+  position: relative;
+}
+
+.lm-wallpaper-grid .lm-wallpaper-item .lm-wallpaper-item-img {
+  display: block;
+  width: 364px;
+  height: 164px;
+  object-fit: cover;
+}
+
+.lm-wallpaper-list .lm-wallpaper-item {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1em;
+  color: hsl(0, 0%, 92%);
+  background-color: #7995c9;
+}
+
+.lm-wallpaper-list .lm-wallpaper-item .lm-wallpaper-item-img {
+  display: block;
+  height: 144px;
+  height: 74px;
+  object-fit: cover;
+}
+
+.lm-wallpaper-item .lm-wallpaper-item-title {
+  font-size: 15px;
+  font-weight: bold;
+  @apply line-clamp-1;
+}
+
+.lm-wallpaper-item .lm-wallpaper-item-desc {
+  font-size: 15px;
+  font-weight: bold;
+  @apply line-clamp-1;
+}
+
+.lm-wallpaper-item-info {
+  padding: 0.7em 0 0 0.1em;
+  display: flex;
+  flex-direction: column;
+}
+
+.lm-wallpaper-list .lm-wallpaper-item .lm-wallpaper-item-desc {
+}
+
+.lm-wallpaper-view {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 1.2em;
+  color: inherit;
+  padding: 1em;
+}
+
+.lm-wallpaper-view .lm-wallpaper-view-right {
+  display: flex;
+  column-gap: 1em;
+  justify-content: center;
+  align-items: center;
+}
+
+.lm-wallpaper-view .lm-wallpaper-view-right .lm-wallpaper-view-right-filter {
+  color: black;
+}
+
+.lm-wallpaper-view
+  .lm-wallpaper-view-right
+  .lm-wallpaper-view-right-filter
+  svg {
+  color: #fff;
+}

@@ -1,0 +1,23 @@
+.lm-wallpaper-input {
+  position: relative;
+  display: inline-block;
+}
+
+.lm-wallpaper-input input {
+  border-radius: 5px;
+  background: transparent;
+  border: 1px solid black;
+  height: 2.25rem;
+  padding: 0.5rem;
+}
+
+.lm-wallpaper-input input:focus {
+  outline: 1px solid #4187f6;
+}
+
+.lm-wallpaper-input svg {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 1rem;
+}
