@@ -1,7 +1,7 @@
 {
   productName: 'LiveMoe',
   appId: 'net.seven.LiveMoe',
-  copyright: 'Copyright © 2021 Seven',
+  copyright: 'Copyright © 2022 Seven',
   asar: true,
   asarUnpack: '**\\*.{dll}',
   files: ['dist', 'node_modules', 'package.json'],
@@ -58,13 +58,8 @@
     output: 'release/build',
   },
   publish: [
-    // {
-    //   provider: 'generic',
-    //   owner: 'seven',
-    //   url: 'http://',
-    // },
-    // {
-    //   provider: 'github',
-    // },
+    {
+      provider: 'github',
+    },
   ],
 }
