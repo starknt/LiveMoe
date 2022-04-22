@@ -64,11 +64,9 @@ export default merge<webpack.Configuration>(baseConfig, {
       },
       // Common Image Formats
       {
-        test: /\.(?:ico|gif|png|jpg|jpeg|webp)$/,
-        use: {
-          loader: 'file-loader',
-        },
-      },
+        test: /\.(ico|gif|png|jpg|jpeg|webp)$/,
+        type: 'asset/resource',
+      }
     ],
   },
 

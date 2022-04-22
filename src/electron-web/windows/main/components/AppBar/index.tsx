@@ -20,6 +20,7 @@ import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplica
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import { useNavigate } from 'react-router-dom';
 import About from '../about';
+import './index.css';
 
 const pages = ['主页', '壁纸', '组件'];
 const settings = ['个人信息', '消息', '退出登录'];
@@ -75,14 +76,7 @@ export default React.forwardRef((_, ref) => {
       ref={ref}
       position="fixed"
       color="secondary"
-      className="draggable"
-      style={{
-        borderTopRightRadius: 'inherit',
-        borderTopLeftRadius: 'inherit',
-        backgroundImage: 'url(background.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
+      className="draggable app-bar"
     >
       <Container style={{ paddingRight: 0 }} sx={{ gap: 1 }} maxWidth="xl">
         <Toolbar style={{ paddingRight: 6 }}>
