@@ -7,6 +7,14 @@ const createWindowsService = (
   windowsService: IChannel
 ): LiveMoe.WindowsService => {
   return {
+    refresh: async (windowId: string) => {
+      return await windowsService.call(WINDOW_MESSAGE_TYPE.IPC_CALL, {
+        type: WINDOW_MESSAGE_TYPE.IPC_CALL,
+        event: 'refresh',
+        arg: windowId,
+      });
+    },
+
     toggleWindow: (windowId: string) => {
       return new Promise((resolve, reject) => {
         windowsService

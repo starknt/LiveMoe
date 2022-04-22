@@ -16,7 +16,11 @@ import Taskbar from './core/Taskbar';
 import WindowManager from './core/windowManager/WindowManager';
 import { shutDownWatcher } from './observables/power.observable';
 import DataBase from './core/Database';
-import { resolveGlobalAssets } from './utils';
+import {
+  resolveGlobalAssets,
+  resolvePreloadPath,
+  resolvePreloadPath,
+} from './utils';
 import {
   EventPreloadType,
   WINDOW_MESSAGE_TYPE,
@@ -103,7 +107,7 @@ export default class Application extends ApplicationEventBus {
 
   setupGlabalPreload() {
     // TODO: 全局预加载脚本
-    // const commonService = resolvePreloadPath('common-service');
+    // const commonService = resolvePreloadPath('service');
 
     session.defaultSession.setPreloads([]);
   }

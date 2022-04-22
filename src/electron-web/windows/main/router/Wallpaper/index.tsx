@@ -1,5 +1,5 @@
 import { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Flipped, Flipper } from 'react-flip-toolkit';
 import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
@@ -11,10 +11,9 @@ import {
   selectPlayerConfiguration,
   selectPlayList,
 } from 'electron-web/features/playerSlice';
-import './index.css';
-import WallpaperCard from './wallpaperCard';
-import { generateUuid } from 'common/electron-common/base/uuid';
 import { Backdrop, CircularProgress } from '@mui/material';
+import WallpaperContainer from './wallpaper';
+import './index.css';
 
 interface IWallpaperItem {
   configuration: IWallpaperConfiguration;
@@ -182,42 +181,12 @@ const Wallpaper: React.FC = () => {
     );
   }
 
-  const play = useCallback(
-    (configuration: IWallpaperConfiguration) => {
-      if (
-        configuration.id === player.configuration.wallpaperConfiguration?.id ||
-        configuration.playPath ===
-          player.configuration.wallpaperConfiguration?.playPath
-      ) {
-        if (player.configuration.status === 'playing') {
-          window.livemoe.wallpaperPlayerService.pause();
-        } else {
-          window.livemoe.wallpaperPlayerService.play();
-        }
-      } else {
-        window.livemoe.wallpaperPlayerService.play(configuration);
-      }
-    },
-    [player, window.livemoe]
-  );
-
   return (
     <div className="lm-wallpaper">
-      {playList.map((configuration) => {
-        return (
-          <WallpaperCard
-            onClick={() => play(configuration)}
-            configuration={configuration}
-            playing={
-              player.configuration.wallpaperConfiguration?.id ===
-                configuration.id ||
-              player.configuration.wallpaperConfiguration?.playPath ===
-                configuration.playPath
-            }
-            key={generateUuid()}
-          />
-        );
-      })}
+      <WallpaperContainer
+        configurations={playList}
+        playerConfiguration={player.configuration}
+      />
     </div>
   );
 };

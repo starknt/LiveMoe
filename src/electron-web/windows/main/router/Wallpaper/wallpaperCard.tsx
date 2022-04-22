@@ -1,8 +1,7 @@
 import Card, { CardProps } from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import PauseIcon from '@mui/icons-material/Pause';
-import { Box, CardActionArea, IconButton, Skeleton } from '@mui/material';
+import { CardActionArea, Skeleton } from '@mui/material';
 import { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer';
 import TinyText from 'electron-web/components/TinyText';
 import React, { useState } from 'react';
@@ -15,7 +14,6 @@ interface WallpaperCardProps extends CardProps {
 const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
   ({ configuration, playing = false, ...props }) => {
     const [isLoading, setLoading] = useState(true);
-
     return (
       <Card
         {...props}
@@ -23,8 +21,8 @@ const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
           position: 'relative',
           minWidth: 'calc( 25% - 1rem )',
           maxWidth: 'calc( 25% - 1rem )',
-          boxShadow: '1px 2px 10px rgba(0, 0, 0, .28)',
         }}
+        elevation={playing ? 15 : 1}
         disabled={isLoading}
       >
         <CardActionArea>
@@ -48,7 +46,6 @@ const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
             onError={() => setLoading(true)}
             component="img"
             height="165"
-            m
             image={configuration.preview}
             loading="lazy"
           />
@@ -87,9 +84,6 @@ const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
         </CardActionArea>
       </Card>
     );
-  },
-  (prev, next) => {
-    return prev.configuration.id === next.configuration.id;
   }
 );
 

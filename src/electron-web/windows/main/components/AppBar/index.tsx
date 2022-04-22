@@ -18,6 +18,8 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplicationsRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
+import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
+import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import { useNavigate } from 'react-router-dom';
 import About from '../about';
 import './index.css';
@@ -50,8 +52,17 @@ export default React.forwardRef((_, ref) => {
   };
 
   const handleNavigate = () => {
-    navgation('wallpaper');
+    navgation('');
   };
+
+  const handleBack = useCallback(() => {
+    navgation(-1);
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    window.location.reload();
+    // window.livemoe.windowsService.refresh('main');
+  }, []);
 
   const handleMinimize = useCallback(() => {
     window.livemoe.windowsService.sendWindowMessage('main', 'min');
@@ -80,7 +91,14 @@ export default React.forwardRef((_, ref) => {
     >
       <Container style={{ paddingRight: 0 }} sx={{ gap: 1 }} maxWidth="xl">
         <Toolbar style={{ paddingRight: 6 }}>
-          <Box sx={{ flexGrow: 1 }}></Box>
+          <Box sx={{ flexGrow: 1 }}>
+            <IconButton onClick={handleBack} className="non-draggable">
+              <ArrowBackIosRoundedIcon />
+            </IconButton>
+            <IconButton onClick={handleRefresh} className="non-draggable">
+              <RefreshRoundedIcon />
+            </IconButton>
+          </Box>
           <Box
             sx={{
               flexGrow: 1,

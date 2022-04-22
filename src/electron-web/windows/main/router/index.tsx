@@ -51,7 +51,7 @@ const routers: RouteObject[] = [
       },
       {
         index: true,
-        path: 'wallpaper',
+        // path: 'wallpaper',
         element: <Wallpaper />,
       },
       {

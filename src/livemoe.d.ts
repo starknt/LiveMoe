@@ -13,6 +13,8 @@ declare namespace LiveMoe {
   }
 
   interface WindowsService {
+    refresh(windowId: string): Promise<void>;
+
     toggleWindow(windowId: string): Promise<any>;
     addEventListener(eventName: string, windowId: string): Promise<Event<any>>;
     sendWindowMessage(
