@@ -1,5 +1,8 @@
 import { Event } from 'common/electron-common/base/event';
-import { EventPreloadType, WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows';
+import {
+  EventPreloadType,
+  WINDOW_MESSAGE_TYPE,
+} from 'common/electron-common/windows';
 import { IWindow } from 'electron-main/common/windows';
 import { IWindowOptions } from 'electron-main/core/windowManager/WindowPool';
 import { resolveHtmlPath } from 'electron-main/utils';
@@ -46,6 +49,9 @@ export default class MainWindow extends IWindow {
           this.setFullScreen(false);
           break;
         case 'exit':
+          break;
+        case 'refresh':
+          this.webContents.reloadIgnoringCache();
           break;
         default:
           return -1;

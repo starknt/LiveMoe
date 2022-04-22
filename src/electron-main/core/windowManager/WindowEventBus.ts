@@ -6,18 +6,17 @@ import type { WindowId } from './WindowManager';
 import type { IPCMainServer } from 'common/electron-main';
 import type Application from 'electron-main/Application';
 import type { IDestroyable } from 'electron-main/common/lifecycle';
-import type { IRegisterableService } from 'electron-main/common/service';
 import type {
   IWindow,
   IWindowMessageOptions,
 } from 'electron-main/common/windows';
-import { EventPreloadType, WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows';
+import {
+  EventPreloadType,
+  WINDOW_MESSAGE_TYPE,
+} from 'common/electron-common/windows';
 import { info } from '../Logger/logger';
 
-export abstract class IWindowEventBus
-  extends EventEmitter
-  implements IRegisterableService
-{
+export abstract class IWindowEventBus extends EventEmitter {
   protected readonly channelName = 'lm:windows';
 
   protected readonly MAX_LISTENERS = 0;
@@ -122,7 +121,6 @@ export default class WindowEventBus
       case 'window': {
         // 创建窗口
         let result;
-        console.log('创建窗口', preload);
         if (
           Array.isArray(preload.arg) &&
           preload.arg.length > 0 &&
@@ -160,6 +158,22 @@ export default class WindowEventBus
         return false;
       }
       default:
+        if (typeof preload.arg === 'string') {
+          return this.handleWindowCallEvent(preload.arg, preload.event, []);
+        }
+
+        if (
+          Array.isArray(preload.arg) &&
+          preload.arg.length >= 1 &&
+          typeof preload.arg[0] === 'string'
+        ) {
+          return this.handleWindowCallEvent(
+            preload.arg[0],
+            preload.event,
+            preload.arg.slice(1)
+          );
+        }
+
         return false;
     }
   }

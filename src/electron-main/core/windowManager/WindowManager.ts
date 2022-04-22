@@ -57,6 +57,10 @@ export default class WindowManager implements IDestroyable {
 
       window.webContents.send('window:ctx', options.id ?? '');
 
+      window.webContents.on('did-navigate', () => {
+        window.webContents.send('window:ctx', options.id ?? '');
+      });
+
       this.windowCollection.set(options.id, window);
 
       this.handleWindowEvents(options.id, window, options);
