@@ -1,6 +1,8 @@
 <br>
 <br>
-
+<p align="center">
+	LiveMoe
+</p>
 <p align="center">
 	<img height="200" src="./public/icon.png" alt="LiveMoe">
 </p>
