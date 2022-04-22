@@ -1,0 +1,12 @@
+body {
+  height: 100vh;
+  margin: 0;
+  background-color: transparent;
+  -webkit-app-region: drag;
+  user-select: none;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+}
