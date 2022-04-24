@@ -1,3 +1,3 @@
 export interface IEventBus {
-  dispatchEvent(...args: any[]): void;
+  dispatchEvent(...args: any[]): void
 }

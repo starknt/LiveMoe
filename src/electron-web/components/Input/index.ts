@@ -1,4 +1,4 @@
-import Input from './input';
-import './input.css';
+import Input from './input'
+import './input.css'
 
-export default Input;
+export default Input

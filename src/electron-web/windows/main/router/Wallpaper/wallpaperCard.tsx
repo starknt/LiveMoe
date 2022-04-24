@@ -1,19 +1,20 @@
-import Card, { CardProps } from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import { CardActionArea, Skeleton } from '@mui/material';
-import { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer';
-import TinyText from 'electron-web/components/TinyText';
-import React, { useState } from 'react';
+import type { CardProps } from '@mui/material/Card'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardMedia from '@mui/material/CardMedia'
+import { CardActionArea, Skeleton } from '@mui/material'
+import type { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer'
+import TinyText from 'electron-web/components/TinyText'
+import React, { useState } from 'react'
 
 interface WallpaperCardProps extends CardProps {
-  configuration: IWallpaperConfiguration;
-  playing?: boolean;
+  configuration: IWallpaperConfiguration
+  playing?: boolean
 }
 
 const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
   ({ configuration, playing = false, ...props }) => {
-    const [isLoading, setLoading] = useState(true);
+    const [isLoading, setLoading] = useState(true)
     return (
       <Card
         {...props}
@@ -24,6 +25,10 @@ const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
         }}
         elevation={playing ? 15 : 1}
         disabled={isLoading}
+        title={`
+          ${configuration.name} - ${configuration.rawConfiguration?.author ?? '未知作者'}
+        ${configuration.description ?? ''}
+        `}
       >
         <CardActionArea>
           <Skeleton
@@ -40,8 +45,8 @@ const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
             }}
             onLoad={() => {
               setTimeout(() => {
-                setLoading(false);
-              }, 500);
+                setLoading(false)
+              }, 500)
             }}
             onError={() => setLoading(true)}
             component="img"
@@ -83,8 +88,8 @@ const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
           </CardContent>
         </CardActionArea>
       </Card>
-    );
-  }
-);
+    )
+  },
+)
 
-export default WallpaperCard;
+export default WallpaperCard

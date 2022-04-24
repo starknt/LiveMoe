@@ -1,13 +1,13 @@
-import { dev } from 'common/electron-common/environment';
-import {
+import { dev } from 'common/electron-common/environment'
+import type {
   BrowserViewConstructorOptions,
   BrowserWindowConstructorOptions,
-} from 'electron';
-import { resolvePreloadPath } from 'electron-main/utils';
+} from 'electron'
+import { resolvePreloadPath } from 'electron-main/utils'
 
-export type IWallpaperPlayerViewConfiguration = BrowserViewConstructorOptions;
+export type IWallpaperPlayerViewConfiguration = BrowserViewConstructorOptions
 export type IWallpaperPlayerWindowConfiguration =
-  BrowserWindowConstructorOptions;
+  BrowserWindowConstructorOptions
 
 const WindowConfiguration: BrowserWindowConstructorOptions = {
   show: false,
@@ -22,15 +22,15 @@ const WindowConfiguration: BrowserWindowConstructorOptions = {
     contextIsolation: true,
     preload: resolvePreloadPath('service'),
   },
-};
+}
 
 export function mergeWindowConfiguration(
   ...options: BrowserWindowConstructorOptions[]
-): BrowserWindowConstructorOptions;
+): BrowserWindowConstructorOptions
 export function mergeWindowConfiguration(
   ...options: BrowserWindowConstructorOptions[]
 ): BrowserWindowConstructorOptions {
-  return Object.assign(WindowConfiguration, ...options);
+  return Object.assign(WindowConfiguration, ...options)
 }
 
 const WallpaperPlayerViewConfiguration: IWallpaperPlayerViewConfiguration = {
@@ -49,10 +49,10 @@ const WallpaperPlayerViewConfiguration: IWallpaperPlayerViewConfiguration = {
     experimentalFeatures: true,
     preload: resolvePreloadPath('wallpaper'),
   },
-};
+}
 
-const WallpaperPlayerWindowConfiguration: IWallpaperPlayerWindowConfiguration =
-  {
+const WallpaperPlayerWindowConfiguration: IWallpaperPlayerWindowConfiguration
+  = {
     title: 'LiveMoe - WallpaperEngine',
     x: 0,
     y: 0,
@@ -75,26 +75,26 @@ const WallpaperPlayerWindowConfiguration: IWallpaperPlayerWindowConfiguration =
     fullscreen: true,
     resizable: false,
     type: 'desktop',
-  };
+  }
 
 const MainWindowConfiguration: BrowserWindowConstructorOptions = {
   width: 1200,
   height: 720,
   minWidth: 720,
   minHeight: 360,
-};
+}
 
 const SettingWindowConfiguration: BrowserWindowConstructorOptions = {
   width: 720,
   height: 360,
   resizable: false,
-};
+}
 
-const DialogWindowConfiguration: BrowserWindowConstructorOptions = {};
+const DialogWindowConfiguration: BrowserWindowConstructorOptions = {}
 
 export {
   WallpaperPlayerViewConfiguration,
   WallpaperPlayerWindowConfiguration,
   MainWindowConfiguration,
   SettingWindowConfiguration,
-};
+}

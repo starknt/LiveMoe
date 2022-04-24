@@ -1,0 +1,13 @@
+{
+  "extends": "@antfu",
+  "rules": {
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "react/prop-types": [
+      "off"
+    ],
+    "react/display-name": "off",
+    "no-console": "off",
+    "import/export": "off"
+  }
+}

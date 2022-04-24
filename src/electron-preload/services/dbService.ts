@@ -1,16 +1,16 @@
-import { IChannel } from 'common/electron-common';
-import {
+import type { IChannel } from 'common/electron-common'
+import type {
+  DBError,
   DatabaseNamespace,
   Doc,
   DocRes,
-  DBError,
-} from 'common/electron-common/database';
-import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows';
-import { LiveMoe } from 'livemoe';
+} from 'common/electron-common/database'
+import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
+import type { LiveMoe } from 'livemoe'
 
 const createDatabaseService = (dbService: IChannel): LiveMoe.DbService => {
   function getDocId(...args: Array<string>): string {
-    return args.join('/');
+    return args.join('/')
   }
 
   function createNamespace(spaceName: string): DatabaseNamespace {
@@ -22,11 +22,11 @@ const createDatabaseService = (dbService: IChannel): LiveMoe.DbService => {
             type: WINDOW_MESSAGE_TYPE.IPC_CALL,
             event: 'put',
             arg: [spaceName, doc],
-          }
-        );
-        return result;
+          },
+        )
+        return result
       },
-      get: async (id: string) => {
+      get: async(id: string) => {
         try {
           const result: DocRes = await dbService.call(
             WINDOW_MESSAGE_TYPE.IPC_CALL,
@@ -34,16 +34,17 @@ const createDatabaseService = (dbService: IChannel): LiveMoe.DbService => {
               type: WINDOW_MESSAGE_TYPE.IPC_CALL,
               event: 'get',
               arg: [spaceName, id],
-            }
-          );
+            },
+          )
 
-          return result;
-        } catch {
-          return null;
+          return result
+        }
+        catch {
+          return null
         }
       },
       remove: async <T>(doc: Doc<T>) => {
-        doc._id = getDocId(spaceName, doc._id);
+        doc._id = getDocId(spaceName, doc._id)
 
         const result: DocRes = await dbService.call(
           WINDOW_MESSAGE_TYPE.IPC_CALL,
@@ -51,15 +52,15 @@ const createDatabaseService = (dbService: IChannel): LiveMoe.DbService => {
             type: WINDOW_MESSAGE_TYPE.IPC_CALL,
             event: 'remove',
             arg: [doc],
-          }
-        );
-        return result;
+          },
+        )
+        return result
       },
-      bulkDocs: async (docs: Doc<any>[]) => {
+      bulkDocs: async(docs: Doc<any>[]) => {
         docs = docs.map((doc) => {
-          doc._id = getDocId(spaceName, doc._id);
-          return doc;
-        });
+          doc._id = getDocId(spaceName, doc._id)
+          return doc
+        })
 
         const result: DocRes[] = await dbService.call(
           WINDOW_MESSAGE_TYPE.IPC_CALL,
@@ -67,39 +68,39 @@ const createDatabaseService = (dbService: IChannel): LiveMoe.DbService => {
             type: WINDOW_MESSAGE_TYPE.IPC_CALL,
             event: 'bulkDocs',
             arg: [docs],
-          }
-        );
-        return result;
+          },
+        )
+        return result
       },
-      allDocs: async (namespace?: string) => {
+      allDocs: async(namespace?: string) => {
         const result: DocRes[] = await dbService.call(
           WINDOW_MESSAGE_TYPE.IPC_CALL,
           {
             type: WINDOW_MESSAGE_TYPE.IPC_CALL,
             event: 'allDocs',
             arg: [namespace ?? spaceName],
-          }
-        );
-        return result;
+          },
+        )
+        return result
       },
       changes: (options) => {
         return dbService.listen(WINDOW_MESSAGE_TYPE.IPC_LISTEN, {
           type: WINDOW_MESSAGE_TYPE.IPC_LISTEN,
           event: 'changes',
           arg: [spaceName, options],
-        });
+        })
       },
       getNamespace: (spaceName) => {
-        return createNamespace(spaceName);
+        return createNamespace(spaceName)
       },
-    };
+    }
   }
 
   return {
-    getNamespace: async (spaceName) => {
-      return createNamespace(spaceName);
+    getNamespace: async(spaceName) => {
+      return createNamespace(spaceName)
     },
-  };
-};
+  }
+}
 
-export default createDatabaseService;
+export default createDatabaseService

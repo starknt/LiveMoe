@@ -1,10 +1,10 @@
-import { Emitter } from 'common/electron-common/base/event';
-import { CPUUsage, ProcessMemoryInfo, SystemMemoryInfo } from 'electron';
+import { Emitter } from 'common/electron-common/base/event'
+import type { CPUUsage, ProcessMemoryInfo, SystemMemoryInfo } from 'electron'
 
 export async function getApplicationUsage() {
-  const cpuUsage = process.getCPUUsage();
-  const memoryUsage = await process.getProcessMemoryInfo();
-  const systemMemoryInfo = process.getSystemMemoryInfo();
+  const cpuUsage = process.getCPUUsage()
+  const memoryUsage = await process.getProcessMemoryInfo()
+  const systemMemoryInfo = process.getSystemMemoryInfo()
 
   return {
     cup: cpuUsage,
@@ -12,21 +12,21 @@ export async function getApplicationUsage() {
       process: memoryUsage,
       system: systemMemoryInfo,
     },
-  };
+  }
 }
 
-const useageEmitter = new Emitter<Promise<Usage>>();
+const useageEmitter = new Emitter<Promise<Usage>>()
 
 setInterval(() => {
-  useageEmitter.fire(getApplicationUsage());
+  useageEmitter.fire(getApplicationUsage())
 }, 60 * 1000)
 
-export const onApplcationUsage = useageEmitter.event;
+export const onApplcationUsage = useageEmitter.event
 
 export interface Usage {
-  cup: CPUUsage;
+  cup: CPUUsage
   memory: {
-    process: ProcessMemoryInfo;
-    system: SystemMemoryInfo;
-  };
+    process: ProcessMemoryInfo
+    system: SystemMemoryInfo
+  }
 }

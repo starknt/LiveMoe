@@ -1,10 +1,10 @@
-import type { EventPreloadType, WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows';
-import { IWindow } from 'electron-main/common/windows';
-import { IWindowOptions } from 'electron-main/core/windowManager/WindowPool';
-import { resolveHtmlPath } from 'electron-main/utils';
+import type { EventPreloadType, WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
+import type { IWindow } from 'electron-main/common/windows'
+import type { IWindowOptions } from 'electron-main/core/windowManager/WindowPool'
+import { resolveHtmlPath } from 'electron-main/utils'
 
 export default class SettingWindow {
-  static readonly id = 'setting';
+  static readonly id = 'setting'
 
   static readonly configuration: IWindowOptions = {
     id: SettingWindow.id,
@@ -17,7 +17,7 @@ export default class SettingWindow {
     fullscreenable: false,
     path: resolveHtmlPath(SettingWindow.id),
     logic: SettingWindow.logic,
-  };
+  }
 
   /**
    * 该函数会在创建窗口时注入到窗口中
@@ -28,47 +28,46 @@ export default class SettingWindow {
       this,
       'handleCommand',
       (_: WINDOW_MESSAGE_TYPE, preload: EventPreloadType): any => {
-        const { event: command, reply } = preload;
+        const { event: command, reply } = preload
         switch (command) {
           case 'toggle':
-            this.toggle();
-            break;
+            this.toggle()
+            break
           case 'show':
-            this.show();
-            break;
+            this.show()
+            break
           case 'hide':
-            this.hide();
-            break;
+            this.hide()
+            break
           case 'min':
-            this.minimize();
-            break;
+            this.minimize()
+            break
           case 'max':
-            this.maximize();
-            break;
+            this.maximize()
+            break
           case 'fullscreen':
-            this.setFullScreen(true);
-            break;
+            this.setFullScreen(true)
+            break
           case 'exitFullscreen':
-            this.setFullScreen(false);
-            break;
+            this.setFullScreen(false)
+            break
           case 'exit':
-            break;
+            break
           default:
-            return -1;
+            return -1
         }
 
-        if (reply) {
-          reply(true);
-        }
-      }
-    );
+        if (reply)
+          reply(true)
+      },
+    )
 
     Reflect.set(
       this,
       'processEvents',
       (event: WINDOW_MESSAGE_TYPE, preload: EventPreloadType): any => {
-        Reflect.get(this, 'handleCommand')(event, preload);
-      }
-    );
+        Reflect.get(this, 'handleCommand')(event, preload)
+      },
+    )
   }
 }

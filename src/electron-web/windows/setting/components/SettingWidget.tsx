@@ -1,52 +1,55 @@
+import type {
+  BoxProps,
+  CheckboxProps,
+  TypographyProps,
+} from '@mui/material'
 import {
   Box,
-  BoxProps,
   Button,
   Checkbox,
-  CheckboxProps,
   Divider,
   IconButton,
-  styled,
   Tooltip,
   Typography,
-  TypographyProps,
-} from '@mui/material';
-import TinyText from 'electron-web/components/TinyText';
-import RadioButtonUncheckedRoundedIcon from '@mui/icons-material/RadioButtonUncheckedRounded';
-import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
-import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
-import React, { useCallback } from 'react';
-import useMemoizedFn from 'electron-web/hooks/useMemoFn';
-import { useAppStore } from 'electron-web/store/store';
+  styled,
+} from '@mui/material'
+import TinyText from 'electron-web/components/TinyText'
+import RadioButtonUncheckedRoundedIcon from '@mui/icons-material/RadioButtonUncheckedRounded'
+import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded'
+import HelpRoundedIcon from '@mui/icons-material/HelpRounded'
+import React, { useCallback } from 'react'
+import useMemoizedFn from 'electron-web/hooks/useMemoFn'
+import { useAppStore } from 'electron-web/store/store'
 
-export const SettingWidget = styled('div')(({}) => ({
+export const SettingWidget = styled('div')(() => ({
   '--widget-gap': '8px',
-  padding: 'var(--widget-gap)',
-  width: 'calc( 100% - 2 * var(--widget-gap) )',
-  maxWidth: '100%',
-  height: 'calc( 100% - 2 * var(--widget-gap) )',
-  maxHeight: '100%',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-}));
+  'padding': 'var(--widget-gap)',
+  'width': 'calc( 100% - 2 * var(--widget-gap) )',
+  'maxWidth': '100%',
+  'height': 'calc( 100% - 2 * var(--widget-gap) )',
+  'maxHeight': '100%',
+  'display': 'flex',
+  'justifyContent': 'center',
+  'alignItems': 'center',
+}))
 
-const CenterBox = styled(Box)(({}) => ({
+const CenterBox = styled(Box)(() => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-}));
+}))
 
 const SettingBox: React.FC<BoxProps> = ({ children, ...props }) => {
-  const childrenCount = React.Children.count(children);
+  const childrenCount = React.Children.count(children)
 
   const renderTwoElementInLine = useMemoizedFn(
     (
-      childrens: (React.ReactChild | React.ReactFragment | React.ReactPortal)[]
+      childrens: (React.ReactChild | React.ReactFragment | React.ReactPortal)[],
     ): any => {
-      if (childrens.length <= 0) return '';
+      if (childrens.length <= 0)
+        return ''
 
-      const ElementInLine = childrens.splice(0, 2);
+      const ElementInLine = childrens.splice(0, 2)
 
       return (
         <>
@@ -60,14 +63,14 @@ const SettingBox: React.FC<BoxProps> = ({ children, ...props }) => {
             }}
           >
             {ElementInLine.map((child) => {
-              return child;
+              return child
             })}
           </Box>
           {childrens.length > 0 ? renderTwoElementInLine(childrens) : ''}
         </>
-      );
-    }
-  );
+      )
+    },
+  )
 
   return (
     <Box
@@ -84,8 +87,8 @@ const SettingBox: React.FC<BoxProps> = ({ children, ...props }) => {
         ? renderTwoElementInLine(React.Children.toArray(children))
         : children}
     </Box>
-  );
-};
+  )
+}
 
 const SettingTypography: React.FC<TypographyProps> = ({
   children,
@@ -95,11 +98,11 @@ const SettingTypography: React.FC<TypographyProps> = ({
     <Typography sx={{ fontSize: '0.85rem', fontWeight: '550' }} {...props}>
       {children}
     </Typography>
-  );
-};
+  )
+}
 
 export interface SettingCheckboxProps extends CheckboxProps {
-  help?: string;
+  help?: string
 }
 
 const SettingCheckbox: React.FC<SettingCheckboxProps> = ({
@@ -122,21 +125,22 @@ const SettingCheckbox: React.FC<SettingCheckboxProps> = ({
         checkedIcon={<CheckCircleOutlineRoundedIcon />}
       />
       <div>{children}</div>
-      {props.help ? (
+      {props.help
+        ? (
         <Tooltip followCursor title={props.help}>
           <IconButton
             sx={{
-              padding: 0,
-              position: 'absolute',
-              top: '6px',
-              right: 'calc( -0.75rem )',
-              display: 'inline-flex',
-              color: 'gray.700',
-              cursor: 'default',
+              'padding': 0,
+              'position': 'absolute',
+              'top': '6px',
+              'right': 'calc( -0.75rem )',
+              'display': 'inline-flex',
+              'color': 'gray.700',
+              'cursor': 'default',
               ':hover': {
                 color: 'skyblue',
               },
-              fontSize: '0.85rem',
+              'fontSize': '0.85rem',
             }}
             className="non-draggable"
             disableFocusRipple
@@ -145,12 +149,13 @@ const SettingCheckbox: React.FC<SettingCheckboxProps> = ({
             <HelpRoundedIcon sx={{ fontSize: 'inherit' }} />
           </IconButton>
         </Tooltip>
-      ) : (
-        ''
-      )}
+          )
+        : (
+            ''
+          )}
     </Box>
-  );
-};
+  )
+}
 
 const SettingWallpaperStore: React.FC<{ path?: string }> = ({
   children,
@@ -175,51 +180,52 @@ const SettingWallpaperStore: React.FC<{ path?: string }> = ({
       </Box>
       <Box sx={{ display: 'flex', gap: '1rem', mt: '1rem' }}>
         {React.Children.map(children, (child: React.ReactNode) => {
-          if (!React.isValidElement(child)) return '';
+          if (!React.isValidElement(child))
+            return ''
 
           return React.cloneElement(child as React.ReactElement, {
             ...(child as React.ReactElement).props,
             className: 'non-draggable',
-          });
+          })
         })}
       </Box>
     </Box>
-  );
-};
+  )
+}
 
 export default function Setting() {
-  const store = useAppStore();
+  const store = useAppStore()
 
-  const appConfiguration = store.applicationConfiguration;
-  const playerConfiguration = store.playerConfiguration;
+  const appConfiguration = store.applicationConfiguration
+  const playerConfiguration = store.playerConfiguration
 
   const handleSelfStartChange = useCallback(
     (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      const { state, ...config } = appConfiguration;
+      const { state, ...config } = appConfiguration
 
       window.livemoe?.applicationService.setConfiguration({
         ...config,
         selfStartup: checked,
-      });
+      })
     },
-    [appConfiguration]
-  );
+    [appConfiguration],
+  )
 
   const handleColdStartupChange = useCallback(
     (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      const { state, ...config } = appConfiguration;
+      const { state, ...config } = appConfiguration
 
       window.livemoe?.applicationService.setConfiguration({
         ...config,
         coldStartup: checked,
-      });
+      })
     },
-    [appConfiguration]
-  );
+    [appConfiguration],
+  )
 
   const handleCloseChange = useCallback(
     (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      const { state, ...config } = appConfiguration;
+      const { state, ...config } = appConfiguration
 
       window.livemoe?.applicationService.setConfiguration({
         ...config,
@@ -227,50 +233,50 @@ export default function Setting() {
           ...config.closeAction,
           action: checked ? 'exit' : 'hide',
         },
-      });
+      })
     },
-    [appConfiguration]
-  );
+    [appConfiguration],
+  )
 
   const handleAutoupdateChange = useCallback(
     (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      const { state, ...config } = appConfiguration;
+      const { state, ...config } = appConfiguration
 
       window.livemoe?.applicationService.setConfiguration({
         ...config,
         autoUpdate: checked,
-      });
+      })
     },
-    [appConfiguration]
-  );
+    [appConfiguration],
+  )
 
   const handleUpdateTipChange = useCallback(
     (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      const { state, ...config } = appConfiguration;
+      const { state, ...config } = appConfiguration
 
       window.livemoe?.applicationService.setConfiguration({
         ...config,
         updateTips: checked,
-      });
+      })
     },
-    [appConfiguration]
-  );
+    [appConfiguration],
+  )
 
   const handleOpenWallpaperRepository = useCallback(() => {
-    window?.livemoe?.guiService.openFolder(appConfiguration.resourcePath);
-  }, [appConfiguration]);
+    window?.livemoe?.guiService.openFolder(appConfiguration.resourcePath)
+  }, [appConfiguration])
 
-  const handleChangeWallpaperRepository = useCallback(() => {}, []);
+  const handleChangeWallpaperRepository = useCallback(() => {}, [])
 
   const handleViewModeChange = useCallback(
     (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
       window.livemoe?.wallpaperPlayerService.setConfiguration({
         ...playerConfiguration.configuration,
         viewMode: checked,
-      });
+      })
     },
-    [playerConfiguration]
-  );
+    [playerConfiguration],
+  )
 
   const handleWallpaperPlayerPause = useCallback(
     (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
@@ -280,10 +286,10 @@ export default function Setting() {
           ...playerConfiguration.configuration.userSettings,
           background: checked ? 'pause' : 'play',
         },
-      });
+      })
     },
-    [playerConfiguration]
-  );
+    [playerConfiguration],
+  )
 
   return (
     <SettingWidget>
@@ -395,8 +401,8 @@ export default function Setting() {
             <SettingCheckbox
               onChange={handleWallpaperPlayerPause}
               checked={
-                playerConfiguration.configuration.userSettings.background ===
-                'pause'
+                playerConfiguration.configuration.userSettings.background
+                === 'pause'
               }
               help="当其他应用进入全屏状态时, 是否应用暂停壁纸的播放"
             >
@@ -416,5 +422,5 @@ export default function Setting() {
         <Box gridColumn="span 12"></Box>
       </Box>
     </SettingWidget>
-  );
+  )
 }

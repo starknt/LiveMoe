@@ -3,36 +3,37 @@ import {
   ListItemText,
   MenuItem,
   Typography,
-} from '@mui/material';
-import { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer';
-import useAsyncEffect from 'electron-web/hooks/useAsyncEffect';
-import DesktopWindowsRoundedIcon from '@mui/icons-material/DesktopWindowsRounded';
-import { useEffect, useState } from 'react';
-import { useAppStore } from 'electron-web/store/store';
-import { PlayerInitalizeState } from 'electron-web/features/playerSlice';
+} from '@mui/material'
+import type { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer'
+import useAsyncEffect from 'electron-web/hooks/useAsyncEffect'
+import DesktopWindowsRoundedIcon from '@mui/icons-material/DesktopWindowsRounded'
+import { useEffect, useState } from 'react'
+import { useAppStore } from 'electron-web/store/store'
+import { PlayerInitalizeState } from 'electron-web/features/playerSlice'
 
 export default function Status() {
-  const store = useAppStore();
+  const store = useAppStore()
 
-  const [playing, setPlaying] = useState<IWallpaperConfiguration | null>(null);
+  const [playing, setPlaying] = useState<IWallpaperConfiguration | null>(null)
 
   useEffect(() => {
     if (store.playerConfiguration.state === PlayerInitalizeState.INITIALIZING) {
       setPlaying(
-        store.playerConfiguration.configuration.wallpaperConfiguration
-      );
+        store.playerConfiguration.configuration.wallpaperConfiguration,
+      )
     }
-  }, [store.playerConfiguration]);
+  }, [store.playerConfiguration])
 
-  useAsyncEffect(async () => {
-    if (!window.livemoe) return;
+  useAsyncEffect(async() => {
+    if (!window.livemoe)
+      return
 
-    const onPlay = await window.livemoe.wallpaperPlayerService.onPlay();
+    const onPlay = await window.livemoe.wallpaperPlayerService.onPlay()
 
     onPlay((configuration) => {
-      setPlaying(configuration);
-    });
-  }, [window.livemoe]);
+      setPlaying(configuration)
+    })
+  }, [window.livemoe])
 
   return (
     <MenuItem disabled>
@@ -45,5 +46,5 @@ export default function Status() {
         </Typography>
       </ListItemText>
     </MenuItem>
-  );
+  )
 }

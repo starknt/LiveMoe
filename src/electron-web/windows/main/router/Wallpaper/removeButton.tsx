@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
-import './removeButton.css';
+import React, { useState } from 'react'
+import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded'
+import './removeButton.css'
 
 interface WallpaperRemoveBtn {
-  check?: boolean;
-  id: number;
-  onChange: (value: boolean) => void;
+  check?: boolean
+  id: number
+  onChange: (value: boolean) => void
 }
 
 const WallpaperRemoveButton: React.FC<WallpaperRemoveBtn> = ({
@@ -13,7 +13,7 @@ const WallpaperRemoveButton: React.FC<WallpaperRemoveBtn> = ({
   onChange,
   check,
 }) => {
-  const [checked, setChecked] = useState<boolean>(check || false);
+  const [checked, setChecked] = useState<boolean>(check || false)
 
   return (
     <label
@@ -28,20 +28,21 @@ const WallpaperRemoveButton: React.FC<WallpaperRemoveBtn> = ({
         type="checkbox"
         onChange={(e) => {
           if (e.target.checked) {
-            setChecked(true);
-            onChange(true);
-          } else {
-            setChecked(false);
-            onChange(false);
+            setChecked(true)
+            onChange(true)
+          }
+          else {
+            setChecked(false)
+            onChange(false)
           }
         }}
       />
     </label>
-  );
-};
+  )
+}
 
 WallpaperRemoveButton.defaultProps = {
   check: false,
-};
+}
 
-export default WallpaperRemoveButton;
+export default WallpaperRemoveButton

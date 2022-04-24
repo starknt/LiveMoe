@@ -1,77 +1,76 @@
-import { Service } from 'common/electron-common';
-import { IPCMainServer } from 'common/electron-main';
-import Application from 'electron-main/Application';
+import path from 'path'
+import { Service } from 'common/electron-common'
+import type { IPCMainServer } from 'common/electron-main'
+import type Application from 'electron-main/Application'
 import type {
-  DatabaseNamespace,
   DBError,
+  DatabaseNamespace,
   Doc,
   DocRes,
-} from 'common/electron-common/database';
-import path from 'path';
-import PouchDB from 'pouchdb';
-import { Emitter, Event } from 'common/electron-common/base/event';
+} from 'common/electron-common/database'
+import PouchDB from 'pouchdb'
+import { Emitter, Event } from 'common/electron-common/base/event'
+import type { EventPreloadType } from 'common/electron-common/windows'
 import {
-  EventPreloadType,
   WINDOW_MESSAGE_TYPE,
-} from 'common/electron-common/windows';
+} from 'common/electron-common/windows'
 
 export default class DataBase {
-  private static instance: DataBase | null = null;
+  private static instance: DataBase | null = null
 
-  private readonly channelName = 'lm:db';
+  private readonly channelName = 'lm:db'
 
-  private readonly service = new Service();
+  private readonly service = new Service()
 
-  private db!: PouchDB.Database;
+  private db!: PouchDB.Database
 
-  private readonly docMaxByteLength = 1024 * 1024 * 2; // 2 MB
+  private readonly docMaxByteLength = 1024 * 1024 * 2 // 2 MB
 
   public static getInstance(
     dataPath: string,
     server: IPCMainServer,
     application: Application,
-    dataName = 'database'
+    dataName = 'database',
   ): DataBase {
-    if (DataBase.instance === null) {
-      DataBase.instance = new DataBase(dataPath, server, application, dataName);
-    }
+    if (DataBase.instance === null)
+      DataBase.instance = new DataBase(dataPath, server, application, dataName)
 
-    return DataBase.instance;
+    return DataBase.instance
   }
 
   private constructor(
     private readonly dataPath: string,
     private readonly server: IPCMainServer,
     private readonly application: Application,
-    private readonly dataName = 'database'
+    private readonly dataName = 'database',
   ) {
-    this.init();
+    this.init()
   }
 
   async init() {
     this.db = new PouchDB(path.join(this.dataPath, this.dataName), {
       auto_compaction: true,
-    });
+    })
 
-    this.db.setMaxListeners(Infinity);
+    this.db.setMaxListeners(Infinity)
 
-    console.info('database info: ', await this.db.info());
+    console.info('database info: ', await this.db.info())
 
-    this.initalizeService();
+    this.initalizeService()
   }
 
   errorInfo(name: string, message: string): DBError {
-    return { error: true, name, message };
+    return { error: true, name, message }
   }
 
   private checkDocSize<T>(doc: Doc<T>) {
     if (Buffer.byteLength(JSON.stringify(doc)) > this.docMaxByteLength) {
       return this.errorInfo(
         'exception',
-        `doc max size ${this.docMaxByteLength / 1024 / 1024} M`
-      );
+        `doc max size ${this.docMaxByteLength / 1024 / 1024} M`,
+      )
     }
-    return false;
+    return false
   }
 
   /**
@@ -82,110 +81,114 @@ export default class DataBase {
    *
    */
   getNamespace(spaceName: string) {
-    return this.createNamespace(spaceName);
+    return this.createNamespace(spaceName)
   }
 
   private initalizeService() {
-    this.server.registerChannel(this.channelName, this.service);
+    this.server.registerChannel(this.channelName, this.service)
 
     this.application.registerEvent(this.channelName, (type, preload) => {
       switch (type) {
         case WINDOW_MESSAGE_TYPE.WINDOW_CALL:
-          return this.dispatchCallEvent(preload);
+          return this.dispatchCallEvent(preload)
         case WINDOW_MESSAGE_TYPE.WINDOW_LISTEN:
-          return this.dispatchListenEvent(preload);
+          return this.dispatchListenEvent(preload)
       }
 
-      return null ?? Event.None;
-    });
+      return null ?? Event.None
+    })
 
     this.service.registerCaller(
       WINDOW_MESSAGE_TYPE.IPC_CALL,
-      async (preload: EventPreloadType) => {
-        console.log('ipc call', preload);
-        const result = await this.dispatchCallEvent(preload);
-        console.log('ipc call result', result);
-        return result;
-      }
-    );
+      async(preload: EventPreloadType) => {
+        console.log('ipc call', preload)
+        const result = await this.dispatchCallEvent(preload)
+        console.log('ipc call result', result)
+        return result
+      },
+    )
 
     this.service.registerListener(
       WINDOW_MESSAGE_TYPE.IPC_LISTEN,
       (preload: EventPreloadType) => {
-        return this.dispatchListenEvent(preload);
-      }
-    );
+        return this.dispatchListenEvent(preload)
+      },
+    )
   }
 
   private async dispatchCallEvent(preload: EventPreloadType) {
     switch (preload.event) {
       case 'put': {
         if (Array.isArray(preload.arg)) {
-          const id = preload.arg[0] as string;
-          const doc = preload.arg[1] as Doc<any>;
+          const id = preload.arg[0] as string
+          const doc = preload.arg[1] as Doc<any>
 
-          if (!id && !doc) return null;
+          if (!id && !doc)
+            return null
 
-          const result = await this.put(id, doc);
+          const result = await this.put(id, doc)
 
-          return result;
+          return result
         }
 
-        return null;
+        return null
       }
       case 'get': {
         if (Array.isArray(preload.arg)) {
-          const spaceName: string = preload.arg[0] as string;
-          const id: string = preload.arg[1] as string;
+          const spaceName: string = preload.arg[0] as string
+          const id: string = preload.arg[1] as string
 
-          if (!id && !spaceName) return null;
+          if (!id && !spaceName)
+            return null
 
-          const result = await this.get(spaceName, id);
+          const result = await this.get(spaceName, id)
 
-          return result;
+          return result
         }
 
-        return null;
+        return null
       }
       case 'remove': {
         if (Array.isArray(preload.arg)) {
-          const doc = preload.arg[0] as Doc<any>;
+          const doc = preload.arg[0] as Doc<any>
 
-          if (!doc) return null;
+          if (!doc)
+            return null
 
-          const result = await this.remove(doc);
+          const result = await this.remove(doc)
 
-          return result;
+          return result
         }
 
-        return null;
+        return null
       }
       case 'bulkDocs': {
         if (Array.isArray(preload.arg)) {
-          const docs = preload.arg[0] as Doc<any>[];
+          const docs = preload.arg[0] as Doc<any>[]
 
-          if (!docs) return null;
+          if (!docs)
+            return null
 
-          const result = await this.bulkDocs(docs);
+          const result = await this.bulkDocs(docs)
 
-          return result;
+          return result
         }
 
-        return [];
+        return []
       }
       case 'allDocs': {
         if (Array.isArray(preload.arg)) {
-          const spaceName = preload.arg[0] as string;
+          const spaceName = preload.arg[0] as string
 
-          const result = await this.allDocs(spaceName);
+          const result = await this.allDocs(spaceName)
 
-          return result;
+          return result
         }
 
-        return null;
+        return null
       }
       default:
-        return null;
+        return null
     }
   }
 
@@ -193,20 +196,21 @@ export default class DataBase {
     switch (preload.event) {
       case 'changes': {
         if (Array.isArray(preload.arg)) {
-          const spaceName = preload.arg[0] as string;
-          const options = preload.arg[1] as PouchDB.Core.ChangesOptions;
+          const spaceName = preload.arg[0] as string
+          const options = preload.arg[1] as PouchDB.Core.ChangesOptions
 
-          if (!spaceName) return Event.None;
+          if (!spaceName)
+            return Event.None
 
-          const result = this.changes(spaceName, options);
+          const result = this.changes(spaceName, options)
 
-          return result;
+          return result
         }
 
-        return Event.None;
+        return Event.None
       }
       default:
-        return Event.None;
+        return Event.None
     }
   }
 
@@ -214,97 +218,101 @@ export default class DataBase {
     return {
       put: async <T>(doc: Doc<T>) => {
         try {
-          const result = await this.put(spaceName, doc);
-          return result;
-        } catch (e: any) {
+          const result = await this.put(spaceName, doc)
+          return result
+        }
+        catch (e: any) {
           return {
             id: this.getDocId(spaceName, doc._id),
             name: e.name,
             error: !0,
             message: e.message,
-          };
+          }
         }
       },
-      get: async (id: string) => {
+      get: async(id: string) => {
         try {
-          const result = await this.get(spaceName, id);
+          const result = await this.get(spaceName, id)
 
-          return result;
-        } catch {
-          return null;
+          return result
+        }
+        catch {
+          return null
         }
       },
       remove: async <T>(doc: Doc<T>) => {
-        return this.remove(doc, spaceName);
+        return this.remove(doc, spaceName)
       },
-      allDocs: async (namespace: string) => {
-        return await this.allDocs(namespace);
+      allDocs: async(namespace: string) => {
+        return await this.allDocs(namespace)
       },
-      bulkDocs: async (docs: Doc<any>[]) => {
+      bulkDocs: async(docs: Doc<any>[]) => {
         docs = docs.map((doc) => {
-          doc._id = this.getDocId(spaceName, doc._id);
-          return doc;
-        });
+          doc._id = this.getDocId(spaceName, doc._id)
+          return doc
+        })
 
-        return await this.bulkDocs(docs);
+        return await this.bulkDocs(docs)
       },
       getNamespace: (spaceName) => {
-        return this.getNamespace(spaceName);
+        return this.getNamespace(spaceName)
       },
       changes: (
-        options?: PouchDB.Core.ChangesOptions | undefined
+        options?: PouchDB.Core.ChangesOptions | undefined,
       ): Event<PouchDB.Core.ChangesResponseChange<{}>> => {
-        return this.changes(spaceName, options);
+        return this.changes(spaceName, options)
       },
-    };
+    }
   }
 
   async put<T>(name: string, doc: Doc<T>): Promise<DBError | DocRes> {
     try {
-      const id = this.getDocId(name, doc._id);
-      doc._id = id;
-      const result = await this.db.put(doc);
-      result.id = this.replaceDocId(name, result.id);
-      return result;
-    } catch (e: any) {
-      doc._id = this.replaceDocId(name, doc._id);
-      return { id: doc._id, name: e.name, error: !0, message: e.message };
+      const id = this.getDocId(name, doc._id)
+      doc._id = id
+      const result = await this.db.put(doc)
+      result.id = this.replaceDocId(name, result.id)
+      return result
+    }
+    catch (e: any) {
+      doc._id = this.replaceDocId(name, doc._id)
+      return { id: doc._id, name: e.name, error: !0, message: e.message }
     }
   }
 
   async get(spaceName: string, id: string): Promise<DocRes | null> {
     try {
-      const result: DocRes = await this.db.get(this.getDocId(spaceName, id));
-      result._id = this.replaceDocId(spaceName, result._id);
-      return result;
-    } catch (e) {
-      return null;
+      const result: DocRes = await this.db.get(this.getDocId(spaceName, id))
+      result._id = this.replaceDocId(spaceName, result._id)
+      return result
+    }
+    catch (e) {
+      return null
     }
   }
 
   async remove<T>(
     doc: Doc<T>,
-    spaceName?: string
+    spaceName?: string,
   ): Promise<DBError | DocRes<T>> {
     try {
       if (!doc._rev) {
         // throw new Error('doc._rev is required');
-        return this.errorInfo('exception', 'doc._rev is required');
+        return this.errorInfo('exception', 'doc._rev is required')
       }
-      if (spaceName) {
-        doc._id = this.getDocId(spaceName, doc._id);
-      }
+      if (spaceName)
+        doc._id = this.getDocId(spaceName, doc._id)
 
-      const result = await this.db.remove(doc as any);
-      return result;
-    } catch (e: any) {
-      return { id: doc._id, name: e.name, error: !0, message: e.message };
+      const result = await this.db.remove(doc as any)
+      return result
+    }
+    catch (e: any) {
+      return { id: doc._id, name: e.name, error: !0, message: e.message }
     }
   }
 
   async bulkDocs<T>(docs: Array<Doc<T>>): Promise<Array<DocRes | DBError>> {
     try {
-      const response = await this.db.bulkDocs(docs);
+      const response = await this.db.bulkDocs(docs)
 
       const result: Array<DocRes | DBError> = response.map((item, index) => {
         if ((<PouchDB.Core.Response>item).ok) {
@@ -313,37 +321,39 @@ export default class DataBase {
             _rev: item.rev ?? '',
             ok: (<PouchDB.Core.Response>item).ok ?? false,
             data: docs[index].data,
-          };
+          }
         }
 
-        item = <PouchDB.Core.Error>item;
+        item = <PouchDB.Core.Error>item
 
         return {
           _id: item.id ?? '',
           ...item,
-        } as DBError;
-      });
+        } as DBError
+      })
 
-      return result;
-    } catch (e: any) {
-      return [];
+      return result
+    }
+    catch (e: any) {
+      return []
     }
   }
 
   async allDocs(spaceName?: string): Promise<Array<DocRes>> {
     try {
-      let result: PouchDB.Core.AllDocsResponse<{}>;
+      let result: PouchDB.Core.AllDocsResponse<{}>
 
       if (spaceName) {
         result = await this.db.allDocs({
           include_docs: true,
           startkey: spaceName,
-          endkey: spaceName + '\uffff',
-        });
-      } else {
+          endkey: `${spaceName}\uFFFF`,
+        })
+      }
+      else {
         result = await this.db.allDocs({
           include_docs: true,
-        });
+        })
       }
 
       return result.rows.map((item) => {
@@ -351,20 +361,21 @@ export default class DataBase {
           _id: (<any>item).doc._id,
           _rev: (<any>item).doc._rev,
           data: (<any>item).doc.data,
-        };
-      });
-    } catch (e: any) {
-      return [];
+        }
+      })
+    }
+    catch (e: any) {
+      return []
     }
   }
 
   changes(
     spaceName: string,
-    options?: PouchDB.Core.ChangesOptions | undefined
+    options?: PouchDB.Core.ChangesOptions | undefined,
   ): Event<PouchDB.Core.ChangesResponseChange<{}>> {
     const namespaceChange = new Emitter<
       PouchDB.Core.ChangesResponseChange<{}>
-    >();
+    >()
     this.db
       .changes({
         ...options,
@@ -372,26 +383,26 @@ export default class DataBase {
         live: true,
         since: 'now',
         filter: (doc) => {
-          return doc._id.startsWith(spaceName);
+          return doc._id.startsWith(spaceName)
         },
       })
       .on('change', (value) => {
-        value.id = this.replaceDocId(spaceName, value.id);
-        namespaceChange.fire(value);
-      });
+        value.id = this.replaceDocId(spaceName, value.id)
+        namespaceChange.fire(value)
+      })
 
-    return namespaceChange.event;
+    return namespaceChange.event
   }
 
   private getDocId(...args: Array<string>): string {
-    return args.join('/');
+    return args.join('/')
   }
 
   private replaceDocId(name: string, id: string): string {
-    return id.replace(`${name}/`, '');
+    return id.replace(`${name}/`, '')
   }
 
   async destroy(): Promise<void> {
-    return await this.db.close();
+    return await this.db.close()
   }
 }

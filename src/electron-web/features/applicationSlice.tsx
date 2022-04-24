@@ -1,6 +1,6 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { IApplicationConfiguration } from 'common/electron-common/application';
-import { retry } from 'common/electron-common/utils';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import type { IApplicationConfiguration } from 'common/electron-common/application'
+import { retry } from 'common/electron-common/utils'
 
 export const enum InitalizeState {
   INITIALIZING = 'INITIALIZING',
@@ -31,24 +31,24 @@ const initialState: IApplicationConfiguration & { state: InitalizeState } = {
       v8: 'v1.0.0',
     },
   },
-};
+}
 
 export const initalizeApplicationState = createAsyncThunk(
   'application-configuration/initalize',
-  async () =>
+  async() =>
     await retry(
-      async () => {
-        const configuration =
-          await livemoe.applicationService.getConfiguration();
+      async() => {
+        const configuration
+          = await livemoe.applicationService.getConfiguration()
 
-        console.log(configuration);
+        console.log(configuration)
 
-        return configuration;
+        return configuration
       },
       3,
-      50
-    )
-);
+      50,
+    ),
+)
 
 const applicationConfiguration = createSlice({
   name: 'application-configuration',
@@ -64,25 +64,25 @@ const applicationConfiguration = createSlice({
         resourcePath,
         selfStartup,
         updateTips,
-      } = action.payload;
-      state.application = application;
-      state.autoUpdate = autoUpdate;
-      state.closeAction = closeAction;
-      state.coldStartup = coldStartup;
-      state.mode = mode;
-      state.resourcePath = resourcePath;
-      state.selfStartup = selfStartup;
-      state.updateTips = updateTips;
+      } = action.payload
+      state.application = application
+      state.autoUpdate = autoUpdate
+      state.closeAction = closeAction
+      state.coldStartup = coldStartup
+      state.mode = mode
+      state.resourcePath = resourcePath
+      state.selfStartup = selfStartup
+      state.updateTips = updateTips
     },
   },
   extraReducers: (builder) => {
     builder.addCase(initalizeApplicationState.pending, (state) => {
-      console.log('加载应用状态中...');
-      state.state = InitalizeState.LOADING;
-    });
+      console.log('加载应用状态中...')
+      state.state = InitalizeState.LOADING
+    })
     builder.addCase(initalizeApplicationState.fulfilled, (state, action) => {
-      console.log('获取应用状态成功', state, action);
-      state.state = InitalizeState.INITIALIZING;
+      console.log('获取应用状态成功', state, action)
+      state.state = InitalizeState.INITIALIZING
       const {
         application,
         autoUpdate,
@@ -92,25 +92,25 @@ const applicationConfiguration = createSlice({
         resourcePath,
         selfStartup,
         updateTips,
-      } = action.payload;
-      state.application = application;
-      state.autoUpdate = autoUpdate;
-      state.closeAction = closeAction;
-      state.coldStartup = coldStartup;
-      state.mode = mode;
-      state.resourcePath = resourcePath;
-      state.selfStartup = selfStartup;
-      state.updateTips = updateTips;
-    });
+      } = action.payload
+      state.application = application
+      state.autoUpdate = autoUpdate
+      state.closeAction = closeAction
+      state.coldStartup = coldStartup
+      state.mode = mode
+      state.resourcePath = resourcePath
+      state.selfStartup = selfStartup
+      state.updateTips = updateTips
+    })
     builder.addCase(initalizeApplicationState.rejected, (state) => {
-      console.log('尝试加载应用状态失败, 准备重试...');
-      state.state = InitalizeState.UNINITIALIZING;
-    });
+      console.log('尝试加载应用状态失败, 准备重试...')
+      state.state = InitalizeState.UNINITIALIZING
+    })
   },
-});
+})
 
-export const { updateConfigurationAll } = applicationConfiguration.actions;
+export const { updateConfigurationAll } = applicationConfiguration.actions
 
-const ApplicationConfigurationReducer = applicationConfiguration.reducer;
+const ApplicationConfigurationReducer = applicationConfiguration.reducer
 
-export default ApplicationConfigurationReducer;
+export default ApplicationConfigurationReducer
