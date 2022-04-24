@@ -1,89 +1,89 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react'
 import {
-  Skeleton,
   AppBar,
   Box,
-  Toolbar,
-  IconButton,
-  Typography,
-  Menu,
-  Container,
   Button,
-  MenuItem,
+  Container,
+  IconButton,
   ListItemIcon,
   ListItemText,
-} from '@mui/material';
-import MinimizeRoundedIcon from '@mui/icons-material/MinimizeRounded';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplicationsRounded';
-import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
-import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
-import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
-import { useNavigate } from 'react-router-dom';
-import About from '../about';
-import './index.css';
-import useToggle from 'electron-web/hooks/useToggle';
+  Menu,
+  MenuItem,
+  Skeleton,
+  Toolbar,
+  Typography,
+} from '@mui/material'
+import MinimizeRoundedIcon from '@mui/icons-material/MinimizeRounded'
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
+import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplicationsRounded'
+import InfoRoundedIcon from '@mui/icons-material/InfoRounded'
+import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded'
+import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
+import { useNavigate } from 'react-router-dom'
+import useToggle from 'electron-web/hooks/useToggle'
+import About from '../about'
+import './index.css'
 
-const pages = ['壁纸', '组件'];
-const settings = ['个人信息', '消息', '退出登录'];
+const pages = ['壁纸', '组件']
+const settings = ['个人信息', '消息', '退出登录']
 
 export default React.forwardRef((_, ref) => {
-  const navgation = useNavigate();
+  const navgation = useNavigate()
 
-  const [about, toggleAbout] = useToggle(false);
+  const [about, toggleAbout] = useToggle(false)
 
-  const [anchorElMenu, setAnchorElMenu] = useState<null | HTMLElement>(null);
-  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const [anchorElMenu, setAnchorElMenu] = useState<null | HTMLElement>(null)
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null)
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
+    setAnchorElUser(event.currentTarget)
+  }
 
   const handleOpenAppMenu = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
-      setAnchorElMenu(event.currentTarget);
+      setAnchorElMenu(event.currentTarget)
     },
-    []
-  );
+    [],
+  )
 
   const handleCloseAppMenu = useCallback(() => {
-    setAnchorElMenu(null);
-  }, []);
+    setAnchorElMenu(null)
+  }, [])
 
   const handleCloseUserMenu = useCallback(() => {
-    setAnchorElUser(null);
-  }, []);
+    setAnchorElUser(null)
+  }, [])
 
   const handleNavigate = useCallback(() => {
-    navgation('');
-  }, [navgation]);
+    navgation('')
+  }, [navgation])
 
   const handleBack = useCallback(() => {
-    navgation(-1);
-  }, []);
+    navgation(-1)
+  }, [])
 
   const handleRefresh = useCallback(() => {
-    window.location.reload();
-  }, []);
+    window.location.reload()
+  }, [])
 
   const handleMinimize = useCallback(() => {
-    window.livemoe.windowsService.sendWindowMessage('main', 'min');
-  }, []);
+    window.livemoe.windowsService.sendWindowMessage('main', 'min')
+  }, [])
 
   const handleClose = useCallback(() => {
-    window.livemoe.windowsService.sendWindowMessage('main', 'hide');
-  }, []);
+    window.livemoe.windowsService.sendWindowMessage('main', 'hide')
+  }, [])
 
   const handleToggleSetting = useCallback(() => {
-    window.livemoe.windowsService.toggleWindow('setting');
-    handleCloseAppMenu();
-  }, []);
+    window.livemoe.windowsService.toggleWindow('setting')
+    handleCloseAppMenu()
+  }, [])
 
   const handleToggleAbout = useCallback(() => {
-    handleCloseAppMenu();
-    toggleAbout();
-  }, []);
+    handleCloseAppMenu()
+    toggleAbout()
+  }, [])
 
   return (
     <AppBar
@@ -109,7 +109,7 @@ export default React.forwardRef((_, ref) => {
               paddingRight: 0,
             }}
           >
-            {pages.map((page) => (
+            {pages.map(page => (
               <Button
                 onClick={handleNavigate}
                 className="non-draggable"
@@ -147,7 +147,7 @@ export default React.forwardRef((_, ref) => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
+              {settings.map(setting => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
@@ -202,7 +202,7 @@ export default React.forwardRef((_, ref) => {
             <IconButton
               onClick={handleMinimize}
               sx={{
-                p: 1,
+                'p': 1,
                 ':hover': {
                   color: 'skyblue',
                 },
@@ -217,7 +217,7 @@ export default React.forwardRef((_, ref) => {
             <IconButton
               onClick={handleClose}
               sx={{
-                p: 1,
+                'p': 1,
                 ':hover': {
                   color: 'skyblue',
                 },
@@ -234,5 +234,5 @@ export default React.forwardRef((_, ref) => {
       </Container>
       <About open={about} onClose={() => toggleAbout()} />
     </AppBar>
-  );
-});
+  )
+})

@@ -1,9 +1,9 @@
-import React from 'react';
+import React from 'react'
 
 export interface ButtonProps {
-  Icon?: React.ReactNode;
-  onClick?: () => void;
-  select?: boolean;
+  Icon?: React.ReactNode
+  onClick?: () => void
+  select?: boolean
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -21,5 +21,5 @@ export const Button: React.FC<ButtonProps> = ({
       <i className="lm-wallpaper-btn-icon">{Icon}</i>
       {children}
     </button>
-  );
-};
+  )
+}

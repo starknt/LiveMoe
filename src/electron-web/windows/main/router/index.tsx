@@ -1,20 +1,21 @@
-import { Outlet, RouteObject } from 'react-router-dom';
-import Home from './Home';
-import NotMatch from './NotMatch';
-import Wallpaper from './Wallpaper';
-import { Container, Paper, useTheme } from '@mui/material';
-import AppBar from 'electron-web/windows/main/components/AppBar';
-import { useEffect, useRef } from 'react';
-import useUpdate from 'electron-web/hooks/useUpdate';
+import type { RouteObject } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
+import { Container, Paper, useTheme } from '@mui/material'
+import AppBar from 'electron-web/windows/main/components/AppBar'
+import { useEffect, useRef } from 'react'
+import useUpdate from 'electron-web/hooks/useUpdate'
+import Wallpaper from './Wallpaper'
+import NotMatch from './NotMatch'
+import Home from './Home'
 
 export function Layout() {
-  const theme = useTheme();
-  const ref = useRef<HTMLDivElement | null>(null);
-  const forceUpdate = useUpdate();
+  const theme = useTheme()
+  const ref = useRef<HTMLDivElement | null>(null)
+  const forceUpdate = useUpdate()
 
   useEffect(() => {
-    forceUpdate();
-  }, [ref]);
+    forceUpdate()
+  }, [ref])
 
   return (
     <Paper className="overflow-hidden" sx={{ borderRadius: 'inherit' }}>
@@ -38,7 +39,7 @@ export function Layout() {
         </Container>
       </Paper>
     </Paper>
-  );
+  )
 }
 
 const routers: RouteObject[] = [
@@ -64,6 +65,6 @@ const routers: RouteObject[] = [
     path: '*',
     element: <NotMatch />,
   },
-];
+]
 
-export default routers;
+export default routers

@@ -1,80 +1,80 @@
-import { useEffect, useRef } from 'react';
-import useLatest from './useLatest';
-import useUnmount from './useUnmount';
-import { BasicTarget, getTargetElement } from './utils';
+import { useEffect, useRef } from 'react'
+import useLatest from './useLatest'
+import useUnmount from './useUnmount'
+import type { BasicTarget } from './utils'
+import { getTargetElement } from './utils'
 
 export interface Options<T extends Target = Target> {
-  target?: T;
-  capture?: boolean;
-  once?: boolean;
-  passive?: boolean;
+  target?: T
+  capture?: boolean
+  once?: boolean
+  passive?: boolean
 }
 
-export type Target = BasicTarget<HTMLElement | Element | Window | Document>;
+export type Target = BasicTarget<HTMLElement | Element | Window | Document>
 
 export default function useEventListener<K extends keyof HTMLElementEventMap>(
   eventName: K,
   handler: (ev: HTMLElementEventMap[K]) => void,
   options?: Options<HTMLElement>
-): void;
+): void
 export default function useEventListener<K extends keyof ElementEventMap>(
   eventName: K,
   handler: (ev: ElementEventMap[K]) => void,
   options?: Options<Element>
-): void;
+): void
 export default function useEventListener<K extends keyof DocumentEventMap>(
   eventName: K,
   handler: (ev: DocumentEventMap[K]) => void,
   options?: Options<Document>
-): void;
+): void
 export default function useEventListener<K extends keyof WindowEventMap>(
   eventName: K,
   handler: (ev: WindowEventMap[K]) => void,
   options?: Options<Window>
-): void;
+): void
 export default function useEventListener(
   type: string,
   handler: (...p: any[]) => void,
-  options?: Options
+  options?: Options,
 ): void {
-  const hasInitRef = useRef(false);
-  const handlerRef = useLatest<null | ((...p: any[]) => void)>(handler);
-  const unListenerRef = useLatest<null | ((...p: any[]) => void)>(null);
+  const hasInitRef = useRef(false)
+  const handlerRef = useLatest<null | ((...p: any[]) => void)>(handler)
+  const unListenerRef = useLatest<null | ((...p: any[]) => void)>(null)
 
   useEffect(() => {
     if (!hasInitRef.current) {
-      hasInitRef.current = true;
+      hasInitRef.current = true
 
-      const targetElement = getTargetElement(options?.target, window);
+      const targetElement = getTargetElement(options?.target, window)
 
-      if (!targetElement?.addEventListener) {
-        return;
-      }
+      if (!targetElement?.addEventListener)
+        return
 
-      handlerRef.current = handler;
+      handlerRef.current = handler
 
       const eventListener = (event: Event) => {
-        handlerRef.current?.(event);
-      };
+        handlerRef.current?.(event)
+      }
 
       targetElement.addEventListener(type, eventListener, {
         capture: options?.capture,
         once: options?.once,
         passive: options?.passive,
-      });
+      })
 
       if (!unListenerRef.current) {
         unListenerRef.current = () => {
           targetElement.removeEventListener(type, eventListener, {
             capture: options?.capture,
-          });
-        };
+          })
+        }
       }
     }
-  }, []);
+  }, [])
 
   useUnmount(() => {
-    hasInitRef.current = false;
-    unListenerRef.current?.();
-  });
+    hasInitRef.current = false
+    unListenerRef.current?.()
+  })
 }

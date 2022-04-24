@@ -1,18 +1,18 @@
-import { IChannel } from 'common/electron-common';
-import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows';
-import * as is from 'common/electron-common/environment';
-import { LiveMoe } from 'livemoe';
+import type { IChannel } from 'common/electron-common'
+import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
+import * as is from 'common/electron-common/environment'
+import type { LiveMoe } from 'livemoe'
 
 const createWindowsService = (
-  windowsService: IChannel
+  windowsService: IChannel,
 ): LiveMoe.WindowsService => {
   return {
-    refresh: async (windowId: string) => {
+    refresh: async(windowId: string) => {
       return await windowsService.call(WINDOW_MESSAGE_TYPE.IPC_CALL, {
         type: WINDOW_MESSAGE_TYPE.IPC_CALL,
         event: 'refresh',
         arg: windowId,
-      });
+      })
     },
 
     toggleWindow: (windowId: string) => {
@@ -24,13 +24,14 @@ const createWindowsService = (
             arg: windowId,
           })
           .then((result) => {
-            resolve(result);
+            resolve(result)
           })
           .catch((error) => {
-            reject(error);
-            if (is.dev()) console.error(error);
-          });
-      });
+            reject(error)
+            if (is.dev())
+              console.error(error)
+          })
+      })
     },
     addEventListener: (eventName: string, windowId: string) => {
       return new Promise((resolve) => {
@@ -38,10 +39,10 @@ const createWindowsService = (
           type: WINDOW_MESSAGE_TYPE.IPC_LISTEN,
           event: eventName,
           arg: [windowId],
-        });
+        })
 
-        resolve(event);
-      });
+        resolve(event)
+      })
     },
     sendWindowMessage: (
       windowId: string,
@@ -52,9 +53,9 @@ const createWindowsService = (
         type: WINDOW_MESSAGE_TYPE.IPC_CALL,
         event: 'command',
         arg: [windowId, eventName, ...args],
-      });
+      })
     },
-  };
-};
+  }
+}
 
-export default createWindowsService;
+export default createWindowsService

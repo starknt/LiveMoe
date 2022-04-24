@@ -2,17 +2,17 @@
   "name": "livemoe",
   "version": "0.1.0",
   "description": "一款基于 Electron 的免费开源桌面壁纸播放器",
-  "main": "./dist/main/main.js",
+  "license": "MIT",
   "author": {
     "name": "Seven",
     "email": "1431880400@qq.com"
   },
+  "main": "./dist/main/main.js",
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
     "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts",
     "postinstall": "npm run electron-rebuild && npm run link-modules"
   },
-  "license": "MIT",
   "dependencies": {
     "pouchdb": "^7.2.2",
     "win-func-tools": "latest"

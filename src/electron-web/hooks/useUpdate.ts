@@ -1,7 +1,7 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react'
 
 export default function useUpdate() {
-  const [_, setUpdate] = useState({});
+  const [_, setUpdate] = useState({})
 
-  return useCallback(() => setUpdate({}), []);
+  return useCallback(() => setUpdate({}), [])
 }

@@ -1,72 +1,78 @@
-import { Emitter, Event } from 'common/electron-common/base/event';
-import { linux, macOS, win } from 'common/electron-common/environment';
-import {
-  BrowserView,
-  ipcMain,
+import { Emitter, Event } from 'common/electron-common/base/event'
+import { dev, linux, macOS, win } from 'common/electron-common/environment'
+import type {
   IpcMainEvent,
   LoadFileOptions,
   LoadURLOptions,
   Rectangle,
-} from 'electron';
+} from 'electron'
 import {
+  BrowserView,
+  ipcMain,
+} from 'electron'
+import type {
   IWallpaperPlayerViewConfiguration,
   IWallpaperPlayerWindowConfiguration,
+} from 'electron-main/common/windowConfiguration'
+import {
   WallpaperPlayerViewConfiguration,
   WallpaperPlayerWindowConfiguration,
-} from 'electron-main/common/windowConfiguration';
-import BasePlayerWindow from './base/basePlayerWindow';
-import {
+} from 'electron-main/common/windowConfiguration'
+import type {
   IWallpaperConfiguration,
+  IWallpaperPlayProgress,
   IWallpaperPlayerState,
   IWallpaperPlayerTypes,
   IWallpaperPlayingConfiguration,
-  IWallpaperPlayProgress,
   PlayRuntimeConfiguration,
-} from 'common/electron-common/wallpaperPlayer';
-import {
+} from 'common/electron-common/wallpaperPlayer'
+import type {
   IWallpaperFailLoadEvent,
   IWallpaperView,
+} from 'electron-main/common/wallpaperPlayer'
+import {
   validateWallpaperConfiguration,
-} from 'electron-main/common/wallpaperPlayer';
-import { resolveWallpaperHtmlPath } from 'electron-main/utils';
-import WallpaperPlayerMsgProcess from 'electron-main/core/wallpaperPlayer/wallpaperPlayerMsgProcess';
-import { TimerHelper } from 'electron-main/common/timer';
+} from 'electron-main/common/wallpaperPlayer'
+import { resolveWallpaperHtmlPath } from 'electron-main/utils'
+import WallpaperPlayerMsgProcess from 'electron-main/core/wallpaperPlayer/wallpaperPlayerMsgProcess'
+import { TimerHelper } from 'electron-main/common/timer'
 import type {
   IWallpaperPlayerAudioChangeEvent,
-  IWallpaperPlayerVolumeChangeEvent,
   IWallpaperPlayerDisabledChangeEvent,
-  IWallpaperPlayerPlayFailEvent,
   IWallpaperPlayerLoopChangeEvent,
-} from 'common/electron-common/wallpaperPlayerWindow';
+  IWallpaperPlayerPlayFailEvent,
+  IWallpaperPlayerVolumeChangeEvent,
+} from 'common/electron-common/wallpaperPlayerWindow'
+import type { IDisposable } from 'common/electron-common/base/lifecycle'
 import {
-  IDisposable,
   toDisposable,
-} from 'common/electron-common/base/lifecycle';
+} from 'common/electron-common/base/lifecycle'
+import BasePlayerWindow from './base/basePlayerWindow'
 
 class WallpaperPlayerView implements IWallpaperView {
-  private readonly _view: BrowserView;
+  private readonly _view: BrowserView
 
-  private readonly _onWallpaperInitalize = new Emitter<void>();
+  private readonly _onWallpaperInitalize = new Emitter<void>()
 
-  readonly onInitalize = this._onWallpaperInitalize.event;
+  readonly onInitalize = this._onWallpaperInitalize.event
 
-  readonly onDidFinshLoad: Event<void>;
+  readonly onDidFinshLoad: Event<void>
 
-  readonly onDidFailLoad: Event<IWallpaperFailLoadEvent>;
+  readonly onDidFailLoad: Event<IWallpaperFailLoadEvent>
 
   constructor(
     options: IWallpaperPlayerViewConfiguration,
-    private readonly bounds: Rectangle
+    private readonly bounds: Rectangle,
   ) {
-    this._view = new BrowserView(options);
-    this.initalize();
+    this._view = new BrowserView(options)
+    this.initalize()
 
-    this._view.setBackgroundColor('#003C3F41');
+    this._view.setBackgroundColor('#003C3F41')
 
     this.onDidFinshLoad = Event.fromNodeEventEmitter<void>(
       this._view.webContents,
-      'did-finish-load'
-    );
+      'did-finish-load',
+    )
 
     this.onDidFailLoad = Event.fromNodeEventEmitter<IWallpaperFailLoadEvent>(
       this._view.webContents,
@@ -75,693 +81,699 @@ class WallpaperPlayerView implements IWallpaperView {
         return {
           errorCode,
           errorDescription,
-        };
-      }
-    );
+        }
+      },
+    )
   }
 
   initalize() {
-    this._view.setBounds(this.bounds);
+    this._view.setBounds(this.bounds)
     this._view.setAutoResize({
       width: true,
       height: true,
       vertical: true,
       horizontal: true,
-    });
+    })
   }
 
   get view() {
-    return this._view;
+    return this._view
   }
 
   get id() {
-    return this._view.webContents.id;
+    return this._view.webContents.id
   }
 
   send(channel: string, ...args: unknown[]) {
-    this._view.webContents.send(channel, ...args);
+    this._view.webContents.send(channel, ...args)
   }
 
   seek(time: number) {
-    this.send('ipc:video:progress', { currentTime: time });
+    this.send('ipc:video:progress', { currentTime: time })
   }
 
-  loadURL(url: string): Promise<void>;
-  loadURL(url: string, options: LoadURLOptions): Promise<void>;
+  loadURL(url: string): Promise<void>
+  loadURL(url: string, options: LoadURLOptions): Promise<void>
   loadURL(url: string, options?: LoadURLOptions) {
-    return this._view.webContents.loadURL(url, options);
+    return this._view.webContents.loadURL(url, options)
   }
 
-  loadFile(filePath: string): Promise<void>;
-  loadFile(filePath: string, options: LoadFileOptions): Promise<void>;
+  loadFile(filePath: string): Promise<void>
+  loadFile(filePath: string, options: LoadFileOptions): Promise<void>
   loadFile(filePath: string, options?: LoadFileOptions): Promise<void> {
-    return this._view.webContents.loadFile(filePath, options);
+    return this._view.webContents.loadFile(filePath, options)
   }
 
   setMute(value: boolean) {
-    this._view.webContents.setAudioMuted(value);
+    this._view.webContents.setAudioMuted(value)
   }
 
   get mute() {
-    return this._view.webContents.audioMuted;
+    return this._view.webContents.audioMuted
   }
 
   public destroy() {
-    this._view.webContents.removeAllListeners('did-finish-load');
-    this._view.webContents.removeAllListeners('did-fail-load');
+    this._view.webContents.removeAllListeners('did-finish-load')
+    this._view.webContents.removeAllListeners('did-fail-load')
   }
 }
 
 export default class WallpaperPlayerWindow extends BasePlayerWindow {
   private readonly _hWnd: number = Number(
-    this.getNativeWindowHandle().readBigInt64LE()
-  );
+    this.getNativeWindowHandle().readBigInt64LE(),
+  )
 
-  private _playReady = false;
+  private _playReady = false
 
-  private readonly messageProcess = new WallpaperPlayerMsgProcess(this._hWnd);
+  private readonly messageProcess = new WallpaperPlayerMsgProcess(this._hWnd)
 
-  private readonly views: [WallpaperPlayerView, WallpaperPlayerView];
+  private readonly views: [WallpaperPlayerView, WallpaperPlayerView]
 
-  private readonly playReadyEmitter = new Emitter<void>();
+  private readonly playReadyEmitter = new Emitter<void>()
 
-  private readonly pauseEmitter = new Emitter<IWallpaperConfiguration>();
+  private readonly pauseEmitter = new Emitter<IWallpaperConfiguration>()
 
-  private readonly playEmitter = new Emitter<IWallpaperConfiguration>();
+  private readonly playEmitter = new Emitter<IWallpaperConfiguration>()
 
-  private readonly playRestoreEmitter = new Emitter<void>();
+  private readonly playRestoreEmitter = new Emitter<void>()
 
-  private readonly didFailEmitter =
-    new Emitter<IWallpaperPlayerPlayFailEvent>();
+  private readonly didFailEmitter
+    = new Emitter<IWallpaperPlayerPlayFailEvent>()
 
-  private readonly progressEmitter =
-    new Emitter<IWallpaperPlayingConfiguration>();
+  private readonly progressEmitter
+    = new Emitter<IWallpaperPlayingConfiguration>()
 
-  private readonly endedEmitter = new Emitter<void>();
+  private readonly endedEmitter = new Emitter<void>()
 
-  private readonly didLoadFailEmitter = new Emitter<IWallpaperFailLoadEvent>();
+  private readonly didLoadFailEmitter = new Emitter<IWallpaperFailLoadEvent>()
 
-  private readonly didLoadFinshEmitter = new Emitter<void>();
+  private readonly didLoadFinshEmitter = new Emitter<void>()
 
-  private readonly disabledEmitter =
-    new Emitter<IWallpaperPlayerDisabledChangeEvent>();
+  private readonly disabledEmitter
+    = new Emitter<IWallpaperPlayerDisabledChangeEvent>()
 
-  private readonly volumeEmitter =
-    new Emitter<IWallpaperPlayerVolumeChangeEvent>();
+  private readonly volumeEmitter
+    = new Emitter<IWallpaperPlayerVolumeChangeEvent>()
 
-  private readonly loopEmitter = new Emitter<IWallpaperPlayerLoopChangeEvent>();
+  private readonly loopEmitter = new Emitter<IWallpaperPlayerLoopChangeEvent>()
 
-  private readonly audioMuteEmitter =
-    new Emitter<IWallpaperPlayerAudioChangeEvent>();
+  private readonly audioMuteEmitter
+    = new Emitter<IWallpaperPlayerAudioChangeEvent>()
 
-  private readonly destroyEmitter = new Emitter<void>();
+  private readonly destroyEmitter = new Emitter<void>()
 
-  readonly onVolumeChange = this.volumeEmitter.event;
+  readonly onVolumeChange = this.volumeEmitter.event
 
-  readonly onAudioMuteChange = this.audioMuteEmitter.event;
+  readonly onAudioMuteChange = this.audioMuteEmitter.event
 
-  readonly onProgress = this.progressEmitter.event;
+  readonly onProgress = this.progressEmitter.event
 
-  readonly onEnded = this.endedEmitter.event;
+  readonly onEnded = this.endedEmitter.event
 
-  readonly onDisbaledChange = this.disabledEmitter.event;
+  readonly onDisbaledChange = this.disabledEmitter.event
 
-  readonly onDestroy = this.destroyEmitter.event;
+  readonly onDestroy = this.destroyEmitter.event
 
-  readonly onPlayChange = this.playEmitter.event;
+  readonly onPlayChange = this.playEmitter.event
 
-  readonly onDidPlayFail = this.didFailEmitter.event;
+  readonly onDidPlayFail = this.didFailEmitter.event
 
-  readonly onPause = this.pauseEmitter.event;
+  readonly onPause = this.pauseEmitter.event
 
-  readonly onPlayRestore = this.playRestoreEmitter.event;
+  readonly onPlayRestore = this.playRestoreEmitter.event
 
-  readonly onDidLoadFail = this.didLoadFailEmitter.event;
+  readonly onDidLoadFail = this.didLoadFailEmitter.event
 
-  readonly onDidLoadFinsh = this.didLoadFinshEmitter.event;
+  readonly onDidLoadFinsh = this.didLoadFinshEmitter.event
 
-  readonly onPlayReady = this.playReadyEmitter.event;
+  readonly onPlayReady = this.playReadyEmitter.event
 
-  private cancelTokenDisposable: IDisposable | undefined = undefined;
+  private cancelTokenDisposable: IDisposable | undefined = undefined
 
-  private _type: IWallpaperPlayerTypes = 1;
+  private _type: IWallpaperPlayerTypes = 1
 
-  private _seekProgress = false;
+  private _seekProgress = false
 
-  private _progress: IWallpaperPlayProgress | null = null;
+  private _progress: IWallpaperPlayProgress | null = null
 
-  private _activeView = 0;
+  private _activeView = 0
 
-  private _activeWalpaper: IWallpaperConfiguration | null = null;
+  private _activeWalpaper: IWallpaperConfiguration | null = null
 
-  private _cursor: number = 0;
+  private _cursor = 0
 
-  private _disabled = false;
+  private _disabled = false
 
-  private _mute = false;
+  private _mute = false
 
-  private _volume = 40;
+  private _volume = 40
 
-  private _state: IWallpaperPlayerState = 'pending';
+  private _state: IWallpaperPlayerState = 'pending'
 
-  private _loop = false;
+  private _loop = false
 
-  private _mutePlay = false;
+  private _mutePlay = false
 
-  private _isSetupDesktop = false;
+  private _isSetupDesktop = false
 
-  private _htmlProgress: TimerHelper.PausableIntervalTimer | null = null;
+  private _htmlProgress: TimerHelper.PausableIntervalTimer | null = null
 
-  private _htmlEnded: TimerHelper.PausableTimeoutTimer | null = null;
+  private _htmlEnded: TimerHelper.PausableTimeoutTimer | null = null
 
   constructor(
     private playlist: IWallpaperConfiguration[],
     private defaultState: PlayRuntimeConfiguration,
     windowOptions: IWallpaperPlayerWindowConfiguration = WallpaperPlayerWindowConfiguration,
-    private readonly viewOptions: IWallpaperPlayerViewConfiguration = WallpaperPlayerViewConfiguration
+    private readonly viewOptions: IWallpaperPlayerViewConfiguration = WallpaperPlayerViewConfiguration,
   ) {
-    super(windowOptions);
+    super(windowOptions)
 
-    this._disabled = this.defaultState.disabled;
-    this._mute = this.defaultState.mute;
-    this._volume = this.defaultState.volume;
-    this._activeWalpaper = this.defaultState.wallpaperConfiguration;
+    this._disabled = this.defaultState.disabled
+    this._mute = this.defaultState.mute
+    this._volume = this.defaultState.volume
+    this._activeWalpaper = this.defaultState.wallpaperConfiguration
 
     this.views = [
       new WallpaperPlayerView(this.viewOptions, this.getBounds()),
       new WallpaperPlayerView(this.viewOptions, this.getBounds()),
-    ];
+    ]
 
-    this.initialize();
+    this.initialize()
   }
 
   private initialize() {
-    this.setMenu(null);
-    this.registerListener();
+    this.setMenu(null)
+    this.registerListener()
 
     if (linux() || macOS()) {
       this.setIgnoreMouseEvents(true, {
         forward: true,
-      });
+      })
     }
 
     [...this.views].forEach((view) => {
-      this.addBrowserView(view.view);
-    });
+      this.addBrowserView(view.view)
+    })
 
-    this._activeView = 1;
+    this._activeView = 1
 
-    this.setupDesktop();
+    this.setupDesktop()
   }
 
   private registerListener() {
     this.onPlayReady(() => {
-      this._playReady = true;
+      this._playReady = true
 
       // ipcMain.removeAllListeners('ipc:video:progress');
       // ipcMain.removeAllListeners('ipc:video:end');
-    });
+    })
 
     this.onPlayChange(({ rawConfiguration }) => {
-      this._state = 'play';
+      this._state = 'play'
 
       if (this._htmlProgress) {
-        this._htmlProgress.dispose();
-        this._htmlProgress = null;
+        this._htmlProgress.dispose()
+        this._htmlProgress = null
       }
 
       if (this._htmlEnded) {
-        this._htmlEnded.dispose();
-        this._htmlEnded = null;
+        this._htmlEnded.dispose()
+        this._htmlEnded = null
       }
 
-      if (rawConfiguration.type === 1) return;
+      if (rawConfiguration.type === 1)
+        return
 
-      const total = 60 * 1000 * 5; // 5 minute
-      let now = 0;
+      const total = 60 * 1000 * 5 // 5 minute
+      let now = 0
 
       if (!this._htmlProgress) {
         this._htmlProgress = new TimerHelper.PausableIntervalTimer(1000, () => {
-          now += 1000;
+          now += 1000
 
           this.progressEmitter.fire({
             totalTime: total / 1000,
             nowTime: now / 1000,
             ended: false,
-          });
-        });
+          })
+        })
       }
 
       if (!this._htmlEnded) {
         this._htmlEnded = new TimerHelper.PausableTimeoutTimer(total, () => {
-          this.endedEmitter.fire();
+          this.endedEmitter.fire()
 
           if (this._htmlProgress && this._htmlEnded) {
-            this._htmlProgress.restore();
-            this._htmlEnded.restore();
+            this._htmlProgress.restore()
+            this._htmlEnded.restore()
           }
-        });
+        })
       }
-    });
+    })
 
     this.onPause(() => {
-      this._state = 'pause';
-      if (this._htmlEnded) this._htmlEnded.pause();
-      if (this._htmlProgress) this._htmlProgress.pause();
-    });
+      this._state = 'pause'
+      if (this._htmlEnded)
+        this._htmlEnded.pause()
+      if (this._htmlProgress)
+        this._htmlProgress.pause()
+    })
 
-    const progressEvent =
-      Event.fromNodeEventEmitter<IWallpaperPlayingConfiguration>(
+    const progressEvent
+      = Event.fromNodeEventEmitter<IWallpaperPlayingConfiguration>(
         ipcMain,
         'ipc:video:progress',
         (_e, progress: IWallpaperPlayProgress) => {
-          const { currentTime, duration } = progress;
+          const { currentTime, duration } = progress
 
-          if (!this._seekProgress) {
-            this._progress = { currentTime, duration };
-          }
+          if (!this._seekProgress)
+            this._progress = { currentTime, duration }
 
           if (this._seekProgress && this._progress) {
-            const view = this.getTopView();
-            view.seek(this._progress.currentTime);
-            this._seekProgress = false;
-            this._progress.duration = duration;
+            const view = this.getTopView()
+            view.seek(this._progress.currentTime)
+            this._seekProgress = false
+            this._progress.duration = duration
 
             return {
               totalTime: duration,
               nowTime: this._progress.currentTime,
               ended: false,
-            };
+            }
           }
 
-          return { totalTime: duration, nowTime: currentTime, ended: false };
-        }
-      );
+          return { totalTime: duration, nowTime: currentTime, ended: false }
+        },
+      )
 
     const endEvent = Event.fromNodeEventEmitter<IWallpaperPlayingConfiguration>(
       ipcMain,
-      'ipc:video:end'
-    );
+      'ipc:video:end',
+    )
 
     progressEvent((playingConfiguration) => {
-      this.progressEmitter.fire(playingConfiguration);
-    });
+      this.progressEmitter.fire(playingConfiguration)
+    })
 
     endEvent(() => {
-      this.endedEmitter.fire();
-    });
+      this.endedEmitter.fire()
+    })
 
     this.onDisbaledChange((disabled) => {
       if (!disabled && this.cancelTokenDisposable) {
-        this.cancelTokenDisposable.dispose();
-        this.cancelTokenDisposable = undefined;
+        this.cancelTokenDisposable.dispose()
+        this.cancelTokenDisposable = undefined
       }
-    });
+    })
   }
 
-  async play(): Promise<void>;
-  async play(wConfiguration: IWallpaperConfiguration): Promise<void>;
-  async play(cursor: number): Promise<void>;
+  async play(): Promise<void>
+  async play(wConfiguration: IWallpaperConfiguration): Promise<void>
+  async play(cursor: number): Promise<void>
   async play(argv?: IWallpaperConfiguration | number) {
     if (typeof argv === 'object') {
-      const cursor = this.getWallpaperCursor(argv);
-      if (cursor !== -1) this.setCursor(cursor);
+      const cursor = this.getWallpaperCursor(argv)
+      if (cursor !== -1)
+        this.setCursor(cursor)
 
-      this._activeWalpaper = argv;
+      this._activeWalpaper = argv
     }
 
     if (typeof argv === 'number') {
-      const rest = await this.setCursor(argv);
+      const rest = await this.setCursor(argv)
 
-      if (!rest) await this.next();
+      if (!rest)
+        await this.next()
     }
 
     if (!this._activeWalpaper) {
-      const result = await this.next();
+      const result = await this.next()
 
       if (!result) {
         this.didFailEmitter.fire({
           errorCode: 100,
-          errorDesc: `WallpaperPlayerWindow play failed`,
-        });
-        return;
+          errorDesc: 'WallpaperPlayerWindow play failed',
+        })
+        return
       }
     }
 
-    this._playReady = false;
+    this._playReady = false
 
-    const view = this.toggleView();
+    const view = this.toggleView()
 
-    if (!(await validateWallpaperConfiguration(this._activeWalpaper!))) {
-      await this.next();
-    }
+    if (!(await validateWallpaperConfiguration(this._activeWalpaper!)))
+      await this.next()
 
     if (this._activeWalpaper?.rawConfiguration?.type === 1) {
-      this._type = 1;
-      view.loadURL(resolveWallpaperHtmlPath('video'));
-    } else if (this._activeWalpaper) {
-      this._type = 2;
-      view.loadURL(this._activeWalpaper.playPath);
+      this._type = 1
+      view.loadURL(resolveWallpaperHtmlPath('video'))
+    }
+    else if (this._activeWalpaper) {
+      this._type = 2
+      view.loadURL(this._activeWalpaper.playPath)
     }
 
     view.onDidFinshLoad(() => {
-      this.didLoadFinshEmitter.fire();
+      this.didLoadFinshEmitter.fire()
 
       view.send('lm:wallpaper:init', {
         src: this._activeWalpaper?.playPath,
-      });
+      })
 
-      setTimeout(() => this.setTopBrowserView(view.view));
+      setTimeout(() => this.setTopBrowserView(view.view))
 
-      if (!this.isVisible()) this.show();
+      if (!this.isVisible())
+        this.show()
 
-      view.send('ipc:mute', this.mute && this.mutePlay);
+      view.send('ipc:mute', this.mute && this.mutePlay)
 
       // if (this._mutePlay) view.send('ipc:mute', true);
 
-      setTimeout(() => this.playReadyEmitter.fire());
+      setTimeout(() => this.playReadyEmitter.fire())
 
-      if (this._activeWalpaper) this.playEmitter.fire(this._activeWalpaper);
-    });
+      if (this._activeWalpaper)
+        this.playEmitter.fire(this._activeWalpaper)
+    })
 
     view.onDidFailLoad(({ errorCode, errorDescription }) => {
-      this.didLoadFailEmitter.fire({ errorCode, errorDescription });
-      this.next();
-      this.toggleView();
-    });
+      this.didLoadFailEmitter.fire({ errorCode, errorDescription })
+      this.next()
+      this.toggleView()
+    })
   }
 
   async pause() {
-    await this.whenPlayReady();
+    await this.whenPlayReady()
 
-    ipcMain.removeAllListeners('ipc:wp:stop:canceltoken');
+    ipcMain.removeAllListeners('ipc:wp:stop:canceltoken')
 
-    return new Promise<() => void>((resolve) => {
-      if (this._activeWalpaper) this.pauseEmitter.fire(this._activeWalpaper);
+    return new Promise<Function>((resolve) => {
+      if (this._activeWalpaper)
+        this.pauseEmitter.fire(this._activeWalpaper)
 
-      const view = this.getTopView();
+      const view = this.getTopView()
 
       if (this._type === 1) {
         resolve(() => {
-          view.send('ipc:video:play');
+          view.send('ipc:video:play')
           if (this._htmlEnded) {
-            this._htmlEnded.dispose();
-            this._htmlEnded = null;
+            this._htmlEnded.dispose()
+            this._htmlEnded = null
           }
 
           if (this._htmlProgress) {
-            this._htmlProgress.dispose();
-            this._htmlProgress = null;
+            this._htmlProgress.dispose()
+            this._htmlProgress = null
           }
 
-          this.playRestoreEmitter.fire();
-        });
+          this.playRestoreEmitter.fire()
+        })
 
-        view.send('ipc:video:pause');
-      } else {
+        view.send('ipc:video:pause')
+      }
+      else {
         const cancelToken = Event.fromNodeEventEmitter(
           ipcMain,
           'ipc:wp:stop:canceltoken',
-          (event: IpcMainEvent) => event
-        );
+          (event: IpcMainEvent) => event,
+        )
 
-        view.send('ipc:wp:stop');
+        view.send('ipc:wp:stop')
 
         cancelToken((e) => {
           resolve(() => {
             if (this._htmlEnded && this._htmlProgress) {
-              this._htmlEnded.reset();
-              this._htmlProgress.reset();
+              this._htmlEnded.reset()
+              this._htmlProgress.reset()
             }
-            this.playRestoreEmitter.fire();
-            ipcMain.removeAllListeners('ipc:wp:stop:canceltoken');
-            e.returnValue = '';
-          });
-        });
+            this.playRestoreEmitter.fire()
+            ipcMain.removeAllListeners('ipc:wp:stop:canceltoken')
+            e.returnValue = ''
+          })
+        })
       }
-    });
+    })
   }
 
   private toggleView() {
-    const view = this.getTopView();
-    view.loadURL(resolveWallpaperHtmlPath('transparent'));
+    const view = this.getTopView()
+    view.loadURL(resolveWallpaperHtmlPath('transparent'))
 
-    this._activeView = this._activeView === 0 ? 1 : 0;
-    return this.views[this._activeView];
+    this._activeView = this._activeView === 0 ? 1 : 0
+    return this.views[this._activeView]
   }
 
   private getTopView() {
-    return this.views[this._activeView];
+    return this.views[this._activeView]
   }
 
   async next() {
-    if (this.playlist.length <= 0) {
-      return null;
-    }
+    if (this.playlist.length <= 0)
+      return null
 
-    if (this._cursor + 1 >= this.playlist.length) {
-      this._cursor = 0;
-    } else {
-      this._cursor += 1;
-    }
+    if (this._cursor + 1 >= this.playlist.length)
+      this._cursor = 0
+    else
+      this._cursor += 1
 
-    this._activeWalpaper = this.playlist[this._cursor];
+    this._activeWalpaper = this.playlist[this._cursor]
 
-    return this._activeWalpaper;
+    return this._activeWalpaper
   }
 
   async prev() {
-    if (this.playlist.length <= 0) {
-      return null;
-    }
+    if (this.playlist.length <= 0)
+      return null
 
-    if (this._cursor - 1 < 0) {
-      this._cursor = this.playlist.length - 1;
-    } else {
-      this._cursor -= 1;
-    }
+    if (this._cursor - 1 < 0)
+      this._cursor = this.playlist.length - 1
+    else
+      this._cursor -= 1
 
-    this._activeWalpaper = this.playlist[this._cursor];
+    this._activeWalpaper = this.playlist[this._cursor]
 
-    return this._activeWalpaper;
+    return this._activeWalpaper
   }
 
   getWallpaperCursor(configuration: IWallpaperConfiguration) {
     for (let i = 0; i < this.playlist.length; i += 1) {
-      const _configuration = this.playlist[i];
+      const _configuration = this.playlist[i]
 
-      if (_configuration.playPath === configuration.playPath) {
-        return i;
-      }
+      if (_configuration.playPath === configuration.playPath)
+        return i
     }
 
-    return -1;
+    return -1
   }
 
   set configuration(configuration: IWallpaperConfiguration) {
-    this._activeWalpaper = configuration;
+    this._activeWalpaper = configuration
+  }
+
+  get configuration() {
+    return this._activeWalpaper as IWallpaperConfiguration
   }
 
   get progress(): IWallpaperPlayingConfiguration {
-    const { currentTime, duration } = <IWallpaperPlayProgress>this._progress;
+    const { currentTime, duration } = <IWallpaperPlayProgress> this._progress
 
-    return { nowTime: currentTime, totalTime: duration, ended: false };
+    return { nowTime: currentTime, totalTime: duration, ended: false }
   }
 
   async setMute(value: boolean) {
-    await this.whenPlayReady();
+    await this.whenPlayReady()
 
-    this._mute = value;
+    this._mute = value
 
-    const view = this.getTopView();
+    const view = this.getTopView()
 
-    view.setMute(this._mute);
+    view.setMute(this._mute)
 
-    this.audioMuteEmitter.fire({ mute: value });
+    this.audioMuteEmitter.fire({ mute: value })
   }
 
   get mute() {
-    return this._mute;
+    return this._mute
   }
 
   get isAudioMute() {
-    const view = this.getTopView();
+    const view = this.getTopView()
 
-    return this.mute && view.mute;
+    return this.mute && view.mute
   }
 
   async setVolume(value: number) {
-    if (value < 0) return;
+    if (value < 0)
+      return
 
-    if (value > 100) {
-      value = value % 100;
-    }
+    if (value > 100)
+      value = value % 100
 
-    const oVolume = this._volume;
-    this._volume = value;
-    const view = this.getTopView();
+    const oVolume = this._volume
+    this._volume = value
+    const view = this.getTopView()
 
-    await this.whenPlayReady();
+    await this.whenPlayReady()
 
-    view.send('ipc:volume', this._volume / 100);
+    view.send('ipc:volume', this._volume / 100)
     this.volumeEmitter.fire({
       oVolume,
       nVolume: value,
-    });
+    })
   }
 
   get volume() {
-    return this._volume;
+    return this._volume
   }
 
   get state() {
-    return this._state;
+    return this._state
   }
 
   async setMutePlay(value: boolean) {
-    this._mutePlay = value;
+    this._mutePlay = value
 
-    await this.whenPlayReady();
+    await this.whenPlayReady()
 
     if (this._state === 'play') {
-      const view = this.getTopView();
-      view.send('ipc:mute', this._mutePlay);
+      const view = this.getTopView()
+      view.send('ipc:mute', this._mutePlay)
     }
   }
 
   get mutePlay() {
-    return this._mutePlay;
+    return this._mutePlay
   }
 
   async setCursor(cursor: number) {
     if (cursor >= 0 && cursor < this.playlist.length) {
-      this._cursor = cursor;
-      this._activeWalpaper = this.playlist[this._cursor];
-      return true;
+      this._cursor = cursor
+      this._activeWalpaper = this.playlist[this._cursor]
+      return true
     }
 
-    return false;
+    return false
   }
 
   get cursor() {
-    return this._cursor;
+    return this._cursor
   }
 
   async setLopp(value: boolean) {
-    this._loop = value;
+    this._loop = value
 
-    await this.whenPlayReady();
+    await this.whenPlayReady()
   }
 
   get loop() {
-    return this._loop;
+    return this._loop
   }
 
   private setupDesktop() {
     if (win() && !this._isSetupDesktop) {
-      const windowTools = require('win-func-tools');
-      windowTools.SetWindowInWorkerW(this._hWnd);
-      this._isSetupDesktop = true;
+      const windowTools = dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools')
+      windowTools.SetWindowInWorkerW(this._hWnd)
+      this._isSetupDesktop = true
     }
   }
 
   async addWallpaper2Playlist(
-    wallpaper: IWallpaperConfiguration | IWallpaperConfiguration[]
+    wallpaper: IWallpaperConfiguration | IWallpaperConfiguration[],
   ) {
-    if (Array.isArray(wallpaper)) {
-      this.playlist.push(...wallpaper);
-    } else {
-      this.playlist.push(wallpaper);
-    }
+    if (Array.isArray(wallpaper))
+      this.playlist.push(...wallpaper)
+    else
+      this.playlist.push(wallpaper)
   }
 
   /**
    * @param {number} time 跳转播放进度
    */
   async seek(time: number) {
-    await this.whenPlayReady();
+    await this.whenPlayReady()
 
     this._progress = {
       currentTime: time,
       duration: -1,
-    };
+    }
 
-    this._seekProgress = true;
+    this._seekProgress = true
   }
 
   async disable() {
-    if (this._disabled) return;
-    this._disabled = true;
+    if (this._disabled)
+      return
+    this._disabled = true
 
-    const cancelToken = await this.pause();
+    const cancelToken = await this.pause()
 
-    this.hide();
-    setTimeout(() => this.messageProcess.kill());
+    this.hide()
+    setTimeout(() => this.messageProcess.kill())
     if (win()) {
-      const windowTools = require('win-func-tools');
-      setTimeout(() => windowTools.RestoreWorkerW());
+      const windowTools = dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools')
+      setTimeout(() => windowTools.RestoreWorkerW())
     }
-    this._isSetupDesktop = false;
+    this._isSetupDesktop = false
 
-    this.disabledEmitter.fire({ disabled: this._disabled });
+    this.disabledEmitter.fire({ disabled: this._disabled })
 
     const disposable = toDisposable(() => {
-      cancelToken();
-    });
+      cancelToken()
+    })
 
-    this.cancelTokenDisposable = disposable;
+    this.cancelTokenDisposable = disposable
   }
 
   async enable() {
-    if (!this._disabled) return;
-    this._disabled = false;
+    if (!this._disabled)
+      return
+    this._disabled = false
 
-    if (this.cancelTokenDisposable) {
-      this.cancelTokenDisposable.dispose();
-    }
+    if (this.cancelTokenDisposable)
+      this.cancelTokenDisposable.dispose()
 
-    this.disabledEmitter.fire({ disabled: this._disabled });
+    this.disabledEmitter.fire({ disabled: this._disabled })
 
-    this.setupDesktop();
-    setTimeout(() => this.show());
-    setTimeout(() => this.messageProcess.setup());
+    this.setupDesktop()
+    setTimeout(() => this.show())
+    setTimeout(() => this.messageProcess.setup())
   }
 
   async whenPlayReady() {
-    if (this._playReady) {
-      return Promise.resolve();
-    }
+    if (this._playReady)
+      return Promise.resolve()
 
-    return Event.toPromise(this.onPlayReady);
+    return Event.toPromise(this.onPlayReady)
   }
 
   async destroy() {
-    this.destroyEmitter.fire();
+    this.destroyEmitter.fire()
     const timer = setTimeout(() => {
-      this.messageProcess.destroy();
+      this.messageProcess.destroy()
 
       this.views.forEach((view) => {
-        view.destroy();
-      });
+        view.destroy()
+      })
 
-      this.audioMuteEmitter.dispose();
-      this.volumeEmitter.dispose();
-      this.didLoadFailEmitter.dispose();
-      this.didLoadFinshEmitter.dispose();
-      this.didFailEmitter.dispose();
-      this.destroyEmitter.dispose();
-      this.playEmitter.dispose();
-      this.pauseEmitter.dispose();
-      this.progressEmitter.dispose();
-      this.endedEmitter.dispose();
-      this.disabledEmitter.dispose();
-      this.playReadyEmitter.dispose();
-      this.playRestoreEmitter.dispose();
-      this.loopEmitter.dispose();
+      this.audioMuteEmitter.dispose()
+      this.volumeEmitter.dispose()
+      this.didLoadFailEmitter.dispose()
+      this.didLoadFinshEmitter.dispose()
+      this.didFailEmitter.dispose()
+      this.destroyEmitter.dispose()
+      this.playEmitter.dispose()
+      this.pauseEmitter.dispose()
+      this.progressEmitter.dispose()
+      this.endedEmitter.dispose()
+      this.disabledEmitter.dispose()
+      this.playReadyEmitter.dispose()
+      this.playRestoreEmitter.dispose()
+      this.loopEmitter.dispose()
 
-      clearTimeout(timer);
+      clearTimeout(timer)
 
-      super.destroy();
-    });
+      super.destroy()
+    })
   }
 }
