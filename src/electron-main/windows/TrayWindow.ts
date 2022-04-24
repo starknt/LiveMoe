@@ -1,9 +1,9 @@
-import { IWindow } from 'electron-main/common/windows';
-import { IWindowOptions } from 'electron-main/core/windowManager/WindowPool';
-import { resolveHtmlPath } from 'electron-main/utils';
+import { IWindow } from 'electron-main/common/windows'
+import type { IWindowOptions } from 'electron-main/core/windowManager/WindowPool'
+import { resolveHtmlPath } from 'electron-main/utils'
 
 export default class TrayWindow extends IWindow {
-  static readonly id = 'tray';
+  static readonly id = 'tray'
 
   static readonly configuration: IWindowOptions = {
     id: TrayWindow.id,
@@ -22,7 +22,7 @@ export default class TrayWindow extends IWindow {
     transparent: true,
     path: resolveHtmlPath('tray'),
     logic: TrayWindow.logic,
-  };
+  }
 
   static logic(this: IWindow) {}
 }

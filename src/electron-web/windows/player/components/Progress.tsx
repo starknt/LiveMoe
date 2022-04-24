@@ -1,40 +1,42 @@
-import { Slider, Box, useTheme } from '@mui/material';
-import useAsyncEffect from 'electron-web/hooks/useAsyncEffect';
-import useLatest from 'electron-web/hooks/useLatest';
-import { FC, memo, useCallback, useState } from 'react';
-import TinyText from 'electron-web/components/TinyText';
+import { Box, Slider, useTheme } from '@mui/material'
+import useAsyncEffect from 'electron-web/hooks/useAsyncEffect'
+import useLatest from 'electron-web/hooks/useLatest'
+import type { FC } from 'react'
+import { memo, useCallback, useState } from 'react'
+import TinyText from 'electron-web/components/TinyText'
 
 function formatDuration(value: number) {
-  const minute = Math.floor(value / 60);
-  const secondLeft = value - minute * 60;
-  return `${minute}:${secondLeft < 9 ? `0${secondLeft}` : secondLeft}`;
+  const minute = Math.floor(value / 60)
+  const secondLeft = value - minute * 60
+  return `${minute}:${secondLeft < 9 ? `0${secondLeft}` : secondLeft}`
 }
 
 const ProgressBar: FC = memo(() => {
-  const theme = useTheme();
-  const initalizeProgress = useLatest(false);
-  const [duration, setDuration] = useState(200);
-  const [position, setPosition] = useState(32);
+  const theme = useTheme()
+  const initalizeProgress = useLatest(false)
+  const [duration, setDuration] = useState(200)
+  const [position, setPosition] = useState(32)
 
-  useAsyncEffect(async () => {
-    if (!window.livemoe || initalizeProgress.current) return;
+  useAsyncEffect(async() => {
+    if (!window.livemoe || initalizeProgress.current)
+      return
 
     window.livemoe.wallpaperPlayerService
       .onProgress()
       .then((onProgress) => {
         onProgress(({ currentTime, duration }) => {
-          setDuration(Math.floor(duration));
-          setPosition(Math.floor(currentTime));
-        });
-        initalizeProgress.current = true;
+          setDuration(Math.floor(duration))
+          setPosition(Math.floor(currentTime))
+        })
+        initalizeProgress.current = true
       })
-      .catch((err) => console.error(err));
-  }, [window.livemoe]);
+      .catch(err => console.error(err))
+  }, [window.livemoe])
 
   const handlePositionChange = useCallback((position: number) => {
-    setPosition(position);
-    window?.livemoe?.wallpaperPlayerService.seek(position);
-  }, [window.livemoe]);
+    setPosition(position)
+    window?.livemoe?.wallpaperPlayerService.seek(position)
+  }, [window.livemoe])
 
   return (
     <>
@@ -47,12 +49,12 @@ const ProgressBar: FC = memo(() => {
         max={duration}
         onChange={(_, value) => handlePositionChange(value as number)}
         sx={{
-          color: theme.palette.mode === 'dark' ? '#fff' : 'rgba(0,0,0,0.87)',
-          height: 4,
+          'color': theme.palette.mode === 'dark' ? '#fff' : 'rgba(0,0,0,0.87)',
+          'height': 4,
           '& .MuiSlider-thumb': {
-            width: 8,
-            height: 8,
-            transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
+            'width': 8,
+            'height': 8,
+            'transition': '0.3s cubic-bezier(.47,1.64,.41,.8)',
             '&:before': {
               boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)',
             },
@@ -85,7 +87,7 @@ const ProgressBar: FC = memo(() => {
         <TinyText>{formatDuration(duration - position)}</TinyText>
       </Box>
     </>
-  );
-});
+  )
+})
 
-export default ProgressBar;
+export default ProgressBar

@@ -1,3 +1,3 @@
 export interface IDestroyable {
-  destroy(): void;
+  destroy(): void
 }

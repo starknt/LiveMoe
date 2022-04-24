@@ -1,13 +1,13 @@
-import { Event } from 'common/electron-common/base/event';
-import { EventPreloadType, WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows';
-import { IWindowOptions } from 'electron-main/core/windowManager/WindowPool';
-import type { DatabaseNamespace } from 'common/electron-common/database';
-import type { IDialogWindowOptions, IWindow } from './windows';
-import type { WindowId } from 'electron-main/core/windowManager/WindowManager';
-import { app } from 'electron';
-import { IApplicationConfiguration } from 'common/electron-common/application';
-import { FileHelper } from 'common/electron-main/fileHelper';
-import { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer';
+import type { Event } from 'common/electron-common/base/event'
+import type { EventPreloadType, WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
+import type { IWindowOptions } from 'electron-main/core/windowManager/WindowPool'
+import type { DatabaseNamespace } from 'common/electron-common/database'
+import type { WindowId } from 'electron-main/core/windowManager/WindowManager'
+import { app } from 'electron'
+import type { IApplicationConfiguration } from 'common/electron-common/application'
+import { FileHelper } from 'common/electron-main/fileHelper'
+import type { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer'
+import type { IDialogWindowOptions, IWindow } from './windows'
 
 export const DEFAULT_CONFIGURATION: IApplicationConfiguration = {
   selfStartup: false,
@@ -31,59 +31,59 @@ export const DEFAULT_CONFIGURATION: IApplicationConfiguration = {
       v8: process.versions.v8,
     },
   },
-};
+}
 
 export interface IApplicationLifecycle {
   /** 初始化完毕 */
-  onReady: Event<void>;
+  onReady: Event<void>
 
   /** 加载壁纸资源前 */
-  onBeforeLoad: Event<void>;
+  onBeforeLoad: Event<void>
 
   /** 加载壁纸资源中  */
-  onLoad: Event<void>;
+  onLoad: Event<void>
 
   /** 加载壁纸资源后 */
-  onAfterLoad: Event<IWallpaperConfiguration[]>;
+  onAfterLoad: Event<IWallpaperConfiguration[]>
 
   /** 退出程序 */
-  onQuit: Event<void>;
+  onQuit: Event<void>
 }
 
 export interface CoreApi {
   /** 将获得一个操作数据库的API  */
-  getNameSpace(spaceName: string): DatabaseNamespace;
+  getNameSpace(spaceName: string): DatabaseNamespace
   /** 将获得一个应用配置的Proxy对象  */
   // getApplicationConfiguration(): IApplicationConfiguration;
   /** 创建一个窗口 */
-  showWindowById(id: string): IWindow;
-  registerWindow(windowId: WindowId, options: IWindowOptions): boolean;
-  unregisterWindow(windowId: WindowId): boolean;
+  showWindowById(id: string): IWindow
+  registerWindow(windowId: WindowId, options: IWindowOptions): boolean
+  unregisterWindow(windowId: WindowId): boolean
   /** 注册服务 */
   // registerService(channelName: string, channel: IServerChannel<string>): boolean;
 }
 
 export interface IApplicationGUI {
   /** 返回一个对话框窗口 */
-  showDialogWindow(options: IDialogWindowOptions): IWindow;
+  showDialogWindow(options: IDialogWindowOptions): IWindow
 }
 
 export interface IApplicationContext {
-  gui: IApplicationGUI;
+  gui: IApplicationGUI
   /** 应用的核心API */
-  core: CoreApi;
+  core: CoreApi
   /** 应用的生命周期 */
-  lifecycle: IApplicationLifecycle;
+  lifecycle: IApplicationLifecycle
   sendCallWindowMessage(
     channelName: string,
     event: string,
     ...args: unknown[]
-  ): any;
+  ): any
   sendListenWindowMessage(
     channelName: string,
     event: string,
     ...args: unknown[]
-  ): Event<any>;
+  ): Event<any>
 
   /** 注册消息处理器  */
   registerMessageHandler(
@@ -92,8 +92,8 @@ export interface IApplicationContext {
       event: WINDOW_MESSAGE_TYPE,
       preload: EventPreloadType
     ) => void | Promise<any> | Event<any>
-  ): boolean;
-  unregisterMessageHandler(channelName: string): boolean;
+  ): boolean
+  unregisterMessageHandler(channelName: string): boolean
 }
 
 /**
@@ -103,7 +103,7 @@ export interface IApplicationEventBus<T = WINDOW_MESSAGE_TYPE> {
   events: Map<
     string,
     (event: T, preload: EventPreloadType) => Promise<any> | Event<any> | void
-  >;
+  >
 
   registerEvent(
     channelName: string,
@@ -111,12 +111,12 @@ export interface IApplicationEventBus<T = WINDOW_MESSAGE_TYPE> {
       event: T,
       preload: EventPreloadType
     ) => Promise<any> | Event<any> | void
-  ): boolean;
+  ): boolean
 
-  unregisterEvent(channelName: string): boolean;
+  unregisterEvent(channelName: string): boolean
 
   // 发送控制命令
-  sendWindowMessage(channelName: string, preload: EventPreloadType): void;
+  sendWindowMessage(channelName: string, preload: EventPreloadType): void
 
-  dispatchEvents(channelName: string, preload: EventPreloadType): void;
+  dispatchEvents(channelName: string, preload: EventPreloadType): void
 }

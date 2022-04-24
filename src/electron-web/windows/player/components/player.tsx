@@ -1,81 +1,83 @@
+import type { PaletteMode } from '@mui/material'
 import {
   Box,
   Button,
-  createTheme,
-  PaletteMode,
   ThemeProvider,
-} from '@mui/material';
-import NormalPlayer from './NormalPlayer';
-import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
-import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
-import { useCallback, useEffect, useState } from 'react';
+  createTheme,
+} from '@mui/material'
+import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined'
+import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined'
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
+import { useCallback, useEffect, useState } from 'react'
 import {
   initalizePlayerState,
   selectPlayerConfiguration,
   updateConfigurationAll,
-} from 'electron-web/features/playerSlice';
-import { useAppDispatch } from 'electron-web/store/store';
-import { useSelector } from 'react-redux';
-import useOnceEffect from 'electron-web/hooks/useOnceEffect';
-import useLocalStorageState from 'electron-web/hooks/useLocalStorageState';
+} from 'electron-web/features/playerSlice'
+import { useAppDispatch } from 'electron-web/store/store'
+import { useSelector } from 'react-redux'
+import useOnceEffect from 'electron-web/hooks/useOnceEffect'
+import useLocalStorageState from 'electron-web/hooks/useLocalStorageState'
+import NormalPlayer from './NormalPlayer'
 
 export default function Player() {
   const [themeValue, setThemeValue] = useLocalStorageState<PaletteMode>(
     'theme',
     'light',
-    true
-  );
-  const [windowMode, setWindowMode] = useState('normal');
+    true,
+  )
+  const [windowMode, setWindowMode] = useState('normal')
   const theme = createTheme({
     palette: {
       mode: themeValue ?? 'light',
     },
-  });
+  })
 
-  const dispath = useAppDispatch();
-  const configuration = useSelector(selectPlayerConfiguration).configuration;
+  const dispath = useAppDispatch()
+  const configuration = useSelector(selectPlayerConfiguration).configuration
 
   useOnceEffect(() => {
-    console.log('Player init');
-    dispath(initalizePlayerState());
-  });
+    console.log('Player init')
+    dispath(initalizePlayerState())
+  })
 
   useEffect(() => {
-    if (!window.livemoe) return;
+    if (!window.livemoe)
+      return
     livemoe.wallpaperPlayerService
       .onConfigChange()
-      .then((onConfigurationChange) =>
+      .then(onConfigurationChange =>
         onConfigurationChange((config) => {
-          dispath(updateConfigurationAll(config));
-        })
+          dispath(updateConfigurationAll(config))
+        }),
       )
-      .catch((err) => console.error(err));
-  }, []);
+      .catch(err => console.error(err))
+  }, [])
 
   const handleCloseWindow = useCallback(() => {
-    window.livemoe.windowsService.toggleWindow('player');
-  }, []);
+    window.livemoe.windowsService.toggleWindow('player')
+  }, [])
 
   const handleThemeModeChange = useCallback(() => {
-    if (themeValue === 'light') {
-      setThemeValue('dark');
-    } else {
-      setThemeValue('light');
-    }
-  }, [themeValue]);
+    if (themeValue === 'light')
+      setThemeValue('dark')
+    else
+      setThemeValue('light')
+  }, [themeValue])
 
-  const mainIconColor = theme.palette.mode === 'dark' ? '#fff' : '#000';
-  const lightIconColor =
-    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)';
+  const mainIconColor = theme.palette.mode === 'dark' ? '#fff' : '#000'
+  const lightIconColor
+    = theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)'
 
   return (
     <ThemeProvider theme={theme}>
-      {windowMode === 'normal' ? (
+      {windowMode === 'normal'
+        ? (
         <NormalPlayer configuration={configuration} />
-      ) : (
-        ''
-      )}
+          )
+        : (
+            ''
+          )}
       {/* Actions */}
       <Box sx={{ position: 'absolute', top: '3px', right: '28px' }}>
         <Button
@@ -85,21 +87,23 @@ export default function Player() {
           disableRipple
           disableElevation
           sx={{
-            minWidth: '24px',
-            padding: 0,
-            color: lightIconColor,
+            'minWidth': '24px',
+            'padding': 0,
+            'color': lightIconColor,
             ':hover': {
               color: mainIconColor,
               backgroundColor: 'transparent',
             },
-            zIndex: 9999,
+            'zIndex': 9999,
           }}
         >
-          {themeValue === 'light' ? (
+          {themeValue === 'light'
+            ? (
             <DarkModeOutlinedIcon viewBox="0 0 28 28" />
-          ) : (
+              )
+            : (
             <LightModeOutlinedIcon viewBox="0 0 28 28" />
-          )}
+              )}
         </Button>
       </Box>
       <Box sx={{ position: 'absolute', top: '2px', right: '4px' }}>
@@ -109,19 +113,19 @@ export default function Player() {
           disableFocusRipple
           disableRipple
           sx={{
-            minWidth: '24px',
-            padding: 0,
-            color: lightIconColor,
+            'minWidth': '24px',
+            'padding': 0,
+            'color': lightIconColor,
             ':hover': {
               color: mainIconColor,
               backgroundColor: 'transparent',
             },
-            zIndex: 9999,
+            'zIndex': 9999,
           }}
         >
           <CloseOutlinedIcon />
         </Button>
       </Box>
     </ThemeProvider>
-  );
+  )
 }

@@ -1,5 +1,5 @@
-import { Emitter } from 'common/electron-common/base/event';
-import { win } from 'common/electron-common/environment';
+import { Emitter } from 'common/electron-common/base/event'
+import { win } from 'common/electron-common/environment'
 
 export const enum QUERY_USER_FULLSCREEN_STATE {
   QUNS_NOT_PRESENT = 1,
@@ -11,9 +11,7 @@ export const enum QUERY_USER_FULLSCREEN_STATE {
   QUNS_APP,
 }
 
-interface MapFullScreenState {
-  [key: number]: boolean;
-}
+type MapFullScreenState = Record<number, boolean>
 
 export const mapFullScreenState: MapFullScreenState = {
   1: false,
@@ -23,41 +21,40 @@ export const mapFullScreenState: MapFullScreenState = {
   5: false,
   6: false,
   7: false,
-};
+}
 
-const queryUserState = new Emitter<boolean>();
-let trayVisible = false;
+const queryUserState = new Emitter<boolean>()
+let trayVisible = false
 export const setTrayVisible = (visible: boolean) => {
-  trayVisible = visible;
-};
+  trayVisible = visible
+}
 
 const queryUserStateCreater = () => {
   return setInterval(() => {
     if (win()) {
       // 检查Tray是否在前台
-      if (trayVisible) {
-        return;
-      }
-      queryUserState.fire(
-        mapFullScreenState[require('win-func-tools').QueryUserState()]
-      );
-    }
-  }, 1000);
-};
+      if (trayVisible)
+        return
 
-let timer: NodeJS.Timeout | null = queryUserStateCreater();
+      queryUserState.fire(
+        mapFullScreenState[require('win-func-tools').QueryUserState()],
+      )
+    }
+  }, 1000)
+}
+
+let timer: NodeJS.Timeout | null = queryUserStateCreater()
 
 export const stopQueryUserState = () => {
   if (timer) {
-    clearInterval(timer);
-    timer = null;
+    clearInterval(timer)
+    timer = null
   }
-};
+}
 
 export const startQueryUserState = () => {
-  if (!timer) {
-    timer = queryUserStateCreater();
-  }
-};
+  if (!timer)
+    timer = queryUserStateCreater()
+}
 
-export const QueryUserState = queryUserState.event;
+export const QueryUserState = queryUserState.event

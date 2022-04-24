@@ -1,38 +1,39 @@
-import { BrowserWindow, BrowserWindowConstructorOptions, Display } from 'electron';
-import { screenWatcher } from 'electron-main/observables/screen.observable';
+import type { BrowserWindowConstructorOptions, Display } from 'electron'
+import { BrowserWindow } from 'electron'
+import { screenWatcher } from 'electron-main/observables/screen.observable'
 
 class BasePlayerWindow extends BrowserWindow {
   constructor(options: BrowserWindowConstructorOptions) {
-    super(options);
+    super(options)
 
-    this.autoResize();
+    this.autoResize()
   }
 
   private autoResize() {
     screenWatcher((e) => {
-      this.handleAutoResize(e.display);
+      this.handleAutoResize(e.display)
     })
   }
 
   handleAutoResize(display: Display) {
-    if (this.isDestroyed()) {
-      return;
-    }
+    if (this.isDestroyed())
+      return
 
-    if (!display) return;
+    if (!display)
+      return
 
-    const { size } = display;
+    const { size } = display
 
-    this.setFullScreen(true);
+    this.setFullScreen(true)
     this.setBounds(
       { x: 0, y: 0, height: size.height, width: size.width },
-      true
-    );
+      true,
+    )
   }
 
   destroy() {
-    super.destroy();
+    super.destroy()
   }
 }
 
-export default BasePlayerWindow;
+export default BasePlayerWindow

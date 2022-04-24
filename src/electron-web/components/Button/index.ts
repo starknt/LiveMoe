@@ -1,13 +1,13 @@
-import { Button } from './button';
-import { ButtonGroup } from './buttonGroup';
-import './button.css';
+import { Button } from './button'
+import { ButtonGroup } from './buttonGroup'
+import './button.css'
 
 type ButtonExport = typeof ButtonGroup & {
-  Button: typeof Button;
-};
+  Button: typeof Button
+}
 
-const button = ButtonGroup as ButtonExport;
-button.Button = Button;
+const button = ButtonGroup as ButtonExport
+button.Button = Button
 
-export default button;
-export { Button, ButtonGroup };
+export default button
+export { Button, ButtonGroup }
