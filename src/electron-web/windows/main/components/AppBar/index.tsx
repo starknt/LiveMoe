@@ -23,14 +23,15 @@ import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import { useNavigate } from 'react-router-dom';
 import About from '../about';
 import './index.css';
+import useToggle from 'electron-web/hooks/useToggle';
 
-const pages = ['主页', '壁纸', '组件'];
+const pages = ['壁纸', '组件'];
 const settings = ['个人信息', '消息', '退出登录'];
 
 export default React.forwardRef((_, ref) => {
   const navgation = useNavigate();
 
-  const [aboutOpen, setAboutOpen] = useState(false);
+  const [about, toggleAbout] = useToggle(false);
 
   const [anchorElMenu, setAnchorElMenu] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
@@ -39,21 +40,24 @@ export default React.forwardRef((_, ref) => {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleOpenAppMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElMenu(event.currentTarget);
-  };
+  const handleOpenAppMenu = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      setAnchorElMenu(event.currentTarget);
+    },
+    []
+  );
 
-  const handleCloseAppMenu = () => {
+  const handleCloseAppMenu = useCallback(() => {
     setAnchorElMenu(null);
-  };
+  }, []);
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = useCallback(() => {
     setAnchorElUser(null);
-  };
+  }, []);
 
-  const handleNavigate = () => {
+  const handleNavigate = useCallback(() => {
     navgation('');
-  };
+  }, [navgation]);
 
   const handleBack = useCallback(() => {
     navgation(-1);
@@ -61,7 +65,6 @@ export default React.forwardRef((_, ref) => {
 
   const handleRefresh = useCallback(() => {
     window.location.reload();
-    // window.livemoe.windowsService.refresh('main');
   }, []);
 
   const handleMinimize = useCallback(() => {
@@ -79,7 +82,7 @@ export default React.forwardRef((_, ref) => {
 
   const handleToggleAbout = useCallback(() => {
     handleCloseAppMenu();
-    setAboutOpen(true);
+    toggleAbout();
   }, []);
 
   return (
@@ -229,7 +232,7 @@ export default React.forwardRef((_, ref) => {
           </Box>
         </Toolbar>
       </Container>
-      <About open={aboutOpen} onClose={() => setAboutOpen(false)} />
+      <About open={about} onClose={() => toggleAbout()} />
     </AppBar>
   );
 });

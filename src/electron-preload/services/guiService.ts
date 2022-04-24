@@ -1,5 +1,6 @@
 import { IChannel } from 'common/electron-common';
 import { shell } from 'electron';
+import { stat } from 'fs/promises';
 import { LiveMoe } from 'livemoe';
 
 export default function createGuiService(
@@ -8,7 +9,7 @@ export default function createGuiService(
   return {
     openFolder: async (path: string) => {
       try {
-        // await stat(path);
+        await stat(path);
         await shell.openPath(path);
         return true;
       } catch {

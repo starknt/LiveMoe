@@ -2,20 +2,16 @@ import { Emitter } from 'common/electron-common/base/event';
 import { generateUuid } from 'common/electron-common/base/uuid';
 import type WindowEventBus from './WindowEventBus';
 import { IPCMainServer } from 'common/electron-main';
-import {
-  BrowserWindow,
-  BrowserWindowConstructorOptions,
-  shell,
-} from 'electron';
+import { BrowserWindow, BrowserWindowConstructorOptions } from 'electron';
 import { IDestroyable } from 'electron-main/common/lifecycle';
 import {
   IWindow,
   IWindowConstructor,
   IWindowContext,
-  IWindowMessageOptions,
 } from 'electron-main/common/windows';
 import { resolvePreloadPath } from 'electron-main/utils';
 import { WindowId } from './WindowManager';
+import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows';
 
 export interface EventBusOptions {
   ipcEvent?: boolean; // 是否注册 ipc-event, 可以接收来着 `ipc-*` 的消息
@@ -185,22 +181,39 @@ export default class WindowPool implements IDestroyable {
 
   createWindowContext(options?: IWindowOptions): IWindowContext {
     return {
-      getIPCChannel: (channelName: string, ctx: string = '') => {
-        return this.server.getChannel(ctx, channelName);
+      getChannel: async (
+        channelName: string,
+        local = true,
+        ctx: string = ''
+      ) => {
+        if (!local) {
+          return await this.getRemoteChannel(channelName, ctx);
+        }
+
+        return {
+          send: (command: string, ...args: any[]) => {},
+        };
       },
-      send: (target, preload, options) => {
-        options.boardcast ??= false;
-        this.eventBus.sendWindowMessage(target, preload, options);
-      },
+
       options: Object.assign({}, DefaultWindowOptions, options),
     };
   }
 
-  getChannel(channelName: string, ctx = '') {
-    return this.server.getChannel(ctx, channelName);
+  async getRemoteChannel(channelName: string, ctx = '') {
+    const remoteChannel = await this.server.getChannel(ctx, channelName);
+
+    return {
+      send: (command: string, ...args: any[]) => {
+        return remoteChannel.call(WINDOW_MESSAGE_TYPE.IPC_CALL, {
+          event: command,
+          type: WINDOW_MESSAGE_TYPE.IPC_CALL,
+          arg: args,
+        });
+      },
+    };
   }
 
-  sendWindowMessage(type: string, options: IWindowMessageOptions) {}
+  async getLocalChannel(channelName: string) {}
 
   private consumeWithConstructor(
     constructor: IWindowConstructor,
@@ -214,13 +227,6 @@ export default class WindowPool implements IDestroyable {
   private async produce(n = this._pool) {
     for (let i = this._windowPool.length; i <= n; i += 1) {
       const window = new IWindow(this.createWindowContext());
-
-      window.webContents.setWindowOpenHandler((details) => {
-        shell.openExternal(details.url);
-        return {
-          action: 'deny',
-        };
-      });
 
       this._windowPool.push(window);
       this._produced.fire();

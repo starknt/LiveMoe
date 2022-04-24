@@ -9,7 +9,7 @@ import type {
 import { generateUuid } from 'common/electron-common/base/uuid';
 import WindowPool, { IWindowOptions } from './WindowPool';
 import WindowEventBus from './WindowEventBus';
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, shell } from 'electron';
 
 export interface WindowOptions {
   constructor?: IWindowConstructor;
@@ -56,6 +56,13 @@ export default class WindowManager implements IDestroyable {
       options?.logic?.call(window);
 
       window.webContents.send('window:ctx', options.id ?? '');
+
+      window.webContents.setWindowOpenHandler((details) => {
+        shell.openExternal(details.url);
+        return {
+          action: 'deny',
+        };
+      });
 
       window.webContents.on('did-navigate', () => {
         window.webContents.send('window:ctx', options.id ?? '');

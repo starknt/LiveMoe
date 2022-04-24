@@ -1,7 +1,6 @@
 import { Event } from 'common/electron-common/base/event';
 import { BaseAutoResizeWindow } from 'electron-main/windows/base/baseWindow';
 import type { IWindowOptions } from 'electron-main/core/windowManager/WindowPool';
-import type { IChannel } from 'common/electron-common';
 import {
   EventPreloadType,
   WINDOW_MESSAGE_TYPE,
@@ -61,18 +60,17 @@ export interface IWindowMessageOptions {
   boardcast?: boolean;
 }
 
+export interface IWindowChannel {
+  send(command: string, ...args: unknown[]): void;
+}
+
 export interface IWindowContext {
   options: IWindowOptions;
-  /**
-   * @param {string} mode
-   * 默认为 `ipc`, 在该模式下, 会把消息发送到渲染进程, 在 `local` 模式下, 会把消息发送给主进程的其他信道
-   */
-  send(
+  getChannel(
     channelName: string,
-    preload: EventPreloadType,
-    options: IWindowMessageOptions
-  ): void;
-  getIPCChannel(channelName: string, ctx: string): Promise<IChannel>;
+    local?: boolean,
+    ctx?: string
+  ): Promise<IWindowChannel>;
 }
 
 export interface IProcessEventWindow {

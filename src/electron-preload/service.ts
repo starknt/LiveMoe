@@ -55,6 +55,9 @@ ipcRenderer.once('window:ctx', async (_, ctx: string) => {
     return;
   }
 
+  // 如果存在则不注入
+  if(window.livemoe) return;
+
   console.info(`正在注入服务, 当前服务上下文为: ${ctx}!!!`);
 
   const server = new IPCRendererServer(ctx, ipcRenderer);
