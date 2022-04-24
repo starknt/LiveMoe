@@ -16,11 +16,7 @@ import Taskbar from './core/Taskbar';
 import WindowManager from './core/windowManager/WindowManager';
 import { shutDownWatcher } from './observables/power.observable';
 import DataBase from './core/Database';
-import {
-  resolveGlobalAssets,
-  resolvePreloadPath,
-  resolvePreloadPath,
-} from './utils';
+import { resolveGlobalAssets } from './utils';
 import {
   EventPreloadType,
   WINDOW_MESSAGE_TYPE,

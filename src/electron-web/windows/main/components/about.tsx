@@ -10,6 +10,7 @@ import { Box, Link } from '@mui/material';
 import { useAppStore } from 'electron-web/store/store';
 import TinyText from 'electron-web/components/TinyText';
 import GitHubIcon from '@mui/icons-material/GitHub';
+import './about.css';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -79,7 +80,7 @@ const About: React.FC<AboutDialogProps> = ({ open, onClose }) => {
             }}
           >
             <Box sx={{ width: 64, height: 64 }}>
-              <img src={'icon.png'}></img>
+              <div className="app-icon"></div>
             </Box>
             <Box
               sx={{
