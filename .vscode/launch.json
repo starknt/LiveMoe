@@ -15,7 +15,7 @@
       ],
       "skipFiles": [
         "<node_internals>/**",
-        "${workspaceFolder}/node_modules/**/*.js",  //跳过node_modules
+        "${workspaceFolder}/node_modules/**/*.js", // 跳过node_modules
       ],
       "sourceMaps": true,
     },

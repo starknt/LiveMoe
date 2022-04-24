@@ -1,16 +1,16 @@
-import React from 'react';
-import { styled } from '@mui/material/styles';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import Typography from '@mui/material/Typography';
-import { Box, Link } from '@mui/material';
-import { useAppStore } from 'electron-web/store/store';
-import TinyText from 'electron-web/components/TinyText';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import './about.css';
+import React from 'react'
+import { styled } from '@mui/material/styles'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import IconButton from '@mui/material/IconButton'
+import CloseIcon from '@mui/icons-material/Close'
+import Typography from '@mui/material/Typography'
+import { Box, Link } from '@mui/material'
+import { useAppStore } from 'electron-web/store/store'
+import TinyText from 'electron-web/components/TinyText'
+import GitHubIcon from '@mui/icons-material/GitHub'
+import './about.css'
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -19,21 +19,22 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogActions-root': {
     padding: theme.spacing(1),
   },
-}));
+}))
 
 export interface DialogTitleProps {
-  id: string;
-  children?: React.ReactNode;
-  onClose: () => void;
+  id: string
+  children?: React.ReactNode
+  onClose: () => void
 }
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
-  const { children, onClose, ...other } = props;
+  const { children, onClose, ...other } = props
 
   return (
     <DialogTitle sx={{ m: 0, p: 2 }} {...other}>
       {children}
-      {onClose ? (
+      {onClose
+        ? (
         <IconButton
           aria-label="close"
           onClick={onClose}
@@ -41,23 +42,24 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
             position: 'absolute',
             right: 8,
             top: 8,
-            color: (theme) => theme.palette.grey[500],
+            color: theme => theme.palette.grey[500],
           }}
         >
           <CloseIcon />
         </IconButton>
-      ) : null}
+          )
+        : null}
     </DialogTitle>
-  );
-};
+  )
+}
 
 interface AboutDialogProps {
-  open: boolean;
-  onClose: () => void;
+  open: boolean
+  onClose: () => void
 }
 
 const About: React.FC<AboutDialogProps> = ({ open, onClose }) => {
-  const application = useAppStore().applicationConfiguration.application;
+  const application = useAppStore().applicationConfiguration.application
 
   return (
     <div>
@@ -91,17 +93,17 @@ const About: React.FC<AboutDialogProps> = ({ open, onClose }) => {
             >
               <Box sx={{ textAlign: 'center' }}>
                 <TinyText>{`${application.name}`}</TinyText>
-                <TinyText>{`软件概述: `}</TinyText>
-                <TinyText>{`electron: `}</TinyText>
-                <TinyText>{`chromium: `}</TinyText>
-                <TinyText>{`nodejs: `}</TinyText>
-                <TinyText>{`v8: `}</TinyText>
+                <TinyText>{'软件概述: '}</TinyText>
+                <TinyText>{'electron: '}</TinyText>
+                <TinyText>{'chromium: '}</TinyText>
+                <TinyText>{'nodejs: '}</TinyText>
+                <TinyText>{'v8: '}</TinyText>
               </Box>
               <Box sx={{ textAlign: 'center' }}>
                 <TinyText>{`v${application.version.app}`}</TinyText>
                 <TinyText
                   noWrap
-                >{`LiveMoe 是一款基于 Electron 的免费开源桌面壁纸播放器`}</TinyText>
+                >{'LiveMoe 是一款基于 Electron 的免费开源桌面壁纸播放器'}</TinyText>
                 <TinyText>{`v ${application.version.electron}`}</TinyText>
                 <TinyText>{`v ${application.version.chrome}`}</TinyText>
                 <TinyText>{`v ${application.version.node}`}</TinyText>
@@ -149,7 +151,7 @@ const About: React.FC<AboutDialogProps> = ({ open, onClose }) => {
         </DialogContent>
       </BootstrapDialog>
     </div>
-  );
-};
+  )
+}
 
-export default About;
+export default About

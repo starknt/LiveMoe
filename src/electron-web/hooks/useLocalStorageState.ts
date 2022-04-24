@@ -1,83 +1,85 @@
-import { useCallback, useEffect, useState } from 'react';
-import useMemoizedFn from './useMemoFn';
-import useUpdateEffect from './useUpdateEffect';
+import { useCallback, useEffect, useState } from 'react'
+import useMemoizedFn from './useMemoFn'
+import useUpdateEffect from './useUpdateEffect'
 
-export default function useLocalStorageState<T extends any>(
+export default function useLocalStorageState<T>(
   key: string,
   initialValue: T,
-  watch?: boolean
+  watch?: boolean,
 ): [T | undefined, (value?: T | ((prevState?: T) => T)) => void] {
-  watch = watch ?? false;
+  watch = watch ?? false
 
   const getStoredValue = useCallback(() => {
     try {
-      const value = localStorage.getItem(key);
-      if (value) {
-        return JSON.parse(value);
-      }
+      const value = localStorage.getItem(key)
+      if (value)
+        return JSON.parse(value)
 
-      if (typeof initialValue === 'function') {
-        return initialValue();
-      }
+      if (typeof initialValue === 'function')
+        return initialValue()
 
-      return initialValue;
-    } catch (error) {
-      console.error(error);
-
-      if (typeof initialValue === 'function') {
-        return initialValue();
-      }
-
-      return initialValue;
+      return initialValue
     }
-  }, []);
+    catch (error) {
+      console.error(error)
 
-  const [storage, setValue] = useState<T | undefined>(() => getStoredValue());
+      if (typeof initialValue === 'function')
+        return initialValue()
+
+      return initialValue
+    }
+  }, [])
+
+  const [storage, setValue] = useState<T | undefined>(() => getStoredValue())
 
   useEffect(() => {
-    if(!watch) return;
+    if (!watch)
+      return
 
     const timer = setInterval(() => {
       try {
-        const value = localStorage.getItem(key);
+        const value = localStorage.getItem(key)
 
-        if (value && JSON.stringify(value) !== JSON.stringify(storage)) {
-          setValue(JSON.parse(value));
-        }
-      } catch {}
-    }, 50);
+        if (value && JSON.stringify(value) !== JSON.stringify(storage))
+          setValue(JSON.parse(value))
+      }
+      catch {}
+    }, 50)
 
-    return () => clearInterval(timer);
-  }, [watch]);
+    return () => clearInterval(timer)
+  }, [watch])
 
   useUpdateEffect(() => {
-    setValue(getStoredValue());
-  }, [key]);
+    setValue(getStoredValue())
+  }, [key])
 
   const setStorageValue = useMemoizedFn(
     (value?: T | ((prevState?: T) => T)) => {
       if (typeof value === 'undefined') {
-        setValue(undefined);
-        localStorage?.removeItem(key);
-      } else if (typeof value === 'function') {
-        // @ts-ignore
-        const currentState = value(storage);
+        setValue(undefined)
+        localStorage?.removeItem(key)
+      }
+      else if (typeof value === 'function') {
+        const currentState = (value as Function)(storage)
         try {
-          setValue(currentState);
-          localStorage?.setItem(key, JSON.stringify(currentState));
-        } catch (e) {
-          console.error(e);
+          setValue(currentState)
+          localStorage?.setItem(key, JSON.stringify(currentState))
         }
-      } else {
-        try {
-          setValue(value);
-          localStorage?.setItem(key, JSON.stringify(value));
-        } catch (e) {
-          console.error(e);
+        catch (e) {
+          console.error(e)
         }
       }
-    }
-  );
+      else {
+        try {
+          setValue(value)
+          localStorage?.setItem(key, JSON.stringify(value))
+        }
+        catch (e) {
+          console.error(e)
+        }
+      }
+    },
+  )
 
-  return [storage, setStorageValue];
+  return [storage, setStorageValue]
 }

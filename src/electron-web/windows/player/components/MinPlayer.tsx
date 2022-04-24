@@ -6,25 +6,25 @@ import {
   Slider,
   SvgIcon,
   Tooltip,
-} from '@mui/material';
-import useOnceEffect from 'electron-web/hooks/useOnceEffect';
-import { useAppDispatch } from 'electron-web/store/store';
+} from '@mui/material'
+import useOnceEffect from 'electron-web/hooks/useOnceEffect'
+import { useAppDispatch } from 'electron-web/store/store'
 import {
   initalizePlayerState,
   selectPlayerConfiguration,
   updateConfigurationAll,
-} from 'electron-web/features/playerSlice';
-import { Suspense, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import SkipPreviousRoundedIcon from '@mui/icons-material/SkipPreviousRounded';
-import SkipNextRoundedIcon from '@mui/icons-material/SkipNextRounded';
-import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
-import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
-import VolumeDownRoundedIcon from '@mui/icons-material/VolumeDownRounded';
-import RepeatOneRoundedIcon from '@mui/icons-material/RepeatOneRounded';
-import RepeatRoundedIcon from '@mui/icons-material/RepeatRounded';
-import './player.css';
-import BorderLinearProgress from 'electron-web/components/BorderLinearProgress';
+} from 'electron-web/features/playerSlice'
+import { Suspense, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import SkipPreviousRoundedIcon from '@mui/icons-material/SkipPreviousRounded'
+import SkipNextRoundedIcon from '@mui/icons-material/SkipNextRounded'
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded'
+import PauseRoundedIcon from '@mui/icons-material/PauseRounded'
+import VolumeDownRoundedIcon from '@mui/icons-material/VolumeDownRounded'
+import RepeatOneRoundedIcon from '@mui/icons-material/RepeatOneRounded'
+import RepeatRoundedIcon from '@mui/icons-material/RepeatRounded'
+import './player.css'
+import BorderLinearProgress from 'electron-web/components/BorderLinearProgress'
 
 const RandomIcon = (props: any) => {
   return (
@@ -34,29 +34,30 @@ const RandomIcon = (props: any) => {
         p-id="2659"
       ></path>
     </SvgIcon>
-  );
-};
+  )
+}
 
 export default function MinPlayer() {
-  const dispath = useAppDispatch();
-  const configuration = useSelector(selectPlayerConfiguration);
+  const dispath = useAppDispatch()
+  const configuration = useSelector(selectPlayerConfiguration)
 
   useOnceEffect(() => {
-    console.log('Player init');
-    dispath(initalizePlayerState());
-  });
+    console.log('Player init')
+    dispath(initalizePlayerState())
+  })
 
   useEffect(() => {
-    if (!window.livemoe) return;
+    if (!window.livemoe)
+      return
     livemoe.wallpaperPlayerService
       .onConfigChange()
-      .then((onConfigurationChange) =>
+      .then(onConfigurationChange =>
         onConfigurationChange((config) => {
-          dispath(updateConfigurationAll(config));
-        })
+          dispath(updateConfigurationAll(config))
+        }),
       )
-      .catch((err) => console.error(err));
-  }, []);
+      .catch(err => console.error(err))
+  }, [])
 
   return (
     <Paper style={{ height: '100vh' }}>
@@ -90,7 +91,8 @@ export default function MinPlayer() {
             gridColumn="1 / 5"
           >
             {configuration.configuration.wallpaperConfiguration
-              ?.rawConfiguration.preview ? (
+              ?.rawConfiguration.preview
+              ? (
               <img
                 src={
                   configuration.configuration.wallpaperConfiguration
@@ -98,9 +100,10 @@ export default function MinPlayer() {
                 }
                 alt="poster"
               />
-            ) : (
+                )
+              : (
               <img src="https://picsum.photos/200/300" alt="poster" />
-            )}
+                )}
           </Box>
           {/* 控制器 */}
           <Box
@@ -141,11 +144,13 @@ export default function MinPlayer() {
                 }}
                 className="non-draggable"
               >
-                {configuration.configuration.status === 'playing' ? (
+                {configuration.configuration.status === 'playing'
+                  ? (
                   <PauseRoundedIcon />
-                ) : (
+                    )
+                  : (
                   <PlayArrowRoundedIcon />
-                )}
+                    )}
               </IconButton>
             </Tooltip>
             <Tooltip followCursor placement="top" title="播放下一张壁纸">
@@ -173,8 +178,8 @@ export default function MinPlayer() {
           >
             <ButtonBase
               sx={{
-                padding: '2px',
-                paddingRight: '4px',
+                'padding': '2px',
+                'paddingRight': '4px',
                 ':hover': {
                   color: 'skyblue',
                 },
@@ -206,5 +211,5 @@ export default function MinPlayer() {
         </Box>
       </Suspense>
     </Paper>
-  );
+  )
 }
