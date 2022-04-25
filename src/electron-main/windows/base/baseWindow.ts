@@ -1,12 +1,7 @@
-import { Emitter, Event } from 'common/electron-common/base/event'
 import type { IDisposable } from 'common/electron-common/base/lifecycle'
-import type {
-  BrowserWindowConstructorOptions,
-  Display,
-} from 'electron'
-import {
-  BrowserWindow,
-} from 'electron'
+import type { BrowserWindowConstructorOptions, Display } from 'electron'
+import { Emitter, Event } from 'common/electron-common/base/event'
+import { BrowserWindow } from 'electron'
 import { screenWatcher } from 'electron-main/observables/screen.observable'
 
 abstract class BaseWindow extends BrowserWindow {

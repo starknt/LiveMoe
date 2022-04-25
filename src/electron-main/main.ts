@@ -21,14 +21,14 @@ async function exceptionHandler() {
 
   process.on('SIGTERM', () => {
     if (win()) {
-      require('win-func-tools').RestoreWorkerW()
+      (dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools')).RestoreWorkerW()
       app.quit()
     }
   })
 
   process.on('SIGINT', () => {
     if (win()) {
-      require('win-func-tools').RestoreWorkerW()
+      (dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools')).RestoreWorkerW()
       app.quit()
     }
   })

@@ -1,52 +1,18 @@
+import type { IpcMainEvent, LoadFileOptions, LoadURLOptions, Rectangle } from 'electron'
+import type { IWallpaperPlayerViewConfiguration, IWallpaperPlayerWindowConfiguration } from 'electron-main/common/windowConfiguration'
+import type { IWallpaperConfiguration, IWallpaperPlayProgress, IWallpaperPlayerState, IWallpaperPlayerTypes, IWallpaperPlayingConfiguration, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
+import type { IWallpaperFailLoadEvent, IWallpaperView } from 'electron-main/common/wallpaperPlayer'
+import type { IWallpaperPlayerAudioChangeEvent, IWallpaperPlayerDisabledChangeEvent, IWallpaperPlayerLoopChangeEvent, IWallpaperPlayerPlayFailEvent, IWallpaperPlayerVolumeChangeEvent } from 'common/electron-common/wallpaperPlayerWindow'
+import type { IDisposable } from 'common/electron-common/base/lifecycle'
 import { Emitter, Event } from 'common/electron-common/base/event'
 import { dev, linux, macOS, win } from 'common/electron-common/environment'
-import type {
-  IpcMainEvent,
-  LoadFileOptions,
-  LoadURLOptions,
-  Rectangle,
-} from 'electron'
-import {
-  BrowserView,
-  ipcMain,
-} from 'electron'
-import type {
-  IWallpaperPlayerViewConfiguration,
-  IWallpaperPlayerWindowConfiguration,
-} from 'electron-main/common/windowConfiguration'
-import {
-  WallpaperPlayerViewConfiguration,
-  WallpaperPlayerWindowConfiguration,
-} from 'electron-main/common/windowConfiguration'
-import type {
-  IWallpaperConfiguration,
-  IWallpaperPlayProgress,
-  IWallpaperPlayerState,
-  IWallpaperPlayerTypes,
-  IWallpaperPlayingConfiguration,
-  PlayRuntimeConfiguration,
-} from 'common/electron-common/wallpaperPlayer'
-import type {
-  IWallpaperFailLoadEvent,
-  IWallpaperView,
-} from 'electron-main/common/wallpaperPlayer'
-import {
-  validateWallpaperConfiguration,
-} from 'electron-main/common/wallpaperPlayer'
+import { BrowserView, ipcMain } from 'electron'
+import { WallpaperPlayerViewConfiguration, WallpaperPlayerWindowConfiguration } from 'electron-main/common/windowConfiguration'
+import { validateWallpaperConfiguration } from 'electron-main/common/wallpaperPlayer'
 import { resolveWallpaperHtmlPath } from 'electron-main/utils'
+import { toDisposable } from 'common/electron-common/base/lifecycle'
 import WallpaperPlayerMsgProcess from 'electron-main/core/wallpaperPlayer/wallpaperPlayerMsgProcess'
 import { TimerHelper } from 'electron-main/common/timer'
-import type {
-  IWallpaperPlayerAudioChangeEvent,
-  IWallpaperPlayerDisabledChangeEvent,
-  IWallpaperPlayerLoopChangeEvent,
-  IWallpaperPlayerPlayFailEvent,
-  IWallpaperPlayerVolumeChangeEvent,
-} from 'common/electron-common/wallpaperPlayerWindow'
-import type { IDisposable } from 'common/electron-common/base/lifecycle'
-import {
-  toDisposable,
-} from 'common/electron-common/base/lifecycle'
 import BasePlayerWindow from './base/basePlayerWindow'
 
 class WallpaperPlayerView implements IWallpaperView {

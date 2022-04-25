@@ -1,40 +1,17 @@
 import applicationLogger from 'common/electron-common/applicationLogger'
 import { Emitter, Event } from 'common/electron-common/base/event'
-import {
-  DEFAULT_CONFIGURATION,
-  DEFAULT_PLAY_RUNTIME_CONFIGURATION,
-  type IWallpaperConfiguration,
-  type IWallpaperPlayProgress,
-  type IWallpaperPlayerConfiguration,
-  type IWallpaperPlayerMode,
-  type PlayRuntimeConfiguration,
-} from 'common/electron-common/wallpaperPlayer'
+import { DEFAULT_CONFIGURATION, DEFAULT_PLAY_RUNTIME_CONFIGURATION, type IWallpaperConfiguration, type IWallpaperPlayProgress, type IWallpaperPlayerConfiguration, type IWallpaperPlayerMode, type PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 import type { IPCMainServer } from 'common/electron-main'
-import {
-  type IWallpaperFailLoadEvent,
-  type IWallpaperPlayer,
-  validateWallpaperConfiguration,
-} from 'electron-main/common/wallpaperPlayer'
+import { type IWallpaperFailLoadEvent, type IWallpaperPlayer, validateWallpaperConfiguration } from 'electron-main/common/wallpaperPlayer'
 import WallpaperPlayerWindow from 'electron-main/windows/wallpaperPlayerWindow'
 import { type Display, globalShortcut, ipcMain, screen } from 'electron'
-import { win } from 'common/electron-common/environment'
+import { dev, win } from 'common/electron-common/environment'
 import { screenWatcher } from 'electron-main/observables/screen.observable'
-import type {
-  IWallpaperPlayerAudioChangeEvent,
-  IWallpaperPlayerDisabledChangeEvent,
-  IWallpaperPlayerLoopChangeEvent,
-  IWallpaperPlayerVolumeChangeEvent,
-} from 'common/electron-common/wallpaperPlayerWindow'
-import {
-  lockScreenWatcher,
-  unLockScreenWatcher,
-} from 'electron-main/observables/power.observable'
+import type { IWallpaperPlayerAudioChangeEvent, IWallpaperPlayerDisabledChangeEvent, IWallpaperPlayerLoopChangeEvent, IWallpaperPlayerVolumeChangeEvent } from 'common/electron-common/wallpaperPlayerWindow'
+import { lockScreenWatcher, unLockScreenWatcher } from 'electron-main/observables/power.observable'
 import { debounce } from 'common/electron-common/base/functional'
 import type Application from 'electron-main/Application'
-import {
-  type EventPreloadType,
-  WINDOW_MESSAGE_TYPE,
-} from 'common/electron-common/windows'
+import { type EventPreloadType, WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import { Service } from 'common/electron-common'
 import type { DocRes } from 'common/electron-common/database'
 import { reactive } from 'common/electron-common/reactive'
@@ -286,12 +263,11 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
         this.pause()
         return true
       case 'play':
-        {
-          if (typeof preload.arg === 'object' && preload.arg)
-            this.play(preload.arg)
-          else
-            this.play()
-        }
+        if (typeof preload.arg === 'object' && preload.arg)
+          this.play(preload.arg)
+        else
+          this.play()
+
         return true
       case 'disable':
         this.disable()
@@ -300,24 +276,23 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
         this.enable()
         return true
       case 'volume':
-        {
-          if (typeof preload.arg === 'number') {
-            this.window.setVolume(preload.arg)
-            return true
-          }
+        if (typeof preload.arg === 'number') {
+          this.window.setVolume(preload.arg)
+          return true
         }
+
         return false
       case 'seek':
-        {
-          if (typeof preload.arg === 'number') {
-            this.window.seek(preload.arg)
-            return true
-          }
+
+        if (typeof preload.arg === 'number') {
+          this.window.seek(preload.arg)
+          return true
         }
+
         return false
-      case 'playlist': {
+      case 'playlist':
         return this.playlist
-      }
+
       case 'configuration': {
         if (typeof preload.arg === 'object') {
           // TODO: 待优化
@@ -501,7 +476,7 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
           if (!this.electronScreen || !this.rtConfiguration.viewMode)
             return
 
-          const windowTools = require('win-func-tools')
+          const windowTools = dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools')
 
           const { scaleFactor } = this.electronScreen
 
@@ -737,7 +712,7 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
 
       /** 保存壁纸播放进度 */
       if (win()) {
-        const windowTools = require('win-func-tools')
+        const windowTools = dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools')
         windowTools.RestoreWorkerW()
         windowTools.ShowDesktopIcon()
         windowTools.ShowShellWindow()

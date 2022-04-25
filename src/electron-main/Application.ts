@@ -5,14 +5,10 @@ import type minimist from 'minimist'
 import applicationLogger from 'common/electron-common/applicationLogger'
 import i18next from 'i18next'
 import type { EventPreloadType } from 'common/electron-common/windows'
-import {
-  WINDOW_MESSAGE_TYPE,
-} from 'common/electron-common/windows'
+import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
 import type { IApplicationContext } from './common/application'
-import {
-  DEFAULT_CONFIGURATION,
-} from './common/application'
+import { DEFAULT_CONFIGURATION } from './common/application'
 import WallpaperPlayer from './core/wallpaperPlayer/WallpaperPlayer'
 import ApplicationTray from './core/ApplicationTray'
 import MainWindow from './windows/MainWindow'
@@ -233,12 +229,10 @@ export default class Application extends ApplicationEventBus {
   private async dispatchCallWindowMessage(preload: EventPreloadType) {
     switch (preload.event) {
       case 'configuration':
-        {
-          if (typeof preload.arg === 'object') {
-            this.configuration = preload.arg
-            this.updateApplicationConfiguration()
-            return true
-          }
+        if (typeof preload.arg === 'object') {
+          this.configuration = preload.arg
+          this.updateApplicationConfiguration()
+          return true
         }
         return this.configuration
       case 'quit':
