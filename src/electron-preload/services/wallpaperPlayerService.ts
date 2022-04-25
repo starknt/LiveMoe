@@ -96,6 +96,12 @@ const createWallpaperPlayerService = (
         arg: volume,
       })
     },
+    toggle: async() => {
+      return await wallpaperPlayerService.call(WINDOW_MESSAGE_TYPE.IPC_CALL, {
+        type: WINDOW_MESSAGE_TYPE.IPC_CALL,
+        event: 'toggle',
+      })
+    },
 
     onConfigChange: async() => {
       return wallpaperPlayerService.listen(WINDOW_MESSAGE_TYPE.IPC_LISTEN, {

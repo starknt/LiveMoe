@@ -1,7 +1,20 @@
 .app-bar {
+  transition: all 0.2s ease-in-out;
+  top: -2px;
+}
+
+.app-bar-light {
   border-top-right-radius: inherit;
   border-top-left-radius: inherit;
-  background-image: url('/assets/public/background.png');
+  background-image: url('/assets/public/background.light.png') !important;
+  background-size: cover;
+  background-position: center;
+}
+
+.app-bar-dark {
+  border-top-right-radius: inherit;
+  border-top-left-radius: inherit;
+  background-image: url('/assets/public/background.dark.png') !important;
   background-size: cover;
   background-position: center;
 }

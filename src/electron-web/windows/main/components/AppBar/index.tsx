@@ -1,18 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import {
-  AppBar,
-  Box,
-  Button,
-  Container,
-  IconButton,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Skeleton,
-  Toolbar,
-  Typography,
-} from '@mui/material'
+import { AppBar, Box, Container, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Skeleton, Toolbar, Typography } from '@mui/material'
 import MinimizeRoundedIcon from '@mui/icons-material/MinimizeRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
@@ -20,15 +7,32 @@ import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplica
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded'
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded'
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded'
+import LightModeIcon from '@mui/icons-material/LightMode'
+import DarkModeIcon from '@mui/icons-material/DarkMode'
 import { useNavigate } from 'react-router-dom'
 import useToggle from 'electron-web/hooks/useToggle'
+import useLocalStorageState from 'electron-web/hooks/useLocalStorageState'
+import classNames from 'classnames'
 import About from '../about'
+import type { INavgationItem } from '../navgation'
+import Navigation from '../navgation'
 import './index.css'
 
-const pages = ['壁纸', '组件']
 const settings = ['个人信息', '消息', '退出登录']
 
+const NavItems: INavgationItem[] = [
+  {
+    name: '我的壁纸',
+    to: '',
+  },
+  {
+    name: '组件',
+    to: 'plugin',
+  },
+]
+
 export default React.forwardRef((_, ref) => {
+  const [themeValue, setThemeValue] = useLocalStorageState('theme', 'light', true)
   const navgation = useNavigate()
 
   const [about, toggleAbout] = useToggle(false)
@@ -54,10 +58,6 @@ export default React.forwardRef((_, ref) => {
   const handleCloseUserMenu = useCallback(() => {
     setAnchorElUser(null)
   }, [])
-
-  const handleNavigate = useCallback(() => {
-    navgation('')
-  }, [navgation])
 
   const handleBack = useCallback(() => {
     navgation(-1)
@@ -85,12 +85,22 @@ export default React.forwardRef((_, ref) => {
     toggleAbout()
   }, [])
 
+  const handleThemeModeChange = useCallback(() => {
+    if (themeValue === 'light')
+      setThemeValue('dark')
+    else
+      setThemeValue('light')
+  }, [themeValue])
+
+  const appBarClassName = classNames('app-bar', 'draggable', `app-bar-${themeValue}`)
+
   return (
     <AppBar
       ref={ref}
       position="fixed"
       color="secondary"
-      className="draggable app-bar"
+      className={appBarClassName}
+      enableColorOnDark
     >
       <Container style={{ paddingRight: 0 }} sx={{ gap: 1 }} maxWidth="xl">
         <Toolbar style={{ paddingRight: 6 }}>
@@ -109,19 +119,7 @@ export default React.forwardRef((_, ref) => {
               paddingRight: 0,
             }}
           >
-            {pages.map(page => (
-              <Button
-                onClick={handleNavigate}
-                className="non-draggable"
-                key={page}
-                sx={{
-                  my: 2,
-                  display: 'block',
-                }}
-              >
-                {page}
-              </Button>
-            ))}
+            <Navigation items={NavItems} />
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
@@ -199,6 +197,23 @@ export default React.forwardRef((_, ref) => {
           </Box>
 
           <Box sx={{ flexGrow: 0, mx: 1 }}>
+              <IconButton
+                disableRipple
+                disableFocusRipple
+                className="non-draggable"
+                sx={{
+                  'p': 1,
+                  ':hover': {
+                    color: 'skyblue',
+                  },
+                }}
+                onClick={handleThemeModeChange}
+              >
+                {
+                  themeValue === 'dark' ? <LightModeIcon /> : <DarkModeIcon />
+                }
+              </IconButton>
+
             <IconButton
               onClick={handleMinimize}
               sx={{

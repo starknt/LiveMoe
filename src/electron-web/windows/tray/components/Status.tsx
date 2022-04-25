@@ -1,9 +1,4 @@
-import {
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Typography,
-} from '@mui/material'
+import { ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material'
 import type { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer'
 import useAsyncEffect from 'electron-web/hooks/useAsyncEffect'
 import DesktopWindowsRoundedIcon from '@mui/icons-material/DesktopWindowsRounded'
