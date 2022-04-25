@@ -3,6 +3,7 @@ import Wallpaper from './Wallpaper'
 import NotMatch from './NotMatch'
 import Home from './Home'
 import { Layout } from './layout'
+import Plugins from './Plugins'
 
 const routers: RouteObject[] = [
   {
@@ -10,16 +11,16 @@ const routers: RouteObject[] = [
     element: <Layout />,
     children: [
       {
+        path: 'explore',
         element: <Home />,
       },
       {
         index: true,
-        // path: 'wallpaper',
         element: <Wallpaper />,
       },
       {
-        path: '*',
-        element: <NotMatch />,
+        path: 'plugin',
+        element: <Plugins />,
       },
     ],
   },

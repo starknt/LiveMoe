@@ -185,7 +185,7 @@ export default function Setting() {
             <SettingCheckbox
               onChange={handleViewModeChange}
               checked={playerConfiguration.configuration.viewMode}
-              help="桌面双击进入观赏模式"
+              help={<>{'桌面双击进入观赏模式, 按'}<code>Ctrl+Shift+Q</code>{'退出'}</>}
             >
               <SettingTypography>观赏模式</SettingTypography>
             </SettingCheckbox>

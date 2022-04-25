@@ -267,7 +267,6 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
           this.play(preload.arg)
         else
           this.play()
-
         return true
       case 'disable':
         this.disable()
@@ -283,13 +282,19 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
 
         return false
       case 'seek':
-
         if (typeof preload.arg === 'number') {
           this.window.seek(preload.arg)
           return true
         }
 
         return false
+      case 'toggle':
+        if (this.rtConfiguration.status === 'playing')
+          this.pause()
+        else
+          this.play()
+
+        return true
       case 'playlist':
         return this.playlist
 

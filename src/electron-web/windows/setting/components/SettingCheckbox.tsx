@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 
 export interface SettingCheckboxProps extends CheckboxProps {
-  help?: string
+  help?: string | React.ReactNode
 }
 
 const SettingCheckbox: React.FC<SettingCheckboxProps> = ({

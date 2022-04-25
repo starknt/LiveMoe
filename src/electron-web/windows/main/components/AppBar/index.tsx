@@ -14,10 +14,22 @@ import useToggle from 'electron-web/hooks/useToggle'
 import useLocalStorageState from 'electron-web/hooks/useLocalStorageState'
 import classNames from 'classnames'
 import About from '../about'
+import type { INavgationItem } from '../navgation'
 import Navigation from '../navgation'
 import './index.css'
 
 const settings = ['个人信息', '消息', '退出登录']
+
+const NavItems: INavgationItem[] = [
+  {
+    name: '我的壁纸',
+    to: '',
+  },
+  {
+    name: '组件',
+    to: 'plugin',
+  },
+]
 
 export default React.forwardRef((_, ref) => {
   const [themeValue, setThemeValue] = useLocalStorageState('theme', 'light', true)
@@ -107,7 +119,7 @@ export default React.forwardRef((_, ref) => {
               paddingRight: 0,
             }}
           >
-            <Navigation />
+            <Navigation items={NavItems} />
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
