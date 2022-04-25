@@ -1,8 +1,5 @@
-import type {
-  IWallpaperConfiguration,
-  PlayRuntimeConfiguration,
-} from 'common/electron-common/wallpaperPlayer'
 import React from 'react'
+import type { IWallpaperConfiguration, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 import WallpaperCard from './wallpaperCard'
 
 interface WallpaperContainerProps {

@@ -10,13 +10,9 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import ButtonGroup from 'electron-web/components/Button'
 import Input from 'electron-web/components/Input'
 import { useSelector } from 'react-redux'
-import {
-  selectPlayList,
-  selectPlayerConfiguration,
-} from 'electron-web/features/playerSlice'
+import { selectPlayList, selectPlayerConfiguration } from 'electron-web/features/playerSlice'
 import { Backdrop, CircularProgress, Divider, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material'
-
-import WallpaperContainer from './wallpaper'
+import WallpaperContainer from './components/wallpaperContainer'
 import './index.css'
 
 interface IWallpaperItem {
@@ -226,7 +222,6 @@ const Wallpaper: React.FC = () => {
         playerConfiguration={player.configuration}
         onContextMenu={onContextMenu}
       />
-
       <Menu
         sx={{ minWidth: 40 }}
         open={contextMenu !== null}

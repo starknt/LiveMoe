@@ -16,16 +16,8 @@ import RepeatRoundedIcon from '@mui/icons-material/RepeatRounded'
 import { Paper, SvgIcon, Tooltip } from '@mui/material'
 import type { PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 import Widget from 'electron-web/components/Widget'
-import type {
-  FC,
-  PropsWithChildren,
-  ReactNode,
-} from 'react'
-import {
-  memo,
-  useCallback,
-  useState,
-} from 'react'
+import type { FC, PropsWithChildren, ReactNode } from 'react'
+import { memo, useCallback, useState } from 'react'
 import Progress from './Progress'
 
 const CoverImage = styled('div')({
@@ -58,31 +50,9 @@ interface PlayerProps {
   configuration: PlayRuntimeConfiguration
 }
 
-function handleUpdate(
-  prev: Readonly<PropsWithChildren<PlayerProps & { children?: ReactNode }>>,
-  next: Readonly<PropsWithChildren<PlayerProps & { children?: ReactNode }>>,
-) {
-  const pConfiguration = prev.configuration
-  const nConfiguration = next.configuration
-  console.log('handleUpdate', pConfiguration, nConfiguration)
-  try {
-    return (
-      pConfiguration.status === nConfiguration.status
-      && pConfiguration.volume === nConfiguration.volume
-      && JSON.stringify(pConfiguration.wallpaperConfiguration)
-        === JSON.stringify(nConfiguration.wallpaperConfiguration)
-      && pConfiguration.mode === nConfiguration.mode
-    )
-  }
-  catch (error) {
-    return false
-  }
-}
-
 const NormalPlayer: FC<PlayerProps> = memo(({ configuration }) => {
   const theme = useTheme()
   const [volume, setVolume] = useState(configuration.volume ?? 50)
-  console.log('NormalPlayer', configuration)
   const handlePrev = useCallback(() => {
     window.livemoe.wallpaperPlayerService.prev()
   }, [])

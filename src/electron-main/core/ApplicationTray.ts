@@ -1,14 +1,12 @@
-import { Tray } from 'electron'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
-import { resolveGlobalAssets } from 'electron-main/utils'
-import type { IWindow } from 'electron-main/common/windows'
-import { Service } from 'common/electron-common'
 import type { IApplicationContext } from 'electron-main/common/application'
+import type { IWindow } from 'electron-main/common/windows'
 import type { IPCMainServer } from 'common/electron-main'
 import type { EventPreloadType } from 'common/electron-common/windows'
-import {
-  WINDOW_MESSAGE_TYPE,
-} from 'common/electron-common/windows'
+import { Tray } from 'electron'
+import { Service } from 'common/electron-common'
+import { resolveGlobalAssets } from 'electron-main/utils'
+import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import { Emitter, Event } from 'common/electron-common/base/event'
 
 export default class ApplicationTray implements IDestroyable {
@@ -66,6 +64,7 @@ export default class ApplicationTray implements IDestroyable {
 
             e(() => {
               this.window?.show()
+              this.window?.focus()
             })
           })
           .catch((e) => {

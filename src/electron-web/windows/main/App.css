@@ -15,7 +15,7 @@ body {
   min-height: 100vh;
   max-height: 100vh;
   overflow: auto;
-  border-radius: 6px;
+  border-radius: 8px;
   z-index: 99999;
 }
 

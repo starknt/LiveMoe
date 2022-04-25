@@ -1,0 +1,49 @@
+.MuiListItemButton-root {
+  --borderColor: #03A9F3;
+  --borderWidth: 2px;
+  color: rgb(0, 0, 0);
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  border: var(--borderWidth) solid var(--borderColor);
+}
+
+.MuiListItemButton-root::before, .MuiListItemButton-root::after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  transition: .3s ease-in-out;
+}
+
+.MuiListItemButton-root::before {
+  top: -5px;
+  left: -5px;
+  border-top: var(--borderWidth) solid var(--borderColor);
+  border-left: var(--borderWidth) solid var(--borderColor);
+}
+
+.MuiListItemButton-root::after {
+  right: -5px;
+  bottom: -5px;
+  border-bottom: var(--borderWidth) solid var(--borderColor);
+  border-right: var(--borderWidth) solid var(--borderColor);
+}
+
+.MuiListItemButton-root.Mui-selected {
+  color: rgb(255, 255, 255);
+}
+
+.MuiListItemButton-root.Mui-selected::before, .MuiListItemButton-root.Mui-selected::after {
+  width: calc(100% + 9px);
+  height: calc(100% + 9px);
+}
+
+.MuiListItemButton-root:hover {
+  color: #fff;
+}
+
+.MuiListItemButton-root:hover::before,
+.MuiListItemButton-root:hover::after {
+  width: calc(100% + 9px);
+  height: calc(100% + 9px);
+}

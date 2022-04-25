@@ -15,19 +15,19 @@ export function Layout() {
 
   useEffect(() => {
     forceUpdate()
-  }, [ref])
+  }, [ref.current])
 
   return (
     <Paper className="overflow-hidden" sx={{ borderRadius: 'inherit' }}>
       <AppBar ref={ref} />
       <Paper
         style={{
-          borderRadius: 'none',
+          borderRadius: 0,
           display: 'flex',
           minHeight: `calc( 100vh - ${
-            ref.current?.getBoundingClientRect().height ?? 70
+            (ref.current?.getBoundingClientRect().height ?? 70) - 2
           }px )`,
-          marginTop: `${ref.current?.getBoundingClientRect().height ?? 70}px`,
+          marginTop: `${(ref.current?.getBoundingClientRect().height ?? 70) - 2}px`,
           backgroundColor:
             theme.palette.mode === 'light'
               ? '#f1f3f5'
