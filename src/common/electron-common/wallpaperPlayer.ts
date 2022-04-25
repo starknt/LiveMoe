@@ -72,6 +72,7 @@ export interface IWallpaperPlayProgress {
 export interface IWallpaperConfiguration {
   id: string;
   name: string;
+  author: string;
   playPath: string;
   resourcePath: string;
   preview: string;

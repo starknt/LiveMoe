@@ -39,6 +39,7 @@ declare namespace LiveMoe {
     sound(): Promise<boolean>;
     seek(value: number): Promise<boolean>;
     volume(value: number): Promise<boolean>;
+    toggle(): Promise<boolean>;
 
     onPlay(): Promise<Event<any>>;
     onConfigChange(): Promise<Event<PlayRuntimeConfiguration>>;

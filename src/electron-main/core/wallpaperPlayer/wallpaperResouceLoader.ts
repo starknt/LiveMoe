@@ -1,19 +1,11 @@
-import fsPromises from 'fs/promises'
 import path from 'path'
-import type { Dirent } from 'fs'
-import fs from 'fs'
+import fs, { type Dirent, promises as fsPromises } from 'fs'
 import { Emitter } from 'common/electron-common/base/event'
-import type {
-  IWallpaperConfiguration,
-  IWallpaperConfigurationFile,
-} from 'common/electron-common/wallpaperPlayer'
+import type { IWallpaperConfiguration, IWallpaperConfigurationFile } from 'common/electron-common/wallpaperPlayer'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import { FileHelper } from 'common/electron-main/fileHelper'
 import applicationLogger from 'common/electron-common/applicationLogger'
-import type {
-  IWallpaperConfigurationFileSchema,
-  IWallpaperConfigurationFileWithBasePath,
-} from 'common/electron-common/wallpaperLoader'
+import type { IWallpaperConfigurationFileSchema, IWallpaperConfigurationFileWithBasePath } from 'common/electron-common/wallpaperLoader'
 import { validateWallpaperConfiguration } from 'electron-main/common/wallpaperPlayer'
 import type Application from 'electron-main/Application'
 import { WallpaperResource } from 'electron-main/common/resource'
