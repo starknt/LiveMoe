@@ -2,20 +2,10 @@ import useAsyncEffect from 'electron-web/hooks/useAsyncEffect'
 import useEventListener from 'electron-web/hooks/useEventListener'
 import { useMemo, useRef, useState } from 'react'
 import type { PaletteMode } from '@mui/material'
-import {
-  MenuList,
-  Paper,
-  ThemeProvider,
-  createTheme,
-  styled,
-} from '@mui/material'
+import { MenuList, Paper, ThemeProvider, createTheme, styled } from '@mui/material'
 import useOnceEffect from 'electron-web/hooks/useOnceEffect'
 import { useAppDispatch } from 'electron-web/store/store'
-import {
-  initalizePlayerState,
-  selectPlayerConfiguration,
-  updateConfigurationAll,
-} from 'electron-web/features/playerSlice'
+import { initalizePlayerState, selectPlayerConfiguration, updateConfigurationAll } from 'electron-web/features/playerSlice'
 import { useSelector } from 'react-redux'
 import { Emitter } from 'common/electron-common/base/event'
 import BorderLinearProgress from 'electron-web/components/BorderLinearProgress'
@@ -26,6 +16,7 @@ import TrayMenu from './TrayMenu'
 const TrayPaper = styled(Paper)(({ theme }) => ({
   transition: 'all 0.1s ease-in-out',
   borderRadius: theme.palette.mode === 'light' ? '4px' : '6px',
+  overflow: 'hidden',
 }))
 
 export default function Tray() {
@@ -117,7 +108,7 @@ export default function Tray() {
       .onProgress()
       .then(onProgress =>
         onProgress(({ currentTime, duration }) => {
-          setProgress((currentTime / duration) * 100)
+          setProgress(((currentTime % duration) / duration) * 100)
         }),
       )
       .catch(err => console.error(err))

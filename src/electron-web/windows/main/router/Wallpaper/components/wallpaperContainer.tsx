@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import type { IWallpaperConfiguration, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
+import { Box } from '@mui/material'
 import WallpaperCard from './wallpaperCard'
+import WallpaperController from './WallpaperController'
 
 interface WallpaperContainerProps {
   playerConfiguration: PlayRuntimeConfiguration
@@ -47,10 +49,9 @@ const WallpaperContainer: React.FC<WallpaperContainerProps> = React.memo(
       }
     }
 
-    return (
-      <>
-        {configurations.map((configuration) => {
-          return (
+    const renderWallpaperCards = useCallback((configurations: IWallpaperConfiguration[]) => {
+      return configurations.map((configuration) => {
+        return (
             <WallpaperCard
               onClick={() => play(configuration)}
               onContextMenu={onContextMenu}
@@ -63,9 +64,16 @@ const WallpaperContainer: React.FC<WallpaperContainerProps> = React.memo(
               }
               key={configuration.name}
             />
-          )
-        })}
+        )
+      })
+    }, [])
 
+    return (
+      <>
+        <WallpaperController />
+        <Box sx={{ width: '100%', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          {renderWallpaperCards(configurations)}
+        </Box>
       </>
     )
   },

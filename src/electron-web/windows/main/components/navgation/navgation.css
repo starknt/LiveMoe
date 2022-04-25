@@ -2,9 +2,9 @@
   --borderColor: #03A9F3;
   --borderWidth: 2px;
   color: rgb(0, 0, 0);
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out !important;
   position: relative;
-  border: var(--borderWidth) solid var(--borderColor);
+  /* border: var(--borderWidth) solid var(--borderColor) !important; */
 }
 
 .MuiListItemButton-root::before, .MuiListItemButton-root::after {
