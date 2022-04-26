@@ -12,7 +12,7 @@
     "strict": true,
     "pretty": true,
     "sourceMap": true,
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
@@ -26,13 +26,13 @@
     "outDir": "release/app/dist",
     "paths": {
       "common/*": [
-        "common/*"
+        "src/common/*"
       ],
       "electron-main/*": [
-        "electron-main/*"
+        "src/electron-main/*"
       ],
       "electron-web/*": [
-        "electron-web/*"
+        "src/electron-web/*"
       ],
       "@mui/styled-engine": [
         "../node_modules/@mui/styled-engine-sc"
@@ -47,6 +47,7 @@
   ],
   "include": [
     "src/**/*",
+    "plugins/**/*",
     "*.d.ts"
   ],
 }
