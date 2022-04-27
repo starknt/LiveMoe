@@ -26,7 +26,7 @@ export interface PluginPackage {
   productDescription: string;
   productVersion: string;
   productAuthor: string;
-  pluginType: string;
+  pluginType: 'frontend' | 'backend' | 'mixin';
   backend: Backend;
   frontend: Frontend;
 }

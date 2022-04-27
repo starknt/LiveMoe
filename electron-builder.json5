@@ -43,14 +43,10 @@
     "category": "Development",
   },
   "icon": "./assets/icons/win/icon.ico",
-  "extraResources": ["./assets", "./extra"],
+  "extraResources": ["./assets", "./extra", "./plugins"],
   "nsis": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
-  },
-  "linux": {
-    "target": ["AppImage"],
-    "category": "Development",
   },
   "directories": {
     "app": "release/app",

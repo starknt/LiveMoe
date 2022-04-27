@@ -6,7 +6,7 @@
   "productAuthor": "Seven",
   "pluginType": "mixin",
   "backend": {
-    "entry": "./dist/index.js"
+    "entry": "./dist/backend.js"
   },
   "frontend": {
     "entry": "./dist/index.html"

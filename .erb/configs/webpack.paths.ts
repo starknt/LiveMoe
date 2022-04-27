@@ -4,34 +4,6 @@ import path from 'path';
 
 const rootPath = path.join(__dirname, '../..');
 const dllPath = path.join(__dirname, '../dll');
-interface PluginFrontend {}
-
-interface PluginBackend {}
-interface PluginConfiguration {
-  name: string;
-
-
-  // 前端
-  frontend: PluginFrontend;
-  // 后端
-  backend: PluginBackend;
-}
-
-// 内置插件入口
-const srcPluginPath = path.join(rootPath, 'plugins');
-const srcPluginEntry =
- fs.readdirSync(srcPluginPath, { withFileTypes: true })
-.filter(Boolean)
-.filter(dir => dir.isDirectory())
-.map<PluginConfiguration>((dir) => {
-  /**
-   * 读入插件配置
-   */
-  const configurationPath = path.join(srcPluginPath, dir.name, 'package.json');
-  const configuration: PluginConfiguration = JSON.parse(JSON.stringify(fs.readFileSync(configurationPath, { encoding: 'utf-8', flag: 'r+' })));
-
-  return configuration;
-})
 
 const srcPath = path.join(rootPath, 'src');
 const srcMainPath = path.join(srcPath, 'electron-main');

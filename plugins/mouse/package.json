@@ -1,12 +1,12 @@
 {
-  "name": "taskbar",
-  "productName": "任务栏优化",
-  "productDescription": "任务栏优化",
+  "name": "mouse",
+  "productName": "鼠标美化",
+  "productDescription": "鼠标美化",
   "productVersion": "1.0.0",
   "productAuthor": "Seven",
   "pluginType": "mixin",
   "backend": {
-    "entry": "./dist/index.js"
+    "entry": "./dist/backend.js"
   },
   "frontend": {
     "entry": "./dist/index.html"

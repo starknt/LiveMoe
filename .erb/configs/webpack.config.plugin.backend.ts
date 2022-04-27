@@ -3,6 +3,7 @@ import { merge } from 'webpack-merge';
 import webpack from 'webpack';
 import webpackPaths from './webpack.paths';
 import path from 'path';
+import webpackPlugin from './webpack.plugin';
 
 const config: webpack.Configuration = {
   mode: 'production',
@@ -11,14 +12,12 @@ const config: webpack.Configuration = {
 
   target: 'electron-main',
 
-  entry: {
-  },
+  entry: webpackPlugin.backendEntries,
 
   output: {
     publicPath: '/',
-    path: path.join(webpackPaths.distMainPath),
-    sourceMapFilename: '[name].js.map',
-    filename: '[name].js',
+    path: path.join(webpackPaths.rootPath, 'plugins'),
+    filename: '[name]/dist/[name].backend.js',
   },
 
   plugins: [
@@ -30,12 +29,6 @@ const config: webpack.Configuration = {
   node: {
     __dirname: false,
     __filename: false,
-  },
-
-  watch: true,
-
-  watchOptions: {
-    ignored: /node_modules/,
   },
 };
 
