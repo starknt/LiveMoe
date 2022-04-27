@@ -4,6 +4,7 @@ import path from 'path';
 
 const rootPath = path.join(__dirname, '../..');
 const dllPath = path.join(__dirname, '../dll');
+const pluginPath = path.join(rootPath, 'plugins');
 
 const srcPath = path.join(rootPath, 'src');
 const srcMainPath = path.join(srcPath, 'electron-main');
@@ -83,6 +84,7 @@ fs.readdirSync(srcPagesPath, { withFileTypes: true })
 export default {
   rootPath,
   dllPath,
+  pluginPath,
   srcPath,
   srcMainPath,
   srcRendererPath,

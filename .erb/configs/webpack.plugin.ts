@@ -10,26 +10,24 @@ let backendEntries: Record<string, any> = {};
 let htmlEntries= [];
 
 // 内置插件入口
-const srcPluginPath = path.join(webpackPaths.rootPath, 'plugins');
-
- fs.readdirSync(srcPluginPath, { withFileTypes: true })
+ fs.readdirSync(webpackPaths.pluginPath, { withFileTypes: true })
   .filter(Boolean)
   .filter(dir => dir.isDirectory())
   .forEach((dir) => {
     /**
      * 读入插件配置
      */
-    const configurationPath = path.join(srcPluginPath, dir.name, 'package.json');
+    const configurationPath = path.join(webpackPaths.pluginPath, dir.name, 'package.json');
     const configuration: PluginPackage = JSON.parse(fs.readFileSync(configurationPath, { encoding: 'utf-8', flag: 'r+' }) || '{}');
 
     if(configuration.pluginType === 'mixin') {
       backendEntries[`${configuration.name}`] = path.join(
-        srcPluginPath,
+        webpackPaths.pluginPath,
         dir.name,
         'backend.ts'
       );
       frontendEntries[`${configuration.name}`] = path.join(
-        srcPluginPath,
+        webpackPaths.pluginPath,
         dir.name,
         'frontend.tsx'
       );
@@ -66,7 +64,7 @@ const srcPluginPath = path.join(webpackPaths.rootPath, 'plugins');
 
     if(configuration.pluginType === 'frontend') {
       frontendEntries[`${configuration.name}`] = path.join(
-        srcPluginPath,
+        webpackPaths.pluginPath,
         dir.name,
         'frontend.tsx'
       );
@@ -105,7 +103,7 @@ const srcPluginPath = path.join(webpackPaths.rootPath, 'plugins');
 
     if(configuration.pluginType === 'backend') {
       backendEntries[`${configuration.name}`] = path.join(
-        srcPluginPath,
+        webpackPaths.pluginPath,
         dir.name,
         'backend.ts'
       );
