@@ -59,10 +59,9 @@ export ELECTRON_MIRROR='https://npm.taobao.org/mirrors/electron/'
 ### 开发模式
 
 ```bash
-// 先打开一个命令行运行
-yarn run sr
-// 再打开一个命令行运行
-yarn run sm
+yarn run dev:main
+yarn run dev:renderer
+yarn run dev:plugin
 ```
 
 ### 编译打包

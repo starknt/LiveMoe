@@ -1,0 +1,12 @@
+.default-background {
+  background-image: url("/assets/public/plugin.default.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  object-fit: cover;
+}
+
+.plugin-view {
+  width: 100%;
+  height: 100%;
+}

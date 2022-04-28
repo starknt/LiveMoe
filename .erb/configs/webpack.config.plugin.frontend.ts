@@ -7,22 +7,21 @@ import TerserPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
-
 const config: webpack.Configuration = {
   mode: 'production',
 
   devtool: false,
 
-  target: 'electron-renderer',
+  target: 'web',
 
   entry: webpackPlugin.frontendEntries,
 
   output: {
-    publicPath: '../',
+    publicPath: '../../',
     path: webpackPaths.pluginPath,
     filename: '[name]/dist/[name].frontend.js',
     library: {
-      type: 'commonjs2',
+      type: 'umd',
     }
   },
 
@@ -79,7 +78,7 @@ const config: webpack.Configuration = {
     }),
 
     new MiniCssExtractPlugin({
-      filename: '[name]/[fullhash].css',
+      filename: '[name]/dist/[contenthash].css',
     }),
 
     ...webpackPlugin.htmlEntries,
@@ -89,6 +88,8 @@ const config: webpack.Configuration = {
     __dirname: false,
     __filename: false,
   },
+
+  watch: process.env.NODE_ENV === 'development',
 };
 
 export default merge(baseConfig, config);

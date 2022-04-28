@@ -22,6 +22,8 @@ const config: webpack.Configuration = {
     }
   },
 
+  externals: ['win-func-tools'],
+
   plugins: [
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
@@ -32,6 +34,8 @@ const config: webpack.Configuration = {
     __dirname: false,
     __filename: false,
   },
+
+  watch: process.env.NODE_ENV === 'development',
 };
 
 export default merge(baseConfig, config);

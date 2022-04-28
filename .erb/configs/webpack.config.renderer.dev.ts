@@ -49,13 +49,13 @@ const devServerConfiguration: DevServerConfiguration = {
   onBeforeSetupMiddleware: process.env.DEBUG
     ? undefined
     : () => {
-        console.log(chalk.bold('Starting Main Process...'));
+        console.log(chalk.bold.greenBright('Starting Main Process...'));
         process.env.TS_NODE_PROJECT = path.join(
           webpackPaths.rootPath,
           'tsconfig.json'
         );
 
-        spawn('npm', ['run', 'sp'], {
+        spawn('npm', ['run', 'dev:preload'], {
           shell: true,
           env: process.env,
           stdio: 'inherit',

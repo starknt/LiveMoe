@@ -57,7 +57,12 @@ export default class PluginManager {
   }
 
   async dispatchCallerEvent(preload: EventPreloadType) {
-
+    switch (preload.event) {
+      case 'plugin':
+        return [...this.frontendPlugins.values()]
+      default:
+        return false
+    }
   }
 
   dispatchListenerEvent(preload: EventPreloadType) {

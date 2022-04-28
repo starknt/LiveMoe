@@ -1,4 +1,4 @@
-import type { IEventListener, IListener } from 'common/electron-common';
+import type { IChannel, IEventListener, IListener } from 'common/electron-common';
 import type { IApplicationConfiguration } from 'common/electron-common/application';
 import type { Event } from 'common/electron-common/base/event';
 import type { DatabaseNamespace, Doc } from 'common/electron-common/database';
@@ -84,7 +84,14 @@ declare namespace LiveMoe {
     removeCallerHandler: (event: string) => void;
   }
 
+  interface WrapperService {
+    sendMessage(eventName: string, ...args: any[]): Promise<any>;
+    listeMessage(eventName: string, ...args: any[]): Promise<Event<any>>;
+  }
+
   interface RendererService {
     createServerService(channelName: string): ServerService;
+
+    getServerService(channelName: string): Promise<WrapperService | null>;
   }
 }
