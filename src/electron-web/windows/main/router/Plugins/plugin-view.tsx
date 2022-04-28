@@ -8,7 +8,7 @@ interface ILocation extends Location {
 }
 
 export default function PluginView() {
-  const { state }: ILocation = useLocation()
+  const { state } = useLocation() as ILocation
 
   if (!state || !state?.plugin)
     return <Navigate to="/" />

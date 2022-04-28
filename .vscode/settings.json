@@ -48,8 +48,8 @@
   "todo-tree.tree.scanMode": "workspace only",
   "todo-tree.tree.showCountsInTree": true,
   "todo-tree.tree.disableCompactFolders": false,
-  "explorer.experimental.fileNesting.enabled": true,
-  "explorer.experimental.fileNesting.patterns": {
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
     "*.asax": "$(capture).*.cs, $(capture).*.vb",
     "*.ascx": "$(capture).*.cs, $(capture).*.vb",
     "*.ashx": "$(capture).*.cs, $(capture).*.vb",
