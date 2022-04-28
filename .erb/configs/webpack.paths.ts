@@ -4,13 +4,14 @@ import path from 'path';
 
 const rootPath = path.join(__dirname, '../..');
 const dllPath = path.join(__dirname, '../dll');
-const pluginPath = path.join(rootPath, 'plugins');
 
 const srcPath = path.join(rootPath, 'src');
 const srcMainPath = path.join(srcPath, 'electron-main');
 const srcRendererPath = path.join(srcPath, 'electron-web');
 const srcPagesPath = path.join(srcRendererPath, 'windows');
 const srcPreloadPath = path.join(srcPath, 'electron-preload');
+const pluginPath = path.join(srcPath, 'plugins');
+
 
 const releasePath = path.join(rootPath, 'release');
 const appPath = path.join(releasePath, 'app');

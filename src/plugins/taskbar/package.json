@@ -1,0 +1,17 @@
+{
+  "name": "taskbar",
+  "displayName": "任务栏优化",
+  "version": "1.0.0",
+  "description": "任务栏优化",
+  "author": "Seven",
+  "pluginType": "mixin",
+  "backend": {
+    "entry": "./dist/taskbar.backend.js"
+  },
+  "frontend": {
+    "entry": "./dist/index.html"
+  },
+  "devDependencies": {
+    "win-func-tools": "^1.0.4"
+  }
+}

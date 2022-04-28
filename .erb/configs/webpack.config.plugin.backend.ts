@@ -2,7 +2,6 @@ import baseConfig from './webpack.config.base';
 import { merge } from 'webpack-merge';
 import webpack from 'webpack';
 import webpackPaths from './webpack.paths';
-import path from 'path';
 import webpackPlugin from './webpack.plugin';
 
 const config: webpack.Configuration = {
@@ -16,8 +15,11 @@ const config: webpack.Configuration = {
 
   output: {
     publicPath: '/',
-    path: path.join(webpackPaths.rootPath, 'plugins'),
+    path: webpackPaths.pluginPath,
     filename: '[name]/dist/[name].backend.js',
+    library: {
+      type: 'commonjs2',
+    }
   },
 
   plugins: [

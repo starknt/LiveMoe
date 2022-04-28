@@ -1,3 +1,5 @@
+import { IApplicationContext } from "electron-main/common/application";
+
 export interface PluginLifecycle {
   /**
    * @description 应用配置加载完毕
@@ -20,21 +22,37 @@ export interface PluginLifecycle {
   onDestroy(): void
 }
 
+export interface IPluginContext extends IApplicationContext {
+
+}
+
+export type IBackendPluginConstructor = new (context: IPluginContext) => any
+
+export interface IBackendPlugin {
+  onReady?(): void
+
+  onBeforeLoadWallpaper?(): void
+
+  onAfterLoadWallpaper?(): void
+
+  onDestroy?(): void
+}
+
 export interface PluginPackage {
   name: string;
-  productName: string;
-  productDescription: string;
-  productVersion: string;
-  productAuthor: string;
+  displayName: string;
+  description: string;
+  version: string;
+  author: string;
   pluginType: 'frontend' | 'backend' | 'mixin';
   backend: Backend;
   frontend: Frontend;
 }
 
-interface Backend {
+export interface Backend {
   entry: string;
 }
 
-interface Frontend {
+export interface Frontend {
   entry: string;
 }

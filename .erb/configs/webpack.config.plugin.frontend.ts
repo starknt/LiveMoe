@@ -2,7 +2,6 @@ import baseConfig from './webpack.config.base';
 import { merge } from 'webpack-merge';
 import webpack from 'webpack';
 import webpackPaths from './webpack.paths';
-import path from 'path';
 import webpackPlugin from './webpack.plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
@@ -20,7 +19,7 @@ const config: webpack.Configuration = {
 
   output: {
     publicPath: '../',
-    path: path.join(webpackPaths.rootPath, 'plugins'),
+    path: webpackPaths.pluginPath,
     filename: '[name]/dist/[name].frontend.js',
     library: {
       type: 'commonjs2',

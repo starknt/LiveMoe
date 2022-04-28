@@ -43,7 +43,7 @@
     "category": "Development",
   },
   "icon": "./assets/icons/win/icon.ico",
-  "extraResources": ["./assets", "./extra", "./plugins"],
+  "extraResources": ["./assets", "./extra", "./src/plugins"],
   "nsis": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,

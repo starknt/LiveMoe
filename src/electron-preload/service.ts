@@ -7,10 +7,9 @@ import createWindowsService from './services/windowService'
 import createWallpaperPlayerService from './services/wallpaperPlayerService'
 import createApplicationService from './services/applicationService'
 import createTrayService from './services/trayService'
-import createTaskbarService from './services/taskbarService'
 import createServerService from './services/serverService'
-import { when } from './helper'
 import createGuiService from './services/guiService'
+import { when } from './helper'
 
 // TODO: 注入服务, 服务注入到全局预加载脚本时, 会导致IPC服务器出错
 // 1. 数据库服务
@@ -32,9 +31,7 @@ async function getAllMainServiceChannel(server: IPCRendererServer) {
     server.getChannel('lm:application'),
   )
   const trayService = await retry(async() => server.getChannel('lm:tray'))
-  const taskbarService = await retry(async() =>
-    server.getChannel('lm:taskbar'),
-  )
+
   const guiService = await retry(async() => server.getChannel('lm:gui'))
 
   return {
@@ -43,7 +40,6 @@ async function getAllMainServiceChannel(server: IPCRendererServer) {
     wallpaperPlayerService,
     applicationService,
     trayService,
-    taskbarService,
     guiService,
   }
 }
@@ -68,7 +64,6 @@ ipcRenderer.once('window:ctx', async(_, ctx: string) => {
     windowsService,
     wallpaperPlayerService,
     applicationService,
-    taskbarService,
     trayService,
     guiService,
   } = await getAllMainServiceChannel(server)
@@ -79,7 +74,6 @@ ipcRenderer.once('window:ctx', async(_, ctx: string) => {
     wallpaperPlayerService,
   )
   const exposeApplicationService = createApplicationService(applicationService)
-  const exposeTaskbarService = createTaskbarService(taskbarService)
   const exposeTrayService = createTrayService(trayService)
 
   const exposeGuiService = createGuiService(guiService)
@@ -91,7 +85,6 @@ ipcRenderer.once('window:ctx', async(_, ctx: string) => {
     windowsService: exposeWindowsService,
     wallpaperPlayerService: exposeWallpaperPlayerService,
     applicationService: exposeApplicationService,
-    taskbarService: exposeTaskbarService,
     trayService: exposeTrayService,
     serverService: exposeServerService,
     platform: {

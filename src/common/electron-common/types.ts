@@ -1,3 +1,7 @@
+export function isClass(x: any) {
+  return !isVaildValue(x) && typeof x?.constructor === 'function';
+}
+
 export function isVaildValue(x: any) {
   return !isNil(x) && x ? true : false;
 }
