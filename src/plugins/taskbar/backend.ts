@@ -134,8 +134,6 @@ export default class Taskbar implements IBackendPlugin {
   }
 
   private async dispatchCallerMessage(preload: EventPreloadType) {
-    console.log(preload)
-
     switch (preload.event) {
       case 'style': {
         if (!preload.arg || (Array.isArray(preload.arg) && preload.arg.length === 0))
