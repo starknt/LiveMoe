@@ -38,7 +38,6 @@ const PluginCard: React.FC<PluginCardProps> = ({ name, preview, configuration })
             <TinyText>{name}</TinyText>
           </CardContent>
     </CardActionArea>
-  </Card>
 }
 
 export default PluginCard
