@@ -89,7 +89,7 @@ export default function App() {
   const handleChangeCOLOR = useCallback((_color: ColorResult) => {
     setColor(_color.rgb)
 
-    const appearance = style
+    // const appearance = style
     // appearance.COLOR = toARGB(`rgba(${color.r}, ${color.g}, ${color.b}, ${alpha.a})`) ?? appearance.COLOR
 
     // service?.sendMessage('style', appearance)
@@ -98,7 +98,7 @@ export default function App() {
   const handleChangeAlpha = useCallback((_color: ColorResult) => {
     setAlpha(_color.rgb)
 
-    const appearance = style
+    // const appearance = style
     // appearance.COLOR = toARGB(`rgba(${color.r}, ${color.g}, ${color.b}, ${alpha.a})`) ?? appearance.COLOR
 
     // service?.sendMessage('style', appearance)

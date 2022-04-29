@@ -10,7 +10,6 @@ import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import { TimerHelper } from 'electron-main/common/timer'
 import type { IBackendPlugin, IPluginContext } from 'common/electron-common/plugin'
-export type { TASKBAR_APPEARANCE, ACCENT, TaskbarState } from 'win-func-tools'
 
 const DEFAULT_CONFIGURATION: ITaskbarCofniguration = {
   enabled: false,

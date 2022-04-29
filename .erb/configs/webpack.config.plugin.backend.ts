@@ -6,15 +6,21 @@ import webpackPlugin from './webpack.plugin';
 import CopyPlugin from 'copy-webpack-plugin';
 import path from 'path';
 
-let move = []
+let movePlugin = []
 
 if(process.env.NODE_ENV !== 'development') {
-  move = Object.values(webpackPlugin.packagesPath).map(config => ({
+  let move = Object.values(webpackPlugin.packagesPath).map(config => ({
         from: config.path,
         to: path.join(webpackPaths.pluginPathProduction, config.name),
         force: true,
       }))
+  movePlugin = [
+    new CopyPlugin({
+      patterns: move,
+    }),
+  ]
 }
+
 
 const config: webpack.Configuration = {
   mode: 'production',
@@ -41,11 +47,7 @@ const config: webpack.Configuration = {
       NODE_ENV: 'development',
     }),
 
-    new CopyPlugin({
-      patterns: [
-        ...move,
-      ]
-    })
+    ...movePlugin,
   ],
 
   node: {
