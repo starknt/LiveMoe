@@ -7,13 +7,13 @@ import i18next from 'i18next'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
+import { dev } from 'common/electron-common/environment'
 import type { IApplicationContext } from './common/application'
 import { DEFAULT_CONFIGURATION } from './common/application'
 import WallpaperPlayer from './core/wallpaperPlayer/WallpaperPlayer'
 import ApplicationTray from './core/ApplicationTray'
 import MainWindow from './windows/MainWindow'
 import SettingWindow from './windows/SettingWindow'
-import Taskbar from './core/Taskbar'
 import WindowManager from './core/windowManager/WindowManager'
 import { shutDownWatcher } from './observables/power.observable'
 import DataBase from './core/Database'
@@ -24,13 +24,13 @@ import WallpaperLoader from './core/wallpaperPlayer/wallpaperResouceLoader'
 import PlayerWindow from './windows/PlayerWindow'
 import { AutoStartup } from './common/autoStartup'
 import { setTrayVisible } from './observables/user.observable'
+import PluginManager from './core/pluginCore/PluginManager'
 
 /**
  * @feature 初始化应用程序
  * @feature 初始化应用程序环境
  * @feature 初始化应用程序配置
  * @feature 初始化应用程序日志 // TODO: 初始化应用程序日志
- *
  */
 export default class Application extends ApplicationEventBus {
   private readonly database = DataBase.getInstance(
@@ -52,7 +52,7 @@ export default class Application extends ApplicationEventBus {
 
   private windowManager!: WindowManager
 
-  private taskbar!: Taskbar
+  private pluginManager!: PluginManager
 
   private readonly readyEmitter = new Emitter<void>()
 
@@ -146,6 +146,19 @@ export default class Application extends ApplicationEventBus {
         getNameSpace: (spaceName) => {
           return this.database.getNamespace(spaceName)
         },
+        registerService: (channelName, service) => {
+          try {
+            this.server.registerChannel(channelName, service)
+          }
+          catch (error) {
+            if (dev())
+              console.error(error)
+
+            return false
+          }
+
+          return true
+        },
       },
       lifecycle: {
         // TODO: 生命周期函数待实现
@@ -177,6 +190,8 @@ export default class Application extends ApplicationEventBus {
       },
     }
 
+    this.pluginManager = new PluginManager(this.context)
+
     this.wallpaperPlayer = new WallpaperPlayer(this, this.server)
 
     await this.wallpaperPlayer.initalize()
@@ -190,8 +205,6 @@ export default class Application extends ApplicationEventBus {
     this.applicationTray = new ApplicationTray(this.context, this.server)
 
     await this.applicationTray.initalize()
-
-    this.taskbar = new Taskbar(this.context, this.server)
 
     this.registerListener()
 
@@ -379,7 +392,6 @@ export default class Application extends ApplicationEventBus {
       this.wallpaperPlayer.destroy()
       this.applicationTray.destroy()
       this.windowManager.destroy()
-      this.taskbar.destroy()
       this.database.destroy()
     })
   }

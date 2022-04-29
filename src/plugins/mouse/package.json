@@ -1,0 +1,14 @@
+{
+  "name": "mouse",
+  "displayName": "鼠标美化",
+  "version": "1.0.0",
+  "description": "鼠标美化",
+  "author": "Seven",
+  "pluginType": "mixin",
+  "backend": {
+    "entry": "./dist/mouse.backend.js"
+  },
+  "frontend": {
+    "entry": "./dist/index.html"
+  }
+}

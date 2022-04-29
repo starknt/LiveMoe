@@ -116,5 +116,10 @@ export function toRGBA(argb: number) {
   const g = (argb & 0x0000ffff) >>> 8;
   const b = (argb & 0x000000ff) >>> 0;
 
-  return `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+  return {
+    a: a / 255,
+    r: r % 255,
+    g: g % 255,
+    b: b % 255,
+  }
 }

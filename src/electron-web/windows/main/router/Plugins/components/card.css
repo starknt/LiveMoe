@@ -1,0 +1,8 @@
+.default-background {
+  background-image: url("/assets/public/plugin.default.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  object-fit: cover;
+}
+

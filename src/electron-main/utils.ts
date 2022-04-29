@@ -5,14 +5,17 @@ import { dev } from 'common/electron-common/environment'
 
 export let assetsPath: string
 export let globalAssetsPath: string
+export let pluginPath: string
 
 if (dev()) {
   assetsPath = path.join(__dirname, 'template')
   globalAssetsPath = path.join(__dirname, '../../assets')
+  pluginPath = path.join(__dirname, '../plugins')
 }
 else {
   assetsPath = path.join(__dirname, 'template')
   globalAssetsPath = path.join(process.resourcesPath, 'assets')
+  pluginPath = path.join(process.resourcesPath, 'plugins')
 }
 
 export const resolveGlobalAssets = (...paths: string[]) => {

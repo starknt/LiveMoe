@@ -576,7 +576,6 @@ export class ChannelClient implements IChannelClient, IDisposable {
         uninitializedPromise = null;
 
         const handler: IHandler = (response) => {
-          // console.log('main process response:', JSON.stringify(response, null, 2));
           // 根据返回的结果类型，进行处理, 这里不处理 Initialize 这个会在更上层处理
           switch (response.type) {
             case ResponseType.PromiseSuccess:

@@ -3,21 +3,18 @@ import { generateUuid } from 'common/electron-common/base/uuid'
 import type { IPCMainServer } from 'common/electron-main'
 import type { BrowserWindow, BrowserWindowConstructorOptions } from 'electron'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
-import type {
-  IWindowConstructor,
-  IWindowContext,
-} from 'electron-main/common/windows'
-import {
-  IWindow,
-} from 'electron-main/common/windows'
+import type { IWindowConstructor, IWindowContext } from 'electron-main/common/windows'
+import { IWindow } from 'electron-main/common/windows'
 import { resolvePreloadPath } from 'electron-main/utils'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { WindowId } from './WindowManager'
 import type WindowEventBus from './WindowEventBus'
 
 export interface EventBusOptions {
-  ipcEvent?: boolean; // 是否注册 ipc-event, 可以接收来着 `ipc-*` 的消息
-  windowEvent?: boolean; // 是否注册 window-event, 可以接收来着 `window-*` 的消息
+  // 是否注册 ipc-event, 可以接收来着 `ipc-*` 的消息
+  ipcEvent?: boolean
+  // 是否注册 window-event, 可以接收来着 `window-*` 的消息
+  windowEvent?: boolean
 }
 
 export interface IWindowOptions extends BrowserWindowConstructorOptions {
@@ -43,6 +40,7 @@ const DefaultWindowOptions: IWindowOptions = {
     webSecurity: false,
     contextIsolation: true,
     nodeIntegration: false,
+    nodeIntegrationInSubFrames: true,
     preload: resolvePreloadPath('service'),
   },
 }

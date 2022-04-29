@@ -1,10 +1,9 @@
 import type { IEventListener, IListener } from 'common/electron-common'
 import { Service } from 'common/electron-common'
 import { Event } from 'common/electron-common/base/event'
+import { retry } from 'common/electron-common/utils'
 import type { EventPreloadType } from 'common/electron-common/windows'
-import {
-  WINDOW_MESSAGE_TYPE,
-} from 'common/electron-common/windows'
+import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { IPCRendererServer } from 'common/electron-renderer'
 import type { LiveMoe } from 'livemoe'
 /**
@@ -64,6 +63,32 @@ const createServerService = (
         removeCallerHandler: (event: string) => {
           callerHandler.delete(event)
         },
+      }
+    },
+
+    getServerService: async(channelName: string) => {
+      try {
+        const channel = await retry(async() => server.getChannel(channelName), 3, 100)
+
+        return {
+          sendMessage: (eventName: string, ...arg: any[]) => {
+            return channel.call(WINDOW_MESSAGE_TYPE.IPC_CALL, {
+              type: WINDOW_MESSAGE_TYPE.IPC_CALL,
+              event: eventName,
+              arg,
+            })
+          },
+          listeMessage: async(eventName: string, ...arg: any[]) => {
+            return channel.listen(WINDOW_MESSAGE_TYPE.IPC_LISTEN, {
+              type: WINDOW_MESSAGE_TYPE.IPC_LISTEN,
+              event: eventName,
+              arg,
+            })
+          },
+        }
+      }
+      catch (error) {
+        return Promise.resolve(null)
       }
     },
   }

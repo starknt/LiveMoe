@@ -19,11 +19,9 @@ export default merge<webpack.Configuration>(baseConfig, {
 
   mode: 'production',
 
-  target: ['web', 'electron-renderer'],
+  target: 'web',
 
-  entry: {
-    ...webpackPaths.windowsEntries,
-  },
+  entry: webpackPaths.windowsEntries,
 
   output: {
     path: webpackPaths.distRendererPath,

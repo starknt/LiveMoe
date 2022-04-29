@@ -4,6 +4,7 @@ import NotMatch from './NotMatch'
 import Home from './Home'
 import { Layout } from './layout'
 import Plugins from './Plugins'
+import PluginView from './Plugins/plugin-view'
 
 const routers: RouteObject[] = [
   {
@@ -21,6 +22,10 @@ const routers: RouteObject[] = [
       {
         path: 'plugin',
         element: <Plugins />,
+      },
+      {
+        path: 'plugin-view/:name',
+        element: <PluginView />,
       },
     ],
   },
