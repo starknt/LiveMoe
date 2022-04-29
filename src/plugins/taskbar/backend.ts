@@ -8,7 +8,6 @@ import { Service } from 'common/electron-common'
 import { Emitter, Event } from 'common/electron-common/base/event'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
-import type { IDestroyable } from 'electron-main/common/lifecycle'
 import { TimerHelper } from 'electron-main/common/timer'
 import type { IBackendPlugin, IPluginContext } from 'common/electron-common/plugin'
 export type { TASKBAR_APPEARANCE, ACCENT, TaskbarState } from 'win-func-tools'
@@ -34,7 +33,7 @@ export function validateTaskbarStyle(style: TASKBAR_APPEARANCE) {
   return true
 }
 
-export default class Taskbar implements IDestroyable, IBackendPlugin {
+export default class Taskbar implements IBackendPlugin {
   private readonly channelName = 'lm:taskbar'
 
   private configuration!: ITaskbarCofniguration
@@ -58,14 +57,11 @@ export default class Taskbar implements IDestroyable, IBackendPlugin {
   ) {
   }
 
-  destroy(): void {
-    throw new Error('Method not implemented.')
-  }
-
   onReady() {
     this.initalize()
 
     this.context.core.registerService(this.channelName, this.serivce)
+    this.registerListener()
   }
 
   async initDatabase() {
@@ -89,6 +85,16 @@ export default class Taskbar implements IDestroyable, IBackendPlugin {
     )
   }
 
+  setConfiguration(configuration: ITaskbarCofniguration) {
+    this.taskbarDbnamespace.get('configuration').then((config) => {
+      this.taskbarDbnamespace.put({
+        data: configuration,
+        _id: 'configuration',
+        _rev: config?._rev,
+      })
+    })
+  }
+
   async initalize() {
     await this.initDatabase()
 
@@ -103,8 +109,6 @@ export default class Taskbar implements IDestroyable, IBackendPlugin {
 
     if (taskbar.enabled)
       this.setTaskbarStyle()
-
-    this.registerListener()
   }
 
   registerListener() {
@@ -131,11 +135,14 @@ export default class Taskbar implements IDestroyable, IBackendPlugin {
   }
 
   private async dispatchCallerMessage(preload: EventPreloadType) {
+    console.log(preload)
+
     switch (preload.event) {
       case 'style': {
-        if (!preload.arg)
+        if (!preload.arg || (Array.isArray(preload.arg) && preload.arg.length === 0))
           return this.appearance
-        this.setTaskbarStyle(preload.arg)
+        if (Array.isArray(preload.arg) && preload.arg.length === 1)
+          this.setTaskbarStyle(preload.arg[0])
         return true
       }
 
@@ -163,6 +170,10 @@ export default class Taskbar implements IDestroyable, IBackendPlugin {
     if (appearance) {
       this.appearance = appearance
       this._onTaskbarStyleChange.fire(appearance)
+      this.setConfiguration({
+        ...this.configuration,
+        style: withT1AsT2<CTASKBAR_APPEARANCE>(START_APPEARANCE),
+      })
     }
 
     if (isNull(this.timer)) {
@@ -190,15 +201,6 @@ export default class Taskbar implements IDestroyable, IBackendPlugin {
       console.error(err)
       applicationLogger.error(err)
     }
-  }
-
-  setConfiguration(configuration: ITaskbarCofniguration) {
-    this.configuration = configuration
-
-    this.taskbarDbnamespace.put({
-      _id: 'configuration',
-      data: configuration,
-    })
   }
 
   getConfiguration() {

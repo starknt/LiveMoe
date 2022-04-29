@@ -1,5 +1,5 @@
 export function isClass(x: any) {
-  return !isVaildValue(x) && typeof x?.constructor === 'function';
+  return isVaildValue(x) && typeof x?.constructor === 'function';
 }
 
 export function isVaildValue(x: any) {

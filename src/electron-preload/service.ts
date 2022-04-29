@@ -44,13 +44,25 @@ async function getAllMainServiceChannel(server: IPCRendererServer) {
   }
 }
 
-ipcRenderer.once('window:ctx', async(_, ctx: string) => {
-  if (typeof ctx !== 'string') {
-    console.error('注入服务失败, 没有提供服务上下文')
+if (process.isMainFrame) {
+  console.log('主框架')
 
-    return
-  }
+  ipcRenderer.once('window:ctx', async(_, ctx: string) => {
+    if (typeof ctx !== 'string')
+      console.error('注入服务失败, 没有提供服务上下文')
 
+    injectMainService(ctx)
+  })
+}
+else {
+  console.log('子框架')
+  const url = new URL(window.location.href)
+  const ctx = url.searchParams.get('ctx') ?? ''
+
+  injectMainService(ctx)
+}
+
+async function injectMainService(ctx: string) {
   // 如果存在则不注入
   if (window.livemoe)
     return
@@ -96,7 +108,7 @@ ipcRenderer.once('window:ctx', async(_, ctx: string) => {
     production: () => is.production(),
     guiService: exposeGuiService,
   })
-})
+}
 
 contextBridge.exposeInMainWorld('helper', {
   whenLiveMoeReady: async() => {

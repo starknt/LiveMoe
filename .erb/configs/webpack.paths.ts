@@ -19,6 +19,8 @@ const appPackagePath = path.join(appPath, 'package.json');
 const appNodeModulesPath = path.join(appPath, 'node_modules');
 const srcNodeModulesPath = path.join(srcPath, 'node_modules');
 const srcPackagePath = path.join(srcPath, 'package.json');
+const pluginPathProduction = path.join(appPath, 'plugins');
+
 
 const distPath = path.join(appPath, 'dist');
 const distMainPath = path.join(distPath, 'main');
@@ -86,6 +88,7 @@ export default {
   rootPath,
   dllPath,
   pluginPath,
+  pluginPathProduction,
   srcPath,
   srcMainPath,
   srcRendererPath,

@@ -7,6 +7,7 @@ import type { PluginPackage } from '../../src/common/electron-common/plugin'
 
 let frontendEntries: Record<string, any> = {};
 let backendEntries: Record<string, any> = {};
+let packagesPath: Record<string, any> = {};
 let htmlEntries= [];
 
 // 内置插件入口
@@ -19,6 +20,11 @@ let htmlEntries= [];
      */
     const configurationPath = path.join(webpackPaths.pluginPath, dir.name, 'package.json');
     const configuration: PluginPackage = JSON.parse(fs.readFileSync(configurationPath, { encoding: 'utf-8', flag: 'r+' }) || '{}');
+
+    packagesPath[`${dir.name}`] = {
+      path: configurationPath,
+      name: dir.name,
+    };
 
     if(configuration.pluginType === 'mixin') {
       backendEntries[`${configuration.name}`] = path.join(
@@ -114,5 +120,6 @@ let htmlEntries= [];
 export default {
   frontendEntries,
   backendEntries,
-  htmlEntries
+  htmlEntries,
+  packagesPath
 };

@@ -40,6 +40,7 @@ const DefaultWindowOptions: IWindowOptions = {
     webSecurity: false,
     contextIsolation: true,
     nodeIntegration: false,
+    nodeIntegrationInSubFrames: true,
     preload: resolvePreloadPath('service'),
   },
 }

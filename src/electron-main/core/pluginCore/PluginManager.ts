@@ -1,5 +1,5 @@
 import { Service } from 'common/electron-common'
-import { Event } from 'common/electron-common/base/event'
+import { Emitter, Event } from 'common/electron-common/base/event'
 import type { IBackendPlugin, PluginPackage } from 'common/electron-common/plugin'
 import { isClass } from 'common/electron-common/types'
 import type { EventPreloadType } from 'common/electron-common/windows'
@@ -8,7 +8,7 @@ import type { IApplicationContext } from 'electron-main/common/application'
 import PluginCore from './PluginCore'
 import PluginLoader from './PluginLoader'
 
-interface PluginContext {}
+interface PluginContext extends IApplicationContext {}
 
 export default class PluginManager {
   private readonly channelName = 'lm:plugin'
@@ -23,6 +23,10 @@ export default class PluginManager {
 
   private readonly frontendPlugins: Map<string, PluginPackage> = new Map()
 
+  private readonly initedEmitter = new Emitter<void>()
+
+  readonly inited = this.initedEmitter.event
+
   context: PluginContext
 
   constructor(appContext: IApplicationContext) {
@@ -33,16 +37,32 @@ export default class PluginManager {
     appContext.core.registerService(this.channelName, this.service)
 
     this.registerListener()
+    let index = 0
 
-    this.loader.plugins.forEach((config) => {
+    this.loader.plugins.forEach(async(config) => {
       if (config.pluginType === 'backend')
-        this.registerBackendPlugin(config)
+        await this.registerBackendPlugin(config)
       if (config.pluginType === 'frontend')
-        this.registerFrontendPlugin(config)
+        await this.registerFrontendPlugin(config)
       if (config.pluginType === 'mixin') {
-        this.registerBackendPlugin(config)
-        this.registerFrontendPlugin(config)
+        await this.registerBackendPlugin(config)
+        await this.registerFrontendPlugin(config)
       }
+      index++
+      if (index === this.loader.plugins.size - 1)
+        setTimeout(() => this.initedEmitter.fire())
+    })
+
+    this.inited(() => {
+      this.backendPlugins.forEach((plugin) => {
+        plugin?.onReady?.()
+      })
+    })
+
+    this.context.lifecycle.onQuit(() => {
+      this.backendPlugins.forEach((plugin) => {
+        plugin?.onDestroy?.()
+      })
     })
   }
 
@@ -82,7 +102,7 @@ export default class PluginManager {
 
         this.backendPlugins.set(plugin.name, pluginInstance)
 
-        console.log(`register backend plugin: ${plugin.name}`, pluginInstance)
+        console.log(`register backend plugin: ${plugin.name}`)
       }
       else {
         console.error(`register backend plugin: ${plugin.name} failed, plugin must be a class`)

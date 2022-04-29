@@ -25,5 +25,7 @@ args.forEach((x) => {
         rimraf.sync(path.join(pathToRemove, plugin.name, 'dist'));
       }
     })
+
+    rimraf.sync(webpackPaths.pluginPathProduction);
   }
 });

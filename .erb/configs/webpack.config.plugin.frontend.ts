@@ -18,7 +18,7 @@ const config: webpack.Configuration = {
 
   output: {
     publicPath: '../../',
-    path: webpackPaths.pluginPath,
+    path: process.env.NODE_ENV === 'development' ? webpackPaths.pluginPath : webpackPaths.pluginPathProduction,
     filename: '[name]/dist/[name].frontend.js',
     library: {
       type: 'umd',
@@ -87,6 +87,12 @@ const config: webpack.Configuration = {
   node: {
     __dirname: false,
     __filename: false,
+  },
+
+  resolve: {
+    alias: {
+      '@mui/styled-engine': '@mui/styled-engine-sc',
+    },
   },
 
   watch: process.env.NODE_ENV === 'development',

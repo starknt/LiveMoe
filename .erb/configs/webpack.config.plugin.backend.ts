@@ -3,6 +3,18 @@ import { merge } from 'webpack-merge';
 import webpack from 'webpack';
 import webpackPaths from './webpack.paths';
 import webpackPlugin from './webpack.plugin';
+import CopyPlugin from 'copy-webpack-plugin';
+import path from 'path';
+
+let move = []
+
+if(process.env.NODE_ENV !== 'development') {
+  move = Object.values(webpackPlugin.packagesPath).map(config => ({
+        from: config.path,
+        to: path.join(webpackPaths.pluginPathProduction, config.name),
+        force: true,
+      }))
+}
 
 const config: webpack.Configuration = {
   mode: 'production',
@@ -15,7 +27,7 @@ const config: webpack.Configuration = {
 
   output: {
     publicPath: '/',
-    path: webpackPaths.pluginPath,
+    path: process.env.NODE_ENV === 'development' ? webpackPaths.pluginPath : webpackPaths.pluginPathProduction,
     filename: '[name]/dist/[name].backend.js',
     library: {
       type: 'commonjs2',
@@ -28,6 +40,12 @@ const config: webpack.Configuration = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
     }),
+
+    new CopyPlugin({
+      patterns: [
+        ...move,
+      ]
+    })
   ],
 
   node: {
