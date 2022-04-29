@@ -10,6 +10,8 @@ const srcMainPath = path.join(srcPath, 'electron-main');
 const srcRendererPath = path.join(srcPath, 'electron-web');
 const srcPagesPath = path.join(srcRendererPath, 'windows');
 const srcPreloadPath = path.join(srcPath, 'electron-preload');
+const pluginPath = path.join(srcPath, 'plugins');
+
 
 const releasePath = path.join(rootPath, 'release');
 const appPath = path.join(releasePath, 'app');
@@ -17,6 +19,8 @@ const appPackagePath = path.join(appPath, 'package.json');
 const appNodeModulesPath = path.join(appPath, 'node_modules');
 const srcNodeModulesPath = path.join(srcPath, 'node_modules');
 const srcPackagePath = path.join(srcPath, 'package.json');
+const pluginPathProduction = path.join(appPath, 'plugins');
+
 
 const distPath = path.join(appPath, 'dist');
 const distMainPath = path.join(distPath, 'main');
@@ -83,6 +87,8 @@ fs.readdirSync(srcPagesPath, { withFileTypes: true })
 export default {
   rootPath,
   dllPath,
+  pluginPath,
+  pluginPathProduction,
   srcPath,
   srcMainPath,
   srcRendererPath,

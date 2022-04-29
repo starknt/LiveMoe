@@ -1,4 +1,4 @@
-import { app } from 'electron'
+import { app, protocol } from 'electron'
 import minimist from 'minimist'
 import { dev, production, win } from 'common/electron-common/environment'
 import { Emitter, Event } from 'common/electron-common/base/event'
@@ -35,12 +35,26 @@ async function exceptionHandler() {
 }
 
 async function beforeReady() {
+  // 注册 App 协议
+  protocol.registerSchemesAsPrivileged([
+    {
+      scheme: 'file',
+      privileges: {
+        standard: true,
+        secure: false,
+        bypassCSP: false,
+        corsEnabled: true,
+        stream: true,
+      },
+    },
+  ])
+
   if (production()) {
     // app.setPath('userData', resolve);
   }
 
-  if (dev())
-    app.commandLine.appendSwitch('--ignore-certificate-errors', 'true')
+  app.commandLine.appendSwitch('disable-site-isolation-trials')
+  app.commandLine.appendSwitch('--ignore-certificate-errors', 'true')
 }
 
 async function ready() {

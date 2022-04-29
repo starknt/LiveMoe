@@ -47,6 +47,7 @@
   ],
   "include": [
     "src/**/*",
+    "plugins/**/*",
     "*.d.ts"
   ],
 }

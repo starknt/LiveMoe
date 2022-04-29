@@ -15,7 +15,7 @@ export class IWindow
 
   processEvents(
     type: WINDOW_MESSAGE_TYPE,
-    // @ts-expect-error
+    // @ts-expect-error ok
     preload: EventPreloadType,
   ): any | Event<any> {
     if (

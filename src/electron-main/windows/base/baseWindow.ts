@@ -3,6 +3,7 @@ import type { BrowserWindowConstructorOptions, Display } from 'electron'
 import { Emitter, Event } from 'common/electron-common/base/event'
 import { BrowserWindow } from 'electron'
 import { screenWatcher } from 'electron-main/observables/screen.observable'
+import { delay } from 'common/electron-common/utils'
 
 abstract class BaseWindow extends BrowserWindow {
   private _onReadyToShow = new Emitter<void>()
@@ -19,6 +20,12 @@ abstract class BaseWindow extends BrowserWindow {
     })
 
     this.on('ready-to-show', () => this._onReadyToShow.fire())
+
+    this.webContents.on('did-fail-load', async() => {
+      await delay(1000)
+
+      this.webContents.reload()
+    })
 
     // 屏蔽右键菜单
     this.hookWindowMessage(278, () => {

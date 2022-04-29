@@ -1,7 +1,8 @@
 import { List, ListItemButton, ListItemText, Typography } from '@mui/material'
 import { styled } from '@mui/system'
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import useLocalStorageState from 'electron-web/hooks/useLocalStorageState'
+import useOnceEffect from 'electron-web/hooks/useOnceEffect'
+import { Link, useNavigate } from 'react-router-dom'
 import './navgation.css'
 
 const NavTypography = styled(Typography)(() => ({
@@ -19,7 +20,13 @@ export interface INavgationProps {
 }
 
 const Navigation: React.FC<INavgationProps> = ({ items = [] }) => {
-  const [selectedIndex, setSelectedIndex] = useState(0)
+  const navigate = useNavigate()
+  const [selectedIndex, setSelectedIndex] = useLocalStorageState('nav', 0, true)
+
+  useOnceEffect(() => {
+    if (typeof selectedIndex === 'number' && selectedIndex !== 0 && items[selectedIndex])
+      navigate(items[selectedIndex].to)
+  })
 
   return <List sx={{ display: 'flex', gap: '2rem' }} component="nav">
       {

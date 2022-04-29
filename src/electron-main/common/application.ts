@@ -7,6 +7,7 @@ import { app } from 'electron'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
 import { FileHelper } from 'common/electron-main/fileHelper'
 import type { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer'
+import type { IServerChannel } from 'common/electron-common'
 import type { IDialogWindowOptions, IWindow } from './windows'
 
 export const DEFAULT_CONFIGURATION: IApplicationConfiguration = {
@@ -60,7 +61,7 @@ export interface CoreApi {
   registerWindow(windowId: WindowId, options: IWindowOptions): boolean
   unregisterWindow(windowId: WindowId): boolean
   /** 注册服务 */
-  // registerService(channelName: string, channel: IServerChannel<string>): boolean;
+  registerService(channelName: string, channel: IServerChannel<string>): boolean
 }
 
 export interface IApplicationGUI {

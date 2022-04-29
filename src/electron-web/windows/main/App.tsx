@@ -1,8 +1,5 @@
 import { initalizeApplicationState } from 'electron-web/features/applicationSlice'
-import {
-  initalizePlayerState,
-  updateConfigurationAll,
-} from 'electron-web/features/playerSlice'
+import { initalizePlayerState, updateConfigurationAll } from 'electron-web/features/playerSlice'
 import { useAppDispatch } from 'electron-web/store/store'
 import { useRoutes } from 'react-router'
 import useOnceEffect from 'electron-web/hooks/useOnceEffect'
