@@ -22,20 +22,12 @@ const PluginCard: React.FC<PluginCardProps> = ({ name, preview, configuration })
     state: {
       plugin: configuration,
     },
-  })}>
-    <CardActionArea>
-          <CardMedia
-            className={cardClasses}
-            sx={{
-              minHeight: 165,
-              maxHeight: 165,
-            }}
-            component="img"
-            height="165"
-            loading="lazy"
-          />
-          <CardContent sx={{ fontSize: '0.9rem', padding: '8px 16px' }}>
-            <TinyText>{name}</TinyText>
+  })}
+  >
+    <CardActionArea sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
+          <CardMedia>我是背景图</CardMedia>
+          <CardContent sx={{ fontSize: '0.9rem', padding: '8px 16px', display: 'flex', justifyContent: 'center' }}>
+          <TinyText component="span">{name}</TinyText>
           </CardContent>
     </CardActionArea>
   </Card>

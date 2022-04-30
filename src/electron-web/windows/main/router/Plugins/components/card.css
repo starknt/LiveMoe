@@ -1,5 +1,5 @@
 .default-background {
-  background-image: url("/assets/public/plugin.default.jpg");
+  background-image: linear-gradient(to bottom, #5d68e9d7 0%, #88ed94c4 100%);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
