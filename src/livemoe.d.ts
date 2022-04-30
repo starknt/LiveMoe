@@ -75,6 +75,8 @@ declare namespace LiveMoe {
 
   interface GuiService {
     openFolder(path: string): Promise<boolean>;
+
+    openFileSelectDialog(options?: Electron.OpenDialogSyncOptions): Promise<string[] | undefined>;
   }
 
   interface ServerService {
