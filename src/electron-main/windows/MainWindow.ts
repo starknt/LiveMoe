@@ -21,7 +21,7 @@ export default class MainWindow extends IWindow {
     logic: MainWindow.logic,
   }
 
-  static logic(this: IWindow) {
+  static logic(this: MainWindow) {
     Reflect.set(this, 'handleCommand', (preload: EventPreloadType): any => {
       const { event: command, reply } = preload
       switch (command) {

@@ -78,7 +78,7 @@ export default class Application extends ApplicationEventBus {
       if (!change.doc)
         return null
 
-      return Reflect.get(change.doc, 'data')
+      return Reflect.get(change.doc, 'data') as IApplicationConfiguration
     },
   )
 
@@ -167,7 +167,7 @@ export default class Application extends ApplicationEventBus {
         },
       },
       lifecycle: {
-        // TODO: 生命周期函数待实现
+        // TODO: 生命周期函数待完善
         onReady: this.readyEmitter.event,
         onBeforeLoad: this.wallpaperLoader.onBeforeLoad,
         onLoad: this.wallpaperLoader.onLoad,
@@ -209,7 +209,7 @@ export default class Application extends ApplicationEventBus {
 
     this.windowManager = new WindowManager(this, this.server)
 
-    this.initWindows()
+    this.registerWindows()
 
     this.applicationTray = new ApplicationTray(this.context, this.server)
 
@@ -276,12 +276,26 @@ export default class Application extends ApplicationEventBus {
   private registerListener() {
     this.onReady(() => {
       process.nextTick(() => {
+        if (this.configuration.coldStartup)
+          return
         this.sendWindowMessage('lm:windows', {
           type: WINDOW_MESSAGE_TYPE.WINDOW_CALL,
           event: 'window',
-          arg: ['main', false],
+          arg: ['main', true],
         })
       })
+    })
+
+    this.onConfigChange(async(configuration) => {
+      if (!configuration)
+        return
+
+      const isEnable = await AutoStartup.isEnable()
+
+      if (configuration.coldStartup && !isEnable)
+        AutoStartup.enable()
+      else if (isEnable)
+        AutoStartup.disable()
     })
 
     this.applicationTray.onShow(() => {
@@ -330,7 +344,7 @@ export default class Application extends ApplicationEventBus {
     this.configuration = configuration.data
   }
 
-  private initWindows() {
+  private registerWindows() {
     try {
       this.windowManager.registerWindow(
         MainWindow.id,

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
 import { retry } from 'common/electron-common/utils'
+import type { rootStore } from 'electron-web/store/store'
 
 export const enum InitalizeState {
   INITIALIZING = 'INITIALIZING',
@@ -110,6 +111,8 @@ const applicationConfiguration = createSlice({
 })
 
 export const { updateConfigurationAll } = applicationConfiguration.actions
+
+export const selectApplicationConfiguration = (state: rootStore) => state.applicationConfiguration
 
 const ApplicationConfigurationReducer = applicationConfiguration.reducer
 
