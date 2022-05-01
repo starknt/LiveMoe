@@ -1,6 +1,6 @@
 import { win } from 'common/electron-common/environment';
 import EventEmitter from 'events';
-import fs, {
+import {
   OpenMode,
   ObjectEncodingOptions,
   existsSync,
