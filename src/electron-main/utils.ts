@@ -32,6 +32,8 @@ export const resolveWallpaperHtmlPath: (htmlFileName: string) => string = (
     htmlFileName.endsWith('.html') ? htmlFileName : `${htmlFileName}.html`,
   )
 
+export const resolveArtTemplate = (fileName: string) => path.resolve(assetsPath, fileName.endsWith('.art') ? fileName : `${fileName}.art`)
+
 export let resolvePreloadPath: (preloadFileName: string) => string
 
 export let PanelsPath: string

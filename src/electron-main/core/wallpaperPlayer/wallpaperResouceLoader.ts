@@ -173,6 +173,7 @@ export default class WallpaperLoader implements IDestroyable {
         const rawConfiguration = await FileHelper.readJSON<
           Record<string | number | symbol, unknown>
         >(themePath)
+
         const transformRest = this.validWallpaperSchema[i].transform(
           basePath,
           rawConfiguration,

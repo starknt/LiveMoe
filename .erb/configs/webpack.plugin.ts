@@ -60,6 +60,7 @@ let htmlEntries= [];
           removeComments: true,
         },
         isBrowser: false,
+        chunks: [configuration.name],
         isDevelopment: process.env.NODE_ENV !== 'production',
         nodeModules: webpackPaths.appNodeModulesPath,
       })

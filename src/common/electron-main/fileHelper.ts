@@ -1,13 +1,14 @@
 import { win } from 'common/electron-common/environment';
 import EventEmitter from 'events';
-import {
+import fs, {
   OpenMode,
   ObjectEncodingOptions,
   existsSync,
   Dirent,
   statSync,
 } from 'fs';
-import { cp, open, FlagAndOpenMode, mkdir } from 'fs/promises';
+import fsExtra from 'fs-extra';
+import { open, FlagAndOpenMode, mkdir } from 'fs/promises';
 import { resolveGlobalAssets } from 'electron-main/utils';
 import path, { dirname } from 'path';
 
@@ -62,7 +63,19 @@ export namespace FileHelper {
 
   export async function move(src: string, dest: string) {
     try {
-      await cp(src, dest);
+      // Nodejs cp v16.7.0
+      await fsExtra.move(src, dest,  { overwrite: true });
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  export async function rm(path: string) {
+    try {
+      if(fsExtra.existsSync(path)) {
+        await fsExtra.remove(path);
+      }
+
     } catch (err) {
       throw err;
     }
@@ -123,10 +136,7 @@ export namespace FileHelper {
 
   export function isDirectory(dir: Dirent[] | Dirent | string) {
     if (Array.isArray(dir)) {
-      return Array.some(
-        dir.map((v) => v.isDirectory()),
-        (v) => v
-      );
+      return dir.map((v) => v.isDirectory()).some((v) => v);
     } else if (typeof dir === 'object') {
       return dir.isDirectory();
     } else {
