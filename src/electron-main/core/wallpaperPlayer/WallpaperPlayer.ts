@@ -503,7 +503,7 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
 
     this.onViewMode(
       debounce(({ x, y }: { x: number; y: number }) => {
-        if (this.rtConfiguration.viewVisible)
+        if (!this.rtConfiguration.viewVisible)
           return
 
         if (win()) {
@@ -539,7 +539,7 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
           }
         }
 
-        globalShortcut.register('Ctrl+Shift+Q', () => {
+        const result = globalShortcut.register('Ctrl+Shift+Q', () => {
           if (win()) {
             const windowTools = dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools')
 
@@ -547,9 +547,12 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
             windowTools.ShowShellWindow()
           }
 
-          this.rtConfiguration.viewVisible = false
+          this.rtConfiguration.viewVisible = true
           globalShortcut.unregister('Ctrl+Shift+Q')
         })
+
+        if (!result)
+          this.handleRegisterShortcutFailedWithViewMode()
       }, 200),
     )
 
@@ -565,6 +568,17 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
           break
       }
     })
+  }
+
+  private handleRegisterShortcutFailedWithViewMode() {
+    if (win()) {
+      const windowTools = dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools')
+
+      windowTools.ShowDesktopIcon()
+      windowTools.ShowShellWindow()
+    }
+
+    this.rtConfiguration.viewVisible = true
   }
 
   private handleAddedWallpaper(event: IWallpaperChangeEvent) {
