@@ -25,5 +25,15 @@ export default function createGuiService(
         arg: options,
       })
     },
+
+    checkFileExists: async(path: string) => {
+      try {
+        await stat(path)
+        return true
+      }
+      catch {
+        return false
+      }
+    },
   }
 }

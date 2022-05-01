@@ -204,7 +204,7 @@ function extractZip(
   });
 }
 
-function openZip(zipFile: string, lazy: boolean = false): Promise<ZipFile> {
+export function openZip(zipFile: string, lazy: boolean = false): Promise<ZipFile> {
   return new Promise<ZipFile>((resolve, reject) => {
     _openZip(
       zipFile,
