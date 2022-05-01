@@ -12,6 +12,7 @@ declare global {
     serverService: LiveMoe.RendererService;
     platform: LiveMoe.Platform;
     guiService: LiveMoe.GuiService;
+    wallpaperService: LiveMoe.WallpaperService;
     dev: () => boolean;
     production: () => boolean;
   };

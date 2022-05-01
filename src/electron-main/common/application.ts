@@ -54,8 +54,8 @@ export interface IApplicationLifecycle {
 export interface CoreApi {
   /** 将获得一个操作数据库的API  */
   getNameSpace(spaceName: string): DatabaseNamespace
-  /** 将获得一个应用配置的Proxy对象  */
-  // getApplicationConfiguration(): IApplicationConfiguration;
+  /** 将获得一个应用配置的对象  */
+  getApplicationConfiguration(): IApplicationConfiguration
   /** 创建一个窗口 */
   showWindowById(id: string): IWindow
   registerWindow(windowId: WindowId, options: IWindowOptions): boolean

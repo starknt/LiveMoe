@@ -10,6 +10,7 @@ import createTrayService from './services/trayService'
 import createServerService from './services/serverService'
 import createGuiService from './services/guiService'
 import { when } from './helper'
+import createWallpaperService from './services/wallpaperService'
 
 // TODO: 注入服务, 服务注入到全局预加载脚本时, 会导致IPC服务器出错
 // 1. 数据库服务
@@ -34,6 +35,8 @@ async function getAllMainServiceChannel(server: IPCRendererServer) {
 
   const guiService = await retry(async() => server.getChannel('lm:gui'))
 
+  const wallpaperService = await retry(async() => server.getChannel('lm:wallpaper'))
+
   return {
     dbService,
     windowsService,
@@ -41,6 +44,7 @@ async function getAllMainServiceChannel(server: IPCRendererServer) {
     applicationService,
     trayService,
     guiService,
+    wallpaperService,
   }
 }
 
@@ -53,13 +57,6 @@ if (process.isMainFrame) {
 
     injectMainService(ctx)
   })
-}
-else {
-  console.log('子框架')
-  const url = new URL(window.location.href)
-  const ctx = url.searchParams.get('ctx') ?? ''
-
-  injectMainService(ctx)
 }
 
 async function injectMainService(ctx: string) {
@@ -78,6 +75,7 @@ async function injectMainService(ctx: string) {
     applicationService,
     trayService,
     guiService,
+    wallpaperService,
   } = await getAllMainServiceChannel(server)
 
   const exposeDbService = createDatabaseService(dbService)
@@ -90,6 +88,8 @@ async function injectMainService(ctx: string) {
 
   const exposeGuiService = createGuiService(guiService)
 
+  const exposeWallpaperService = createWallpaperService(wallpaperService)
+
   const exposeServerService = createServerService(server)
 
   contextBridge.exposeInMainWorld('livemoe', {
@@ -99,6 +99,7 @@ async function injectMainService(ctx: string) {
     applicationService: exposeApplicationService,
     trayService: exposeTrayService,
     serverService: exposeServerService,
+    wallpaperService: exposeWallpaperService,
     platform: {
       windows: () => is.win(),
       macOS: () => is.macOS(),

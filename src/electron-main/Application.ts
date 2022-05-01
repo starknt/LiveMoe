@@ -53,9 +53,9 @@ export default class Application extends ApplicationEventBus {
 
   private windowManager!: WindowManager
 
-  private pluginManager!: PluginManager
+  pluginManager!: PluginManager
 
-  private service!: Service
+  service!: Service
 
   private readonly readyEmitter = new Emitter<void>()
 
@@ -137,6 +137,9 @@ export default class Application extends ApplicationEventBus {
         },
       },
       core: {
+        getApplicationConfiguration: () => {
+          return this.configuration
+        },
         showWindowById: (id: string) => {
           return this.windowManager.showWindowById(id)
         },

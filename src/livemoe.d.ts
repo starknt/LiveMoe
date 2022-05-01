@@ -3,7 +3,7 @@ import type { IApplicationConfiguration } from 'common/electron-common/applicati
 import type { Event } from 'common/electron-common/base/event';
 import type { DatabaseNamespace, Doc } from 'common/electron-common/database';
 import type { TASKBAR_APPEARANCE } from 'common/electron-common/taskbar';
-import type { IWallpaperConfiguration, IWallpaperPlayProgress, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer';
+import type { IWallpaperConfiguration, IWallpaperConfigurationFile, IWallpaperPlayProgress, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer';
 
 declare namespace LiveMoe {
   interface Gui {}
@@ -46,6 +46,11 @@ declare namespace LiveMoe {
     onProgress(): Promise<Event<IWallpaperPlayProgress>>;
   }
 
+  interface WallpaperService {
+    createVideoWallpaper(configuration: IWallpaperConfigurationFile): Promise<void>;
+    createImageWallpaper(configuration: IWallpaperConfigurationFile): Promise<void>;
+    createHtmlWallpaper(configuration: IWallpaperConfigurationFile): Promise<void>;
+  }
   interface ApplicationService {
     getConfiguration(): Promise<IApplicationConfiguration>;
     setConfiguration(configuration: IApplicationConfiguration): Promise<any>;
@@ -77,6 +82,8 @@ declare namespace LiveMoe {
     openFolder(path: string): Promise<boolean>;
 
     openFileSelectDialog(options?: Electron.OpenDialogSyncOptions): Promise<string[] | undefined>;
+
+    checkFileExists(path: string): Promise<boolean>;
   }
 
   interface ServerService {
