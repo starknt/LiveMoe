@@ -10,10 +10,11 @@ import React, { useState } from 'react'
 interface WallpaperCardProps extends CardProps {
   configuration: IWallpaperConfiguration
   playing?: boolean
+  onContextMenu?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, configuration: IWallpaperConfiguration, playing: boolean) => void
 }
 
 const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
-  ({ configuration, playing = false, ...props }) => {
+  ({ configuration, playing = false, onContextMenu, ...props }) => {
     const [isLoading, setLoading] = useState(true)
     return (
       <Card
@@ -22,6 +23,10 @@ const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
           position: 'relative',
           minWidth: 'calc( 25% - 1rem )',
           maxWidth: 'calc( 25% - 1rem )',
+        }}
+        onContextMenu={(event: any) => {
+          if (onContextMenu)
+            onContextMenu?.(event, configuration, playing)
         }}
         elevation={playing ? 15 : 1}
         disabled={isLoading}

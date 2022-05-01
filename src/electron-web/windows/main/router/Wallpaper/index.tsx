@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded'
+import PauseIcon from '@mui/icons-material/Pause'
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded'
 import { useSelector } from 'react-redux'
 import { selectPlayList, selectPlayerConfiguration } from 'electron-web/features/playerSlice'
@@ -18,15 +19,19 @@ const Wallpaper: React.FC = () => {
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number
     mouseY: number
+    configuration: IWallpaperConfiguration
+    playing: boolean
   } | null>(null)
 
-  const onContextMenu = useCallback((event: React.MouseEvent) => {
+  const onContextMenu = useCallback((event: React.MouseEvent, configuration: IWallpaperConfiguration, playing: boolean) => {
     event.preventDefault()
     setContextMenu(
       contextMenu === null
         ? {
             mouseX: event.clientX - 2,
             mouseY: event.clientY - 4,
+            configuration,
+            playing,
           }
         : null,
     )
@@ -37,8 +42,25 @@ const Wallpaper: React.FC = () => {
   }, [])
 
   const handleToggle = useCallback(() => {
+    if (!contextMenu)
+      return
+
+    const { playing, configuration } = contextMenu
+
+    if (playing)
+      livemoe.wallpaperPlayerService.toggle()
+    else
+      livemoe.wallpaperPlayerService.play(configuration)
+
     handleClose()
-  }, [])
+  }, [contextMenu])
+
+  const handleDelete = useCallback(() => {
+    if (!contextMenu)
+      return
+
+    handleClose()
+  }, [contextMenu])
 
   const filterVideo = useCallback((item: IWallpaperConfiguration) => {
     return item.rawConfiguration.type === 1
@@ -49,18 +71,23 @@ const Wallpaper: React.FC = () => {
   }, [])
 
   const renderContextMenu = useCallback(() => {
+    if (contextMenu === null)
+      return ''
+
+    const { playing } = contextMenu
+
     return <>
         <MenuItem onClick={handleToggle}>
-          <ListItemIcon><PlayArrowRoundedIcon /></ListItemIcon>
-          <ListItemText>播放/暂停</ListItemText>
+          <ListItemIcon>{ playing ? <PauseIcon /> : <PlayArrowRoundedIcon /> }</ListItemIcon>
+          <ListItemText>{ playing ? '暂停' : '播放' }</ListItemText>
         </MenuItem>
         <Divider />
-        <MenuItem onClick={handleClose}>
+        <MenuItem disabled={playing} onClick={handleDelete}>
           <ListItemIcon><DeleteOutlineRoundedIcon /> </ListItemIcon>
           <ListItemText>删除</ListItemText>
         </MenuItem>
     </>
-  }, [])
+  }, [contextMenu, handleToggle, handleDelete])
 
   if (!playList || playList.length === 0) {
     return (

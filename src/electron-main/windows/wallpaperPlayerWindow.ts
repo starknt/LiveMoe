@@ -653,6 +653,10 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
       this.playlist.push(wallpaper)
   }
 
+  async removeWallpaperFromPlaylist(id: string) {
+    this.playlist = this.playlist.filter(wallpaper => wallpaper.id !== id)
+  }
+
   /**
    * @param {number} time 跳转播放进度
    */

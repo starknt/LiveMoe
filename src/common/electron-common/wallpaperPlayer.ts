@@ -110,3 +110,10 @@ export interface IWallpaperPlayerPlayingConfiguration {
 }
 
 export type IWallpaperPlayerMode = 'single' | 'random' | 'order' | 'list-loop';
+
+
+export interface IWallpaperPlayerPlayListChangeEvent {
+  type: 'added' | 'deleted'
+  configuration?: IWallpaperConfiguration
+  id?: string
+}
