@@ -3,11 +3,9 @@ import type { IApplicationConfiguration } from 'common/electron-common/applicati
 import type { Event } from 'common/electron-common/base/event';
 import type { DatabaseNamespace, Doc } from 'common/electron-common/database';
 import type { TASKBAR_APPEARANCE } from 'common/electron-common/taskbar';
-import type { IWallpaperConfiguration, IWallpaperConfigurationFile, IWallpaperPlayProgress, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer';
+import type { IWallpaperConfiguration, IWallpaperConfigurationFile, IWallpaperPlayerPlayListChangeEvent, IWallpaperPlayProgress, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer';
 
 declare namespace LiveMoe {
-  interface Gui {}
-
   interface DbService {
     getNamespace(name: string): Promise<DatabaseNamespace>;
   }
@@ -44,6 +42,7 @@ declare namespace LiveMoe {
     onPlay(): Promise<Event<any>>;
     onConfigChange(): Promise<Event<PlayRuntimeConfiguration>>;
     onProgress(): Promise<Event<IWallpaperPlayProgress>>;
+    onPlaylistChange(): Promise<Event<IWallpaperPlayerPlayListChangeEvent>>;
   }
 
   interface WallpaperService {

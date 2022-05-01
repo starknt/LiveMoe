@@ -14,11 +14,20 @@ import type { IApplicationConfiguration } from 'common/electron-common/applicati
 import { extract } from 'common/electron-main/zip'
 import { createCancelablePromise } from 'common/electron-common/base/cancelablePromise'
 import { app } from 'electron'
+import { Emitter, Event } from 'common/electron-common/base/event'
 
 export default class WallpaperService {
   private readonly channelName = 'lm:wallpaper'
 
   private readonly service = new Service()
+
+  private readonly onCreateStartEmitter = new Emitter<string>()
+
+  private readonly onCreateEndedEmitter = new Emitter<string>()
+
+  readonly onCreateStart = this.onCreateStartEmitter.event
+
+  readonly onCreateEnd = this.onCreateEndedEmitter.event
 
   constructor(private readonly server: IPCMainServer, private readonly context: IApplicationContext) {
     this.server.registerChannel(this.channelName, this.service)
@@ -27,8 +36,23 @@ export default class WallpaperService {
   }
 
   registerListener() {
+    this.context.registerMessageHandler(this.channelName, (type, preload) => {
+      switch (type) {
+        case WINDOW_MESSAGE_TYPE.WINDOW_CALL:
+          return this.dispatchCallerEvent(preload)
+        case WINDOW_MESSAGE_TYPE.WINDOW_LISTEN:
+          return this.dispatchListenerEvent(preload)
+      }
+
+      return Event.None
+    })
+
     this.service.registerCaller(WINDOW_MESSAGE_TYPE.IPC_CALL, async(preload: EventPreloadType) => {
       return await this.dispatchCallerEvent(preload)
+    })
+
+    this.service.registerListener(WINDOW_MESSAGE_TYPE.IPC_LISTEN, (preload: EventPreloadType) => {
+      return this.dispatchListenerEvent(preload)
     })
   }
 
@@ -52,13 +76,23 @@ export default class WallpaperService {
     }
   }
 
+  dispatchListenerEvent(preload: EventPreloadType) {
+    switch (preload.event) {
+      case 'create:start':
+        return this.onCreateStart
+      case 'create:end':
+        return this.onCreateEnd
+      default:
+        return Event.None
+    }
+  }
+
   async createVideo(configuration: IWallpaperConfigurationFile) {
     const applicationConfiguration = this.context.core.getApplicationConfiguration()
 
+    // 生成文件夹
+    const dirName = this.generateDir(applicationConfiguration)
     try {
-      // 生成文件夹
-      const dirName = this.generateDir(applicationConfiguration)
-
       const file = path.parse(configuration.src)
       const preview = path.parse(configuration.preview)
 
@@ -76,6 +110,9 @@ export default class WallpaperService {
     catch {
       return false
     }
+    finally {
+      this.onCreateEndedEmitter.fire(dirName)
+    }
   }
 
   async createHtml(configuration: IWallpaperConfigurationFile) {
@@ -87,9 +124,11 @@ export default class WallpaperService {
     const tempDirname = `livemoe-${file.name}`
 
     const tempDirPath = path.join(app.getPath('temp'), tempDirname)
+    let dirName = this.generateDirName()
 
     try {
-      let dirName = this.generateDirName()
+      this.onCreateStartEmitter.fire(dirName)
+
       while (fs.existsSync(path.join(`${applicationConfiguration.resourcePath}`, `${dirName}`)))
         dirName = this.generateDirName(generateUuid().substring(0, 2))
 
@@ -142,16 +181,16 @@ export default class WallpaperService {
     finally {
       await FileHelper.rm(path.join(tempDirPath, file.name))
       await FileHelper.rm(tempDirPath)
+      this.onCreateEndedEmitter.fire(dirName)
     }
   }
 
   async createPicture(configuration: IWallpaperConfigurationFile) {
     const applicationConfiguration = this.context.core.getApplicationConfiguration()
 
+    // 生成文件夹
+    const dirName = this.generateDir(applicationConfiguration)
     try {
-      // 生成文件夹
-      const dirName = this.generateDir(applicationConfiguration)
-
       const html = template(resolveArtTemplate('picture'), {
 
       })
@@ -179,6 +218,9 @@ export default class WallpaperService {
     catch {
       return false
     }
+    finally {
+      this.onCreateEndedEmitter.fire(dirName)
+    }
   }
 
   generateDir(applicationConfiguration: IApplicationConfiguration) {
@@ -186,6 +228,8 @@ export default class WallpaperService {
     let dirName = this.generateDirName()
     while (fs.existsSync(path.join(`${applicationConfiguration.resourcePath}`, `${dirName}`)))
       dirName = this.generateDirName(generateUuid().substring(0, 2))
+
+    this.onCreateStartEmitter.fire(dirName)
 
     fs.mkdirSync(path.join(`${applicationConfiguration.resourcePath}`, `${dirName}`))
     return dirName
@@ -195,5 +239,10 @@ export default class WallpaperService {
     const date = new Date()
 
     return `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}${extra}`
+  }
+
+  destroy() {
+    this.onCreateStartEmitter.dispose()
+    this.onCreateEndedEmitter.dispose()
   }
 }

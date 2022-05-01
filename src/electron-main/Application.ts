@@ -172,6 +172,7 @@ export default class Application extends ApplicationEventBus {
         onBeforeLoad: this.wallpaperLoader.onBeforeLoad,
         onLoad: this.wallpaperLoader.onLoad,
         onAfterLoad: this.wallpaperLoader.onAfterLoad,
+        onChange: this.wallpaperLoader.onChange,
         onQuit: this.onDestroy,
       },
       sendCallWindowMessage: (channelName, event, ...args) => {
