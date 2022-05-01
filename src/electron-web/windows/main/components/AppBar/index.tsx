@@ -163,7 +163,7 @@ export default React.forwardRef((_, ref) => {
               <MenuRoundedIcon />
             </IconButton>
             <Menu
-              sx={{ mt: '45px' }}
+              sx={{ mt: '45px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
               anchorEl={anchorElMenu}
               anchorOrigin={{
                 vertical: 'top',
@@ -177,16 +177,16 @@ export default React.forwardRef((_, ref) => {
               open={Boolean(anchorElMenu)}
               onClose={handleCloseAppMenu}
             >
-              <MenuItem onClick={handleToggleSetting}>
-                <ListItemIcon>
+              <MenuItem sx={{ gap: '0.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }} onClick={handleToggleSetting}>
+                <ListItemIcon sx={{ maxWidth: '64px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                   <SettingsApplicationsRoundedIcon />
                 </ListItemIcon>
                 <ListItemText>
                   <Typography textAlign="center">设置</Typography>
                 </ListItemText>
               </MenuItem>
-              <MenuItem onClick={handleToggleAbout}>
-                <ListItemIcon>
+              <MenuItem sx={{ gap: '0.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }} onClick={handleToggleAbout}>
+                <ListItemIcon sx={{ maxWidth: '64px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                   <InfoRoundedIcon />
                 </ListItemIcon>
                 <ListItemText>

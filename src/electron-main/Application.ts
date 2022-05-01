@@ -24,6 +24,7 @@ import WallpaperLoader from './core/wallpaperPlayer/wallpaperResouceLoader'
 import PlayerWindow from './windows/PlayerWindow'
 import { AutoStartup } from './common/autoStartup'
 import { setTrayVisible } from './observables/user.observable'
+import Service from './core/services'
 import PluginManager from './core/pluginCore/PluginManager'
 
 /**
@@ -52,7 +53,9 @@ export default class Application extends ApplicationEventBus {
 
   private windowManager!: WindowManager
 
-  private pluginManager!: PluginManager
+  pluginManager!: PluginManager
+
+  service!: Service
 
   private readonly readyEmitter = new Emitter<void>()
 
@@ -134,6 +137,9 @@ export default class Application extends ApplicationEventBus {
         },
       },
       core: {
+        getApplicationConfiguration: () => {
+          return this.configuration
+        },
         showWindowById: (id: string) => {
           return this.windowManager.showWindowById(id)
         },
@@ -189,6 +195,8 @@ export default class Application extends ApplicationEventBus {
         return this.unregisterEvent(channelName)
       },
     }
+
+    this.service = new Service(this.context, this.server)
 
     this.pluginManager = new PluginManager(this.context)
 
