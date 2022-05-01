@@ -13,6 +13,8 @@ import { useNavigate } from 'react-router-dom'
 import useToggle from 'electron-web/hooks/useToggle'
 import useLocalStorageState from 'electron-web/hooks/useLocalStorageState'
 import classNames from 'classnames'
+import { useSelector } from 'react-redux'
+import { selectApplicationConfiguration } from 'electron-web/features/applicationSlice'
 import About from '../about'
 import type { INavgationItem } from '../navgation'
 import Navigation from '../navgation'
@@ -32,6 +34,7 @@ const NavItems: INavgationItem[] = [
 ]
 
 export default React.forwardRef((_, ref) => {
+  const configuration = useSelector(selectApplicationConfiguration)
   const [themeValue, setThemeValue] = useLocalStorageState('theme', 'light', true)
   const navgation = useNavigate()
 
@@ -72,8 +75,11 @@ export default React.forwardRef((_, ref) => {
   }, [])
 
   const handleClose = useCallback(() => {
-    window.livemoe.windowsService.sendWindowMessage('main', 'hide')
-  }, [])
+    if (configuration.closeAction.action === 'hide')
+      window.livemoe.windowsService.sendWindowMessage('main', 'hide')
+    else
+      window.livemoe.applicationService.quit()
+  }, [configuration])
 
   const handleToggleSetting = useCallback(() => {
     window.livemoe.windowsService.toggleWindow('setting')
