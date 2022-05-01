@@ -5,14 +5,9 @@ import { Service } from 'common/electron-common'
 import type { IPCMainServer } from 'common/electron-main'
 import type Application from 'electron-main/Application'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
-import type {
-  IWindow,
-  IWindowMessageOptions,
-} from 'electron-main/common/windows'
+import type { IWindow, IWindowMessageOptions } from 'electron-main/common/windows'
 import type { EventPreloadType } from 'common/electron-common/windows'
-import {
-  WINDOW_MESSAGE_TYPE,
-} from 'common/electron-common/windows'
+import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import { info } from '../Logger/logger'
 import type { WindowId } from './WindowManager'
 

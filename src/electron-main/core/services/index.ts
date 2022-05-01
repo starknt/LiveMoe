@@ -9,4 +9,7 @@ export default class Service {
   wallpaperService = new WallpaperService(this.server, this.context)
 
   constructor(private readonly context: IApplicationContext, private readonly server: IPCMainServer) {}
+
+  destroy() {
+  }
 }

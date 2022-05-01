@@ -13,11 +13,10 @@ declare global {
     platform: LiveMoe.Platform;
     guiService: LiveMoe.GuiService;
     wallpaperService: LiveMoe.WallpaperService;
+    updateService: LiveMoe.UpdateService;
     dev: () => boolean;
     production: () => boolean;
   };
-
-  var gui: LiveMoe.Gui;
 
   var helper: {
     whenLiveMoeReady(): Promise<void>;
