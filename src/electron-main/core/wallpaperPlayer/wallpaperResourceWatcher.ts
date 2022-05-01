@@ -1,37 +1,39 @@
-import path from 'path'
 import applicationLogger from 'common/electron-common/applicationLogger'
-import { Emitter, Event } from 'common/electron-common/base/event'
-import type { IEnvironmentConfiguration } from 'common/electron-common/configuration'
-import type { IWallpaperConfigurationFileSchema } from 'common/electron-common/wallpaperLoader'
+import type { Event } from 'common/electron-common/base/event'
+import { Emitter } from 'common/electron-common/base/event'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import Chokidar from 'chokidar'
+import type { IApplicationContext } from 'electron-main/common/application'
 
 export default class WallpaperResourceWatcher implements IDestroyable {
   private resourcePath: string
 
-  private _ready = false
+  private ready = false
 
-  private readonly _onReady = new Emitter<void>()
+  private readonly onAddedDirEmitter = new Emitter<string>()
 
-  private readonly _onAddWallpaper = new Emitter<void>()
+  private readonly onDeleteDirEmitter = new Emitter<string>()
 
-  private readonly _onError = new Emitter<Error>()
+  private readonly onErrorEmitter = new Emitter<Error>()
 
-  readonly onReady = this._onReady.event
+  readonly onAddedDir = this.onAddedDirEmitter.event
 
-  readonly onAddWallpaper = this._onAddWallpaper.event
+  readonly onDeleteDir = this.onDeleteDirEmitter.event
 
-  readonly onError = this._onError.event
+  readonly onError = this.onErrorEmitter.event
+
+  private onCreateWallpaperStart!: Event<string>
+
+  private onCreateWallpaperEnded!: Event<string>
+
+  private awaitDirs: string[] = []
 
   private watcher: Chokidar.FSWatcher | null = null
 
   constructor(
-    private readonly configuration: IEnvironmentConfiguration,
-    private readonly validWallpaperSchema: IWallpaperConfigurationFileSchema[],
+    private readonly context: IApplicationContext,
   ) {
-    this.resourcePath = <string>(
-      this.configuration.getApplicationConfiguration('resourcePath')
-    )
+    this.resourcePath = this.context.core.getApplicationConfiguration().resourcePath
 
     this.initalize()
   }
@@ -42,45 +44,69 @@ export default class WallpaperResourceWatcher implements IDestroyable {
       persistent: true,
       awaitWriteFinish: true,
       followSymlinks: false,
+      ignorePermissionErrors: true,
     })
 
-    this.watcher.on('change', (path, stats) => {
-      if (stats!.isDirectory())
-        return
+    this.context.lifecycle.onReady(() => {
+      this.onCreateWallpaperStart = this.context.sendListenWindowMessage('lm:wallpaper', 'create:start')
 
-      const extension = path.split('.').pop()
+      this.onCreateWallpaperEnded = this.context.sendListenWindowMessage('lm:wallpaper', 'create:ended')
 
-      if (extension === 'json')
-        this._onAddWallpaper.fire()
+      this.onCreateWallpaperStart((dir) => {
+        console.log(`[WallpaperResourceWatcher] Create wallpaper start: ${dir}`)
+
+        this.awaitDirs.push(dir)
+      })
+
+      this.onCreateWallpaperEnded((dir) => {
+        console.log(`[WallpaperResourceWatcher] Create wallpaper ended: ${dir}`)
+
+        this.awaitDirs.splice(this.awaitDirs.indexOf(dir), 1)
+      })
     })
+
+    this.watcher
+      .on('addDir', async(dirPath, stats) => {
+        if (!stats || !this.ready)
+          return
+
+        if (!stats.isDirectory())
+          return
+
+        await new Promise<void>((resolve) => {
+          const timer = setInterval(() => {
+            if (!this.awaitDirs.includes(dirPath)) {
+              clearInterval(timer)
+              resolve()
+            }
+          }, 100)
+        })
+
+        setTimeout(() => this.onAddedDirEmitter.fire(dirPath), 1000)
+
+        console.log(`${dirPath} added`)
+      })
+      .on('unlinkDir', (dirPath) => {
+        if (!this.ready)
+          return
+
+        this.onDeleteDirEmitter.fire(dirPath)
+
+        console.log(`${dirPath} unlinkDir`)
+      })
       .on('ready', () => {
-        this._ready = true
-        this._onReady.fire()
+        this.ready = true
 
         applicationLogger.info('wallpaper watcher ready')
       })
-      .on('add', (filePath) => {
-        for (let i = 0; i < this.validWallpaperSchema.length; i += 1) {
-          if (this.validWallpaperSchema[i].ext === path.basename(filePath))
-            return
-        }
-      })
-      .on('unlinkDir', (path) => {})
       .on('error', error =>
         applicationLogger.error(`[LiveMoe ResouceWatcher] error: ${error}`),
       )
   }
 
-  whenReady() {
-    if (this._ready)
-      return Promise.resolve()
-
-    return Event.toPromise(this.onReady)
-  }
-
   destroy(): void {
-    this._onError.dispose()
-    this._onReady.dispose()
-    this._onAddWallpaper.dispose()
+    this.onAddedDirEmitter.dispose()
+    this.onDeleteDirEmitter.dispose()
+    this.onErrorEmitter.dispose()
   }
 }

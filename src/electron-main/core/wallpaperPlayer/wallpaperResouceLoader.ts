@@ -15,12 +15,20 @@ import { createCancelablePromise } from 'common/electron-common/base/cancelableP
 import { ApplicationNotification } from 'electron-main/common/notification'
 import { retry } from 'common/electron-common/utils'
 import { generateUuid } from 'common/electron-common/base/uuid'
+import WallpaperResourceWatcher from './wallpaperResourceWatcher'
+
+export interface IWallpaperChangeEvent {
+  type: 'deleted' | 'added'
+  path: string
+  configuration: IWallpaperConfiguration | null
+}
 
 export default class WallpaperLoader implements IDestroyable {
   private resourcePath!: string
 
-  private readonly validWallpaperSchema: IWallpaperConfigurationFileSchema[]
-    = []
+  private readonly validWallpaperSchema: IWallpaperConfigurationFileSchema[] = []
+
+  private resourceWatcher: WallpaperResourceWatcher | null = null
 
   private readonly beforeLoadEmitter = new Emitter<void>()
 
@@ -34,12 +42,18 @@ export default class WallpaperLoader implements IDestroyable {
 
   readonly onAfterLoad = this.afterLoadEmitter.event
 
+  private onChangeEmitter = new Emitter<IWallpaperChangeEvent>()
+
+  readonly onChange = this.onChangeEmitter.event
+
   constructor(private readonly application: Application) {
     this.resourcePath = application.configuration.resourcePath
   }
 
   async initalize() {
     this.initalizWallpaperSchema()
+
+    this.resourceWatcher = new WallpaperResourceWatcher(this.application.context)
 
     await this.initalizeWallpaperResource()
 
@@ -160,6 +174,10 @@ export default class WallpaperLoader implements IDestroyable {
   private async parseWallpaperBaseConfiguration(value: Dirent) {
     const basePath = path.join(this.resourcePath, value.name)
 
+    return await this.readWallpaperConfiguration(basePath)
+  }
+
+  private async readWallpaperConfiguration(basePath: string) {
     for (let i = 0; i < this.validWallpaperSchema.length; i += 1) {
       const themePath = path.join(
         basePath,
@@ -180,7 +198,7 @@ export default class WallpaperLoader implements IDestroyable {
         )
 
         if (transformRest !== null) {
-          FileHelper.writeJSON(path.join(basePath, 'theme.lmw'), transformRest)
+          await FileHelper.writeJSON(path.join(basePath, 'theme.lmw'), transformRest)
             .then(v => v)
             .catch(err => console.error(err))
             .catch(err =>
@@ -253,6 +271,30 @@ export default class WallpaperLoader implements IDestroyable {
     this.application.onConfigChange(() => {
       this.resourcePath = this.application.configuration.resourcePath
     })
+
+    this.resourceWatcher?.onAddedDir(async(dirPath) => {
+      // 检查是否是壁纸资源
+      const result = await this.readWallpaperConfiguration(dirPath)
+
+      if (!result)
+        return
+
+      const configuration = this.transform2WallpaperResult([result])[0]
+
+      this.onChangeEmitter.fire({
+        type: 'added',
+        path: dirPath,
+        configuration,
+      })
+    })
+
+    this.resourceWatcher?.onDeleteDir((dirPath) => {
+      this.onChangeEmitter.fire({
+        type: 'deleted',
+        path: dirPath,
+        configuration: null,
+      })
+    })
   }
 
   registerWallpaperSchema(schema: IWallpaperConfigurationFileSchema) {
@@ -264,5 +306,7 @@ export default class WallpaperLoader implements IDestroyable {
     this.afterLoadEmitter.dispose()
     this.loadEmitter.dispose()
     this.beforeLoadEmitter.dispose()
+    this.onChangeEmitter.dispose()
+    this.resourceWatcher?.destroy()
   }
 }

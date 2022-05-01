@@ -121,6 +121,12 @@ const createWallpaperPlayerService = (
         event: 'progress',
       })
     },
+    onPlaylistChange: async() => {
+      return wallpaperPlayerService.listen(WINDOW_MESSAGE_TYPE.IPC_LISTEN, {
+        type: WINDOW_MESSAGE_TYPE.IPC_LISTEN,
+        event: 'playlist',
+      })
+    },
   }
 }
 

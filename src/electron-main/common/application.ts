@@ -8,6 +8,7 @@ import type { IApplicationConfiguration } from 'common/electron-common/applicati
 import { FileHelper } from 'common/electron-main/fileHelper'
 import type { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer'
 import type { IServerChannel } from 'common/electron-common'
+import type { IWallpaperChangeEvent } from 'electron-main/core/wallpaperPlayer/wallpaperResouceLoader'
 import type { IDialogWindowOptions, IWindow } from './windows'
 
 export const DEFAULT_CONFIGURATION: IApplicationConfiguration = {
@@ -46,6 +47,9 @@ export interface IApplicationLifecycle {
 
   /** 加载壁纸资源后 */
   onAfterLoad: Event<IWallpaperConfiguration[]>
+
+  /** 壁纸资源发生变化 */
+  onChange: Event<IWallpaperChangeEvent>
 
   /** 退出程序 */
   onQuit: Event<void>

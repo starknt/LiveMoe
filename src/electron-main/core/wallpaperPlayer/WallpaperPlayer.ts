@@ -1,5 +1,6 @@
 import applicationLogger from 'common/electron-common/applicationLogger'
 import { Emitter, Event } from 'common/electron-common/base/event'
+import type { IWallpaperPlayerPlayListChangeEvent } from 'common/electron-common/wallpaperPlayer'
 import { DEFAULT_CONFIGURATION, DEFAULT_PLAY_RUNTIME_CONFIGURATION, type IWallpaperConfiguration, type IWallpaperPlayProgress, type IWallpaperPlayerConfiguration, type IWallpaperPlayerMode, type PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 import type { IPCMainServer } from 'common/electron-main'
 import { type IWallpaperFailLoadEvent, type IWallpaperPlayer, validateWallpaperConfiguration } from 'electron-main/common/wallpaperPlayer'
@@ -16,6 +17,7 @@ import { Service } from 'common/electron-common'
 import type { DocRes } from 'common/electron-common/database'
 import { reactive } from 'common/electron-common/reactive'
 import { QueryUserState } from 'electron-main/observables/user.observable'
+import type { IWallpaperChangeEvent } from './wallpaperResouceLoader'
 
 export default class WallpaperPlayer implements IWallpaperPlayer {
   private readonly channelName = 'lm:wallpaper:player'
@@ -61,13 +63,13 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
   private readonly volumeEmitter
     = new Emitter<IWallpaperPlayerVolumeChangeEvent>()
 
-  private readonly _onLoopChange
+  private readonly onLoopChangeEmitter
     = new Emitter<IWallpaperPlayerLoopChangeEvent>()
 
-  private readonly _onAudioMuteChange
+  private readonly onAudioMuteChangeEmitter
     = new Emitter<IWallpaperPlayerAudioChangeEvent>()
 
-  private readonly _onDisableChange
+  private readonly onDisableChangeEmitter
     = new Emitter<IWallpaperPlayerDisabledChangeEvent>()
 
   private readonly didLoadFailEmitter = new Emitter<IWallpaperFailLoadEvent>()
@@ -77,6 +79,8 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
   private readonly closeEmitter = new Emitter<void>()
 
   private readonly destroyEmitter = new Emitter<void>()
+
+  private readonly onPlayListChangeEmitter = new Emitter<IWallpaperPlayerPlayListChangeEvent>()
 
   private readonly onViewMode = Event.fromNodeEventEmitter(
     ipcMain,
@@ -99,19 +103,21 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
 
   readonly onDidLoadFinsh = this.didLoadFinshEmiiter.event
 
-  readonly onDisableChange = this._onDisableChange.event
+  readonly onDisableChange = this.onDisableChangeEmitter.event
 
   readonly onVolumeChange = this.volumeEmitter.event
 
-  readonly onAudioMuteChange = this._onAudioMuteChange.event
+  readonly onAudioMuteChange = this.onAudioMuteChangeEmitter.event
 
-  readonly onLoopChange = this._onLoopChange.event
+  readonly onLoopChange = this.onLoopChangeEmitter.event
 
   readonly onEnded = this.endedEmitter.event
 
   readonly onClosed = this.closeEmitter.event
 
   readonly onDestroy = this.destroyEmitter.event
+
+  readonly onPlayListChange = this.onPlayListChangeEmitter.event
 
   constructor(
     private readonly application: Application,
@@ -365,6 +371,8 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
           },
         )
       }
+      case 'playlist':
+        return this.onPlayListChange
       default:
         return Event.None
     }
@@ -409,6 +417,24 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
       this.isReady = true
 
       this.handleReady()
+    })
+
+    this.onPlayListChange((event) => {
+      switch (event.type) {
+        case 'added':
+          this.playlist.push(event.configuration!)
+          this.window.addWallpaper2Playlist(event.configuration!)
+          break
+        case 'deleted': {
+          const index = this.playlist.findIndex(configuration => configuration.id === event.id)
+          if (index !== -1)
+            this.playlist.splice(index, 1)
+          this.window.removeWallpaperFromPlaylist(event.id!)
+        }
+          break
+        default:
+          break
+      }
     })
 
     // 准备加载壁纸
@@ -477,6 +503,9 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
 
     this.onViewMode(
       debounce(({ x, y }: { x: number; y: number }) => {
+        if (!this.rtConfiguration.viewVisible)
+          return
+
         if (win()) {
           if (!this.electronScreen || !this.rtConfiguration.viewMode)
             return
@@ -508,16 +537,75 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
             windowTools.ShowDesktopIcon()
             this.rtConfiguration.viewVisible = true
           }
+        }
 
-          globalShortcut.register('Ctrl+Shift+Q', () => {
+        const result = globalShortcut.register('Ctrl+Shift+Q', () => {
+          if (win()) {
+            const windowTools = dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools')
+
             windowTools.ShowDesktopIcon()
             windowTools.ShowShellWindow()
-            this.rtConfiguration.viewVisible = false
-            globalShortcut.unregister('Ctrl+Shift+Q')
-          })
-        }
+          }
+
+          this.rtConfiguration.viewVisible = true
+          globalShortcut.unregister('Ctrl+Shift+Q')
+        })
+
+        if (!result)
+          this.handleRegisterShortcutFailedWithViewMode()
       }, 200),
     )
+
+    this.application.context.lifecycle.onChange((e) => {
+      switch (e.type) {
+        case 'added':
+          this.handleAddedWallpaper(e)
+          break
+        case 'deleted':
+          this.handleDeletedWallpaper(e)
+          break
+        default:
+          break
+      }
+    })
+  }
+
+  private handleRegisterShortcutFailedWithViewMode() {
+    if (win()) {
+      const windowTools = dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools')
+
+      windowTools.ShowDesktopIcon()
+      windowTools.ShowShellWindow()
+    }
+
+    this.rtConfiguration.viewVisible = true
+  }
+
+  private handleAddedWallpaper(event: IWallpaperChangeEvent) {
+    const { configuration } = event
+    if (configuration) {
+      this.onPlayListChangeEmitter.fire({
+        type: 'added',
+        configuration: configuration!,
+      })
+    }
+  }
+
+  private handleDeletedWallpaper(event: IWallpaperChangeEvent) {
+    const { path: Path } = event
+
+    const configuration = this.playlist.find((configuration) => {
+      return configuration.resourcePath === Path
+    })
+
+    if (!configuration)
+      return
+
+    this.onPlayListChangeEmitter.fire({
+      type: 'deleted',
+      configuration: configuration!,
+      id: configuration.id,
+    })
   }
 
   private initalizeService() {
@@ -708,12 +796,13 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
       this.endedEmitter.dispose()
       this.closeEmitter.dispose()
       this.destroyEmitter.dispose()
-      this._onAudioMuteChange.dispose()
+      this.onAudioMuteChangeEmitter.dispose()
       this.didLoadFailEmitter.dispose()
       this.didLoadFinshEmiiter.dispose()
-      this._onDisableChange.dispose()
+      this.onDisableChangeEmitter.dispose()
       this.volumeEmitter.dispose()
-      this._onLoopChange.dispose()
+      this.onLoopChangeEmitter.dispose()
+      this.onPlayListChangeEmitter.dispose()
 
       /** 保存壁纸播放进度 */
       if (win()) {

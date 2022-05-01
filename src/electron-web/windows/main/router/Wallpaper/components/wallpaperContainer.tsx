@@ -8,7 +8,7 @@ import WallpaperController from './WallpaperController'
 interface WallpaperContainerProps {
   playerConfiguration: PlayRuntimeConfiguration
   configurations: IWallpaperConfiguration[]
-  onContextMenu?: (event: React.MouseEvent) => void
+  onContextMenu?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, configuration: IWallpaperConfiguration, playing: boolean) => void
 }
 
 function handleUpdate(
