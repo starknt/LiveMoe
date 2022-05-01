@@ -255,8 +255,8 @@ export default function QuickCreator(): JSX.Element {
     </QuickCreatorDialog>
     <WallpaperConfigurationDialog disableEscapeKeyDown title="请先填写一下新壁纸的信息" content="" open={isOpenForm}>
       <Box sx={{ mt: '1rem', gap: '1rem', display: 'flex', flexDirection: 'column' }}>
-        <TextField label="壁纸名称" value={name} onChange={e => setName(e.target.value)} />
-        <TextField label="壁纸描述" placeholder="简单的描述一下你的壁纸吧" multiline onChange={e => setDescription(e.target.value)} />
+        <TextField label="壁纸名称" value={name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)} />
+        <TextField label="壁纸描述" placeholder="简单的描述一下你的壁纸吧" multiline onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)} />
         <Box sx={{ display: 'flex', gap: '1rem', justifyContent: 'space-between', alignItems: 'center' }}>
           <TinyText component="span" >封面图: </TinyText>
           {
