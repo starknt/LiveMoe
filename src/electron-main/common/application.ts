@@ -60,6 +60,8 @@ export interface CoreApi {
   getNameSpace(spaceName: string): DatabaseNamespace
   /** 将获得一个应用配置的对象  */
   getApplicationConfiguration(): IApplicationConfiguration
+  /** 监听应用配置的变化 */
+  onApplicationConfigurationChange: Event<IApplicationConfiguration>
   /** 创建一个窗口 */
   showWindowById(id: string): IWindow
   registerWindow(windowId: WindowId, options: IWindowOptions): boolean

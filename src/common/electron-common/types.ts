@@ -2,6 +2,10 @@ export function isClass(x: any) {
   return isVaildValue(x) && typeof x?.constructor === 'function';
 }
 
+export function isPromise(x: any) {
+  return isVaildValue(x) && typeof x === 'object' && typeof x.then === 'function' && typeof x.catch === 'function';
+}
+
 export function isVaildValue(x: any) {
   return !isNil(x) && x ? true : false;
 }

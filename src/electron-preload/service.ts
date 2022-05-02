@@ -11,6 +11,7 @@ import createServerService from './services/serverService'
 import createGuiService from './services/guiService'
 import { when } from './helper'
 import createWallpaperService from './services/wallpaperService'
+import createUpdateService from './services/updateService'
 
 // TODO: 注入服务, 服务注入到全局预加载脚本时, 会导致IPC服务器出错
 // 1. 数据库服务
@@ -37,6 +38,8 @@ async function getAllMainServiceChannel(server: IPCRendererServer) {
 
   const wallpaperService = await retry(async() => server.getChannel('lm:wallpaper'))
 
+  const updateService = await retry(async() => server.getChannel('lm:update'))
+
   return {
     dbService,
     windowsService,
@@ -45,6 +48,7 @@ async function getAllMainServiceChannel(server: IPCRendererServer) {
     trayService,
     guiService,
     wallpaperService,
+    updateService,
   }
 }
 
@@ -76,6 +80,7 @@ async function injectMainService(ctx: string) {
     trayService,
     guiService,
     wallpaperService,
+    updateService,
   } = await getAllMainServiceChannel(server)
 
   const exposeDbService = createDatabaseService(dbService)
@@ -90,6 +95,8 @@ async function injectMainService(ctx: string) {
 
   const exposeWallpaperService = createWallpaperService(wallpaperService)
 
+  const exposeUpdateService = createUpdateService(updateService)
+
   const exposeServerService = createServerService(server)
 
   contextBridge.exposeInMainWorld('livemoe', {
@@ -100,6 +107,7 @@ async function injectMainService(ctx: string) {
     trayService: exposeTrayService,
     serverService: exposeServerService,
     wallpaperService: exposeWallpaperService,
+    updateService: exposeUpdateService,
     platform: {
       windows: () => is.win(),
       macOS: () => is.macOS(),

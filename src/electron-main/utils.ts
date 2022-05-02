@@ -24,7 +24,7 @@ export const resolveGlobalAssets = (...paths: string[]) => {
 
 export let resolveHtmlPath: (htmlFileName: string) => string
 
-export const resolveWallpaperHtmlPath: (htmlFileName: string) => string = (
+export const resolveWallpaperHtmlPath = (
   htmlFileName: string,
 ) =>
   path.resolve(
@@ -32,7 +32,9 @@ export const resolveWallpaperHtmlPath: (htmlFileName: string) => string = (
     htmlFileName.endsWith('.html') ? htmlFileName : `${htmlFileName}.html`,
   )
 
-export const resolveArtTemplate = (fileName: string) => path.resolve(assetsPath, fileName.endsWith('.art') ? fileName : `${fileName}.art`)
+export const resolveArtTemplate = (fileName: string) => {
+  return path.resolve(assetsPath, fileName?.endsWith('.art') ? fileName : `${fileName}.art`)
+}
 
 export let resolvePreloadPath: (preloadFileName: string) => string
 

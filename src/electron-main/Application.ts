@@ -26,6 +26,7 @@ import { AutoStartup } from './common/autoStartup'
 import { setTrayVisible } from './observables/user.observable'
 import Service from './core/services'
 import PluginManager from './core/pluginCore/PluginManager'
+import UpdateManager from './core/UpdateManager'
 
 /**
  * @feature 初始化应用程序
@@ -53,9 +54,11 @@ export default class Application extends ApplicationEventBus {
 
   private windowManager!: WindowManager
 
-  pluginManager!: PluginManager
+  private updateManager!: UpdateManager
 
-  service!: Service
+  private pluginManager!: PluginManager
+
+  private service!: Service
 
   private readonly readyEmitter = new Emitter<void>()
 
@@ -140,6 +143,7 @@ export default class Application extends ApplicationEventBus {
         getApplicationConfiguration: () => {
           return this.configuration
         },
+        onApplicationConfigurationChange: this.onConfigChange as Event<IApplicationConfiguration>,
         showWindowById: (id: string) => {
           return this.windowManager.showWindowById(id)
         },
@@ -200,6 +204,8 @@ export default class Application extends ApplicationEventBus {
     this.service = new Service(this.context, this.server)
 
     this.pluginManager = new PluginManager(this.context)
+
+    this.updateManager = new UpdateManager(this.context)
 
     this.wallpaperPlayer = new WallpaperPlayer(this, this.server)
 
@@ -415,6 +421,9 @@ export default class Application extends ApplicationEventBus {
       this.wallpaperPlayer.destroy()
       this.applicationTray.destroy()
       this.windowManager.destroy()
+      this.updateManager.destory()
+      this.pluginManager.destroy()
+      this.service.destroy()
       this.database.destroy()
     })
   }
