@@ -3,7 +3,15 @@
   "files.associations": {
     ".eslintrc": "jsonc",
     ".prettierrc": "jsonc",
-    ".eslintignore": "ignore"
+    ".eslintignore": "ignore",
+    "*.jsx": "javascriptreact",
+    "*.tsx": "typescriptreact",
+  },
+  "[javascriptreact]": {
+    "editor.formatOnSave": true,
+  },
+  "[typescriptreact]": {
+    "editor.formatOnSave": true,
   },
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",

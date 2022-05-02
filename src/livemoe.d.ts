@@ -1,13 +1,26 @@
-import type { IChannel, IEventListener, IListener } from 'common/electron-common';
+import type { IEventListener, IListener } from 'common/electron-common';
 import type { IApplicationConfiguration } from 'common/electron-common/application';
 import type { Event } from 'common/electron-common/base/event';
 import type { DatabaseNamespace, Doc } from 'common/electron-common/database';
 import type { TASKBAR_APPEARANCE } from 'common/electron-common/taskbar';
 import type { IWallpaperConfiguration, IWallpaperConfigurationFile, IWallpaperPlayerPlayListChangeEvent, IWallpaperPlayProgress, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer';
+import type { ProgressInfo, UpdateInfo } from 'electron-updater';
 
 declare namespace LiveMoe {
   interface DbService {
     getNamespace(name: string): Promise<DatabaseNamespace>;
+  }
+
+  interface UpdateService {
+    checkForUpdate(): Promise<boolean>;
+    update(): Promise<boolean>;
+
+    onCheckForUpdate(): Promise<Event<void>>;
+    onUpdateAvailable(): Promise<Event<UpdateInfo>>;
+    onUpdateNotAvailable(): Promise<Event<UpdateInfo>>;
+    onDownloadProgress(): Promise<Event<ProgressInfo>>;
+    onUpdateDownloaded(): Promise<Event<UpdateInfo>>;
+    onUpdateCheckError(): Promise<Event<Error>>;
   }
 
   interface WindowsService {

@@ -116,4 +116,12 @@ export default class PluginManager {
   async registerFrontendPlugin(plugin: PluginPackage) {
     this.frontendPlugins.set(plugin.name, plugin)
   }
+
+  destroy() {
+    this.initedEmitter.dispose()
+
+    this.backendPlugins.forEach((plugin) => {
+      plugin?.onDestroy?.()
+    })
+  }
 }

@@ -1,11 +1,7 @@
 import type { IPCMainServer } from 'common/electron-main'
 import type Application from 'electron-main/Application'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
-import type {
-  IDialogWindowOptions,
-  IWindow,
-  IWindowConstructor,
-} from 'electron-main/common/windows'
+import type { IDialogWindowOptions, IWindow, IWindowConstructor } from 'electron-main/common/windows'
 import { generateUuid } from 'common/electron-common/base/uuid'
 import { BrowserWindow, shell } from 'electron'
 import type { IWindowOptions } from './WindowPool'
@@ -240,8 +236,6 @@ export default class WindowManager implements IDestroyable {
 
     BrowserWindow.getAllWindows().forEach((window) => {
       window.destroy()
-      // @ts-expect-error
-      window = null
     })
   }
 }

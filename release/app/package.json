@@ -14,6 +14,7 @@
     "postinstall": "npm run electron-rebuild && npm run link-modules"
   },
   "dependencies": {
+    "art-template": "^4.13.2",
     "pouchdb": "^7.2.2",
     "win-func-tools": "latest"
   }
