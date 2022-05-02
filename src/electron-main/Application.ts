@@ -143,6 +143,7 @@ export default class Application extends ApplicationEventBus {
         getApplicationConfiguration: () => {
           return this.configuration
         },
+        onApplicationConfigurationChange: this.onConfigChange as Event<IApplicationConfiguration>,
         showWindowById: (id: string) => {
           return this.windowManager.showWindowById(id)
         },

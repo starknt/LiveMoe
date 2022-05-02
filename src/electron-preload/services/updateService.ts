@@ -11,6 +11,12 @@ export default function createUpdateService(updateService: IChannel): LiveMoe.Up
         type: WINDOW_MESSAGE_TYPE.IPC_CALL,
       })
     },
+    update: async() => {
+      return await updateService.call(WINDOW_MESSAGE_TYPE.IPC_CALL, {
+        event: 'update',
+        type: WINDOW_MESSAGE_TYPE.IPC_CALL,
+      })
+    },
 
     onCheckForUpdate: async() => {
       return updateService.listen(WINDOW_MESSAGE_TYPE.IPC_LISTEN, {

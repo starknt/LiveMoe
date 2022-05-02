@@ -13,6 +13,7 @@ declare namespace LiveMoe {
 
   interface UpdateService {
     checkForUpdate(): Promise<boolean>;
+    update(): Promise<boolean>;
 
     onCheckForUpdate(): Promise<Event<void>>;
     onUpdateAvailable(): Promise<Event<UpdateInfo>>;

@@ -8,34 +8,52 @@ import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
 import SettingsApplicationsRoundedIcon from '@mui/icons-material/SettingsApplicationsRounded'
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded'
 import UpdateIcon from '@mui/icons-material/Update'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import useToggle from 'electron-web/hooks/useToggle'
-import { Badge } from '@mui/material'
+import { Badge, Button, Snackbar } from '@mui/material'
 import useAsyncState from 'electron-web/hooks/useAsyncState'
+import useAsyncEffect from 'electron-web/hooks/useAsyncEffect'
+import { useSelector } from 'react-redux'
+import { selectApplicationConfiguration } from 'electron-web/features/applicationSlice'
 import About from '../About'
 import './appbarMenu.css'
-import useAsyncEffect from 'electron-web/hooks/useAsyncEffect'
 
 interface Props {
 }
 
 const AppbarMenu: React.FC<Props> = () => {
+  const applicationConfig = useSelector(selectApplicationConfiguration)
   const [anchorElMenu, setAnchorElMenu] = useState<null | HTMLElement>(null)
   const [about, toggleAbout] = useToggle(false)
   const [updateAvailable, setUpdateAvailable] = useAsyncState(async() => await livemoe.updateService.checkForUpdate(), false)
+  const [updateProgress, setUpdateProgress] = useState<null | number>(null)
 
   useAsyncEffect(async() => {
     const onUpdateAvailable = await livemoe.updateService.onUpdateAvailable()
     const onUpdateNotAvailable = await livemoe.updateService.onUpdateNotAvailable()
+    const onUpdateProgress = await livemoe.updateService.onDownloadProgress()
+    const onUpdateEnded = await livemoe.updateService.onUpdateDownloaded()
 
     onUpdateAvailable((info) => {
       console.log('onUpdateAvailable', info)
       setUpdateAvailable(true)
+      setUpdateProgress(0)
     })
 
     onUpdateNotAvailable((info) => {
       console.log('onUpdateNotAvailable', info)
       setUpdateAvailable(false)
+      setUpdateProgress(null)
+    })
+
+    onUpdateProgress((info) => {
+      console.log('onUpdateProgress', info)
+      setUpdateProgress(Math.floor(info.percent))
+    })
+
+    onUpdateEnded((info) => {
+      console.log('onUpdateEnded', info)
+      setUpdateProgress(100)
     })
   }, [])
 
@@ -55,15 +73,18 @@ const AppbarMenu: React.FC<Props> = () => {
     handleCloseAppMenu()
   }, [])
 
-  const handleCheckUpdate = useCallback(() => {
+  const handleCheckUpdate = useCallback(async() => {
     handleCloseAppMenu()
-    console.log(livemoe.updateService.checkForUpdate())
+    const update = await livemoe.updateService.checkForUpdate()
+    setUpdateAvailable(update)
   }, [])
 
   const handleToggleAbout = useCallback(() => {
     handleCloseAppMenu()
     toggleAbout()
   }, [])
+
+  const handleUpdate = useCallback(() => {}, [])
 
   return <>
         <Badge color={ updateAvailable ? 'secondary' : undefined } variant="dot" overlap="circular">
@@ -107,8 +128,8 @@ const AppbarMenu: React.FC<Props> = () => {
                     </ListItemIcon>
                   </Badge>
                   <ListItemText>
-                    <Typography textAlign="center">检查更新</Typography>
-                  </ListItemText>
+                  { updateProgress !== null ? <Typography textAlign="center">更新中{ updateProgress }%</Typography> : <Typography textAlign="center">检查更新</Typography> }
+                </ListItemText>
               </MenuItem>
 
               <MenuItem onClick={handleToggleAbout}>
@@ -121,6 +142,7 @@ const AppbarMenu: React.FC<Props> = () => {
               </MenuItem>
         </Menu>
       <About open={about} onClose={() => toggleAbout()} />
+      <Snackbar autoHideDuration={3000} open={ updateAvailable && applicationConfig.updateTips } message={ updateAvailable ? '有更新可用' : '无更新可用' } anchorOrigin={{ vertical: 'top', horizontal: 'center' }} action={ updateAvailable ? <Button onClick={handleUpdate}>立即更新</Button> : '' } />
   </>
 }
 

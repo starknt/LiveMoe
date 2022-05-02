@@ -18,10 +18,19 @@ export default class UpdateManager {
   constructor(private readonly context: IApplicationContext) {
     this.context.core.registerService(this.channelName, this.service)
 
+    autoUpdater.autoDownload = this.context.core.getApplicationConfiguration().autoUpdate
+
+    this.checkUpdate()
+
     this.registerListener()
   }
 
   registerListener() {
+    this.context.core.onApplicationConfigurationChange((configuration) => {
+      autoUpdater.autoDownload = configuration.autoUpdate
+      this.checkUpdate()
+    })
+
     this.service.registerCaller(WINDOW_MESSAGE_TYPE.IPC_CALL, async(preload: EventPreloadType) => {
       return await this.dispatchCallerMessage(preload)
     })
@@ -44,10 +53,16 @@ export default class UpdateManager {
     }
   }
 
+  async update() {
+    autoUpdater.downloadUpdate()
+  }
+
   async dispatchCallerMessage(preload: EventPreloadType) {
     switch (preload.event) {
       case 'check':
         return await this.checkUpdate()
+      case 'update':
+        return await this.update()
       default:
         return false
     }
