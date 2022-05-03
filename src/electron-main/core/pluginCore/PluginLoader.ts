@@ -38,14 +38,14 @@ export default class PluginLoader {
     // fix path
     this.pluginConfigMap.forEach(async(config) => {
       if (config.pluginType === 'mixin') {
-        config.backend.entry = path.join(this.pluginPath, config.name, config.backend.entry)
-        config.frontend.entry = path.join(this.pluginPath, config.name, config.frontend.entry)
+        config.backend.entry = path.normalize(path.join(this.pluginPath, config.name, config.backend.entry))
+        config.frontend.entry = path.normalize(path.join(this.pluginPath, config.name, config.frontend.entry))
       }
       else if (config.pluginType === 'frontend') {
-        config.frontend.entry = path.join(this.pluginPath, config.name, config.frontend.entry)
+        config.frontend.entry = path.normalize(path.join(this.pluginPath, config.name, config.frontend.entry))
       }
       else if (config.pluginType === 'backend') {
-        config.backend.entry = path.join(this.pluginPath, config.name, config.backend.entry)
+        config.backend.entry = path.normalize(path.join(this.pluginPath, config.name, config.backend.entry))
       }
     })
   }

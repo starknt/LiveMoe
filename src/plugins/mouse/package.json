@@ -6,7 +6,7 @@
   "author": "Seven",
   "pluginType": "mixin",
   "backend": {
-    "entry": "./dist/mouse.backend.js"
+    "entry": "./dist/mouse.backend"
   },
   "frontend": {
     "entry": "./dist/index.html"
