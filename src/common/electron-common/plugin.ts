@@ -1,4 +1,6 @@
 import { IApplicationContext } from "electron-main/common/application";
+import type WinFuncTools from 'win-func-tools'
+
 
 export interface PluginLifecycle {
   /**
@@ -23,7 +25,7 @@ export interface PluginLifecycle {
 }
 
 export interface IPluginContext extends IApplicationContext {
-
+  tool: typeof WinFuncTools
 }
 
 export type IBackendPluginConstructor = new (context: IPluginContext) => any

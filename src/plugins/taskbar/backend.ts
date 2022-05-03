@@ -1,7 +1,6 @@
 import type { TASKBAR_APPEARANCE as CTASKBAR_APPEARANCE, ITaskbarCofniguration } from 'common/electron-common/taskbar'
 import { START_APPEARANCE } from 'common/electron-common/taskbar'
 import type { TASKBAR_APPEARANCE } from 'win-func-tools'
-import { SetTaskbar } from 'win-func-tools'
 import { isNil, isNull, withMinAndMax, withT1AsT2 } from 'common/electron-common/types'
 import applicationLogger from 'common/electron-common/applicationLogger'
 import { Service } from 'common/electron-common'
@@ -182,7 +181,7 @@ export default class Taskbar implements IBackendPlugin {
       this.timer?.restore()
     }
 
-    SetTaskbar(this.appearance)
+    this.context.tool.SetTaskbar(this.appearance)
   }
 
   restoreTaskbarStyle() {
@@ -192,7 +191,7 @@ export default class Taskbar implements IBackendPlugin {
     this.appearance = withT1AsT2<TASKBAR_APPEARANCE>(START_APPEARANCE)
 
     try {
-      SetTaskbar(this.appearance)
+      this.context.tool.SetTaskbar(this.appearance)
     }
     catch (err) {
       console.error(err)
