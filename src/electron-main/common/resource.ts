@@ -1,10 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { isNil } from 'common/electron-common/types'
-import type {
-  IWallpaperConfigurationLivelyFile,
-  IWallpaperConfigurationUpUpFile,
-} from 'common/electron-common/wallpaperLoader'
+import type { IWallpaperConfigurationLivelyFile, IWallpaperConfigurationUpUpFile } from 'common/electron-common/wallpaperLoader'
 import type { IWallpaperConfigurationFile } from 'common/electron-common/wallpaperPlayer'
 import { FileHelper } from 'common/electron-main/fileHelper'
 

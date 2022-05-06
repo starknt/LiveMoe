@@ -1,7 +1,8 @@
 /* eslint-disable import/no-mutable-exports */
 import { URL } from 'url'
 import path from 'path'
-import { dev } from 'common/electron-common/environment'
+import { dev, win } from 'common/electron-common/environment'
+import { existsSync } from 'fs-extra'
 
 export let assetsPath: string
 export let globalAssetsPath: string
@@ -92,4 +93,16 @@ if (dev()) {
 else {
   resolveExtraPath = (...paths: string[]) =>
     path.join(process.resourcesPath, 'extra', ...paths)
+}
+
+export const createResoucePath = () => {
+  if (win()) {
+    const Dirve = ['F:', 'E:', 'D:', 'C:']
+    for (let i = 0; i < Dirve.length; i += 1) {
+      if (existsSync(Dirve[i]))
+        return path.join(Dirve[i], 'LiveMoeResource')
+    }
+  }
+
+  return resolveGlobalAssets('LiveMoeResource')
 }

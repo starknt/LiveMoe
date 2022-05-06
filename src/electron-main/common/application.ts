@@ -5,16 +5,16 @@ import type { DatabaseNamespace } from 'common/electron-common/database'
 import type { WindowId } from 'electron-main/core/windowManager/WindowManager'
 import { app } from 'electron'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
-import { FileHelper } from 'common/electron-main/fileHelper'
 import type { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer'
 import type { IServerChannel } from 'common/electron-common'
 import type { IWallpaperChangeEvent } from 'electron-main/core/wallpaperPlayer/wallpaperResouceLoader'
+import { createResoucePath } from 'electron-main/utils'
 import type { IDialogWindowOptions, IWindow } from './windows'
 
 export const DEFAULT_CONFIGURATION: IApplicationConfiguration = {
   selfStartup: false,
   autoUpdate: false,
-  resourcePath: FileHelper.createResoucePath(),
+  resourcePath: createResoucePath(),
   coldStartup: false,
   closeAction: {
     dialog: false,
