@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { AppBar, Box, Container, IconButton, Menu, MenuItem, Skeleton, Toolbar, Typography } from '@mui/material'
+import { AppBar, Box, Container, IconButton, Toolbar, Tooltip } from '@mui/material'
 import MinimizeRoundedIcon from '@mui/icons-material/MinimizeRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded'
@@ -11,12 +11,12 @@ import useLocalStorageState from 'electron-web/hooks/useLocalStorageState'
 import classNames from 'classnames'
 import { useSelector } from 'react-redux'
 import { selectApplicationConfiguration } from 'electron-web/features/applicationSlice'
+import { PlayerSettingIcon } from 'electron-web/styles/icons/PlayerSettingIcon'
 import type { INavgationItem } from '../Navgation'
 import Navigation from '../Navgation'
 import AppbarMenu from '../AppbarMenu'
 import './index.css'
-
-const settings = ['个人信息', '消息', '退出登录']
+import { PlayerSetting } from '../playerSetting'
 
 const NavItems: INavgationItem[] = [
   {
@@ -30,19 +30,10 @@ const NavItems: INavgationItem[] = [
 ]
 
 export default React.forwardRef((_, ref) => {
+  const [playerSettingOpen, setPlayerSettingOpen] = useState(false)
   const configuration = useSelector(selectApplicationConfiguration)
   const [themeValue, setThemeValue] = useLocalStorageState('theme', 'light', true)
   const navgation = useNavigate()
-
-  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null)
-
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget)
-  }
-
-  const handleCloseUserMenu = useCallback(() => {
-    setAnchorElUser(null)
-  }, [])
 
   const handleBack = useCallback(() => {
     navgation(-1)
@@ -70,6 +61,10 @@ export default React.forwardRef((_, ref) => {
       setThemeValue('light')
   }, [themeValue])
 
+  const handlePlayerSettingToggle = useCallback(() => {
+    setPlayerSettingOpen(prev => !prev)
+  }, [])
+
   const appBarClassName = classNames('app-bar', 'draggable', `app-bar-${themeValue}`)
 
   return (
@@ -83,12 +78,16 @@ export default React.forwardRef((_, ref) => {
       <Container style={{ paddingRight: 0 }} sx={{ gap: 1 }} maxWidth="xl">
         <Toolbar style={{ paddingRight: 6 }}>
           <Box sx={{ flexGrow: 1 }}>
-            <IconButton onClick={handleBack} className="non-draggable">
-              <ArrowBackIosRoundedIcon />
-            </IconButton>
-            <IconButton onClick={handleRefresh} className="non-draggable">
-              <RefreshRoundedIcon />
-            </IconButton>
+            <Tooltip title="后退">
+              <IconButton onClick={handleBack} className="non-draggable">
+                <ArrowBackIosRoundedIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="重新加载">
+              <IconButton onClick={handleRefresh} className="non-draggable">
+                <RefreshRoundedIcon />
+              </IconButton>
+            </Tooltip>
           </Box>
           <Box
             sx={{
@@ -100,40 +99,28 @@ export default React.forwardRef((_, ref) => {
             <Navigation items={NavItems} />
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
-            <IconButton
-              className="non-draggable"
-              onClick={handleOpenUserMenu}
-              sx={{ p: 0 }}
-            >
-              <Skeleton variant="circular" width={40} height={40} />
-            </IconButton>
-            <Menu
-              sx={{ mt: '45px' }}
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map(setting => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
+          {/* <Box sx={{ flexGrow: 0 }}>
+
+          </Box> */}
           <Box className="flex" sx={{ flexGrow: 0, mx: 1 }}>
             <AppbarMenu />
           </Box>
           <Box sx={{ flexGrow: 0, mx: 1 }}>
+                <IconButton
+                  disableRipple
+                  disableFocusRipple
+                  className="non-draggable"
+                  onClick={handlePlayerSettingToggle}
+                  sx={{
+                    'p': 1,
+                    ':hover': {
+                      color: 'skyblue',
+                    },
+                  }}
+                >
+                  <PlayerSettingIcon />
+                </IconButton>
+
               <IconButton
                 disableRipple
                 disableFocusRipple
@@ -184,6 +171,7 @@ export default React.forwardRef((_, ref) => {
           </Box>
         </Toolbar>
       </Container>
+      <PlayerSetting onClose={handlePlayerSettingToggle} open={playerSettingOpen} />
     </AppBar>
   )
 })

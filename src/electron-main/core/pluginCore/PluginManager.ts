@@ -31,7 +31,7 @@ export default class PluginManager {
   constructor(appContext: IApplicationContext) {
     this.context = {
       ...appContext,
-      tool: __non_webpack_require__('win-func-tools'),
+      tool: dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools'),
     }
 
     appContext.core.registerService(this.channelName, this.service)

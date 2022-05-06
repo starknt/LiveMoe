@@ -1211,13 +1211,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/source-map-support@^0.5.4":
-  version "0.5.4"
-  resolved "https://registry.npmmirror.com/@types/source-map-support/-/source-map-support-0.5.4.tgz#574ff6a8636bc0ebae78a8014136f749b3177d58"
-  integrity sha512-9zGujX1sOPg32XLyfgEB/0G9ZnrjthL/Iv1ZfuAjj8LEilHZEpQSQs1scpRXPhHzGYgWiLz9ldF1cI8JhL+yMw==
-  dependencies:
-    source-map "^0.6.0"
-
 "@types/styled-components@^5.1.22":
   version "5.1.24"
   resolved "https://registry.npmmirror.com/@types/styled-components/-/styled-components-5.1.24.tgz#b52ae677f03ea8a6018aa34c6c96b7018b7a3571"

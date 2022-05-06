@@ -1,8 +1,9 @@
 import type { IpcMainEvent, LoadFileOptions, LoadURLOptions, Rectangle } from 'electron'
 import type { IWallpaperPlayerViewConfiguration, IWallpaperPlayerWindowConfiguration } from 'electron-main/common/windowConfiguration'
-import type { IWallpaperConfiguration, IWallpaperPlayProgress, IWallpaperPlayerState, IWallpaperPlayerTypes, IWallpaperPlayingConfiguration, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
+import type { IWallpaperConfiguration, IWallpaperPlayProgress, IWallpaperPlayerMode, IWallpaperPlayerState, IWallpaperPlayerTypes, IWallpaperPlayingConfiguration, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
+import { WallpaperPlayerTypes } from 'common/electron-common/wallpaperPlayer'
 import type { IWallpaperFailLoadEvent, IWallpaperView } from 'electron-main/common/wallpaperPlayer'
-import type { IWallpaperPlayerAudioChangeEvent, IWallpaperPlayerDisabledChangeEvent, IWallpaperPlayerLoopChangeEvent, IWallpaperPlayerPlayFailEvent, IWallpaperPlayerVolumeChangeEvent } from 'common/electron-common/wallpaperPlayerWindow'
+import type { IWallpaperPlayerAudioChangeEvent, IWallpaperPlayerDisabledChangeEvent, IWallpaperPlayerPlayFailEvent, IWallpaperPlayerVolumeChangeEvent } from 'common/electron-common/wallpaperPlayerWindow'
 import type { IDisposable } from 'common/electron-common/base/lifecycle'
 import { Emitter, Event } from 'common/electron-common/base/event'
 import { dev, linux, macOS, win } from 'common/electron-common/environment'
@@ -141,10 +142,10 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
   private readonly volumeEmitter
     = new Emitter<IWallpaperPlayerVolumeChangeEvent>()
 
-  private readonly loopEmitter = new Emitter<IWallpaperPlayerLoopChangeEvent>()
-
   private readonly audioMuteEmitter
     = new Emitter<IWallpaperPlayerAudioChangeEvent>()
+
+  private readonly modeEmitter = new Emitter<IWallpaperPlayerMode>()
 
   private readonly destroyEmitter = new Emitter<void>()
 
@@ -174,9 +175,11 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
 
   readonly onPlayReady = this.playReadyEmitter.event
 
+  readonly onModeChange = this.modeEmitter.event
+
   private cancelTokenDisposable: IDisposable | undefined = undefined
 
-  private _type: IWallpaperPlayerTypes = 1
+  private _type: IWallpaperPlayerTypes = WallpaperPlayerTypes.Video
 
   private _seekProgress = false
 
@@ -194,9 +197,9 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
 
   private _volume = 40
 
-  private _state: IWallpaperPlayerState = 'pending'
+  private _mode: IWallpaperPlayerMode = 'single'
 
-  private _loop = false
+  private _state: IWallpaperPlayerState = 'pending'
 
   private _mutePlay = false
 
@@ -254,6 +257,19 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
       // ipcMain.removeAllListeners('ipc:video:end');
     })
 
+    this.onModeChange(() => {
+      switch (this._mode) {
+        case 'single':
+          if (this._type === WallpaperPlayerTypes.Video)
+            this.setLoop(true)
+          break
+        default:
+          if (this._type === WallpaperPlayerTypes.Video)
+            this.setLoop(false)
+          break
+      }
+    })
+
     this.onPlayChange(({ rawConfiguration }) => {
       this._state = 'play'
 
@@ -289,9 +305,21 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
         this._htmlEnded = new TimerHelper.PausableTimeoutTimer(total, () => {
           this.endedEmitter.fire()
 
-          if (this._htmlProgress && this._htmlEnded) {
-            this._htmlProgress.restore()
-            this._htmlEnded.restore()
+          switch (this._mode) {
+            case 'single':
+              if (this._htmlProgress && this._htmlEnded) {
+                this._htmlProgress.reset()
+                this._htmlEnded.reset()
+              }
+              break
+            case 'list-loop':
+              break
+            default:
+              if (this._htmlProgress && this._htmlEnded) {
+                this._htmlProgress.restore()
+                this._htmlEnded.restore()
+              }
+              break
           }
         })
       }
@@ -305,43 +333,52 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
         this._htmlProgress.pause()
     })
 
-    const progressEvent
-      = Event.fromNodeEventEmitter<IWallpaperPlayingConfiguration>(
-        ipcMain,
-        'ipc:video:progress',
-        (_e, progress: IWallpaperPlayProgress) => {
-          const { currentTime, duration } = progress
+    const progressEvent = Event.debounce(Event.fromNodeEventEmitter<IWallpaperPlayingConfiguration>(
+      ipcMain,
+      'ipc:video:progress',
+      (_e: any, progress: IWallpaperPlayProgress) => {
+        const { currentTime, duration } = progress
 
-          if (!this._seekProgress)
-            this._progress = { currentTime, duration }
+        if (!this._seekProgress)
+          this._progress = { currentTime, duration }
 
-          if (this._seekProgress && this._progress) {
-            const view = this.getTopView()
-            view.seek(this._progress.currentTime)
-            this._seekProgress = false
-            this._progress.duration = duration
+        if (this._seekProgress && this._progress) {
+          const view = this.getTopView()
+          view.seek(this._progress.currentTime)
+          this._seekProgress = false
+          this._progress.duration = duration
 
-            return {
-              totalTime: duration,
-              nowTime: this._progress.currentTime,
-              ended: false,
-            }
+          return {
+            totalTime: duration,
+            nowTime: this._progress.currentTime,
+            ended: this._progress.currentTime + 1 >= duration,
           }
+        }
 
-          return { totalTime: duration, nowTime: currentTime, ended: false }
-        },
-      )
+        return { totalTime: duration, nowTime: currentTime, ended: currentTime + 1 >= duration }
+      },
+    ), (last, event) => {
+      if (!last)
+        return event
 
-    const endEvent = Event.fromNodeEventEmitter<IWallpaperPlayingConfiguration>(
+      const { nowTime, totalTime, ended } = event
+
+      return { totalTime, nowTime: Math.floor(Math.max(last.nowTime, nowTime)), ended }
+    })
+
+    const onVideoEnded = Event.fromNodeEventEmitter<IWallpaperPlayingConfiguration>(
       ipcMain,
       'ipc:video:end',
     )
 
     progressEvent((playingConfiguration) => {
+      if (playingConfiguration.ended)
+        this.endedEmitter.fire()
+
       this.progressEmitter.fire(playingConfiguration)
     })
 
-    endEvent(() => {
+    onVideoEnded(() => {
       this.endedEmitter.fire()
     })
 
@@ -522,6 +559,12 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
     return this._activeWalpaper
   }
 
+  async setLoop(v: boolean) {
+    await this.whenPlayReady()
+
+    this.getTopView().send('ipc:video:loop', v)
+  }
+
   getWallpaperCursor(configuration: IWallpaperConfiguration) {
     for (let i = 0; i < this.playlist.length; i += 1) {
       const _configuration = this.playlist[i]
@@ -626,16 +669,6 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
     return this._cursor
   }
 
-  async setLopp(value: boolean) {
-    this._loop = value
-
-    await this.whenPlayReady()
-  }
-
-  get loop() {
-    return this._loop
-  }
-
   private setupDesktop() {
     if (win() && !this._isSetupDesktop) {
       const windowTools = dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools')
@@ -710,6 +743,10 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
     setTimeout(() => this.messageProcess.setup())
   }
 
+  async mode(mode: IWallpaperPlayerMode) {
+    this._mode = mode
+  }
+
   async whenPlayReady() {
     if (this._playReady)
       return Promise.resolve()
@@ -739,7 +776,7 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
       this.disabledEmitter.dispose()
       this.playReadyEmitter.dispose()
       this.playRestoreEmitter.dispose()
-      this.loopEmitter.dispose()
+      this.modeEmitter.dispose()
 
       clearTimeout(timer)
 

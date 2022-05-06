@@ -3,7 +3,7 @@ import type { IApplicationConfiguration } from 'common/electron-common/applicati
 import type { Event } from 'common/electron-common/base/event';
 import type { DatabaseNamespace, Doc } from 'common/electron-common/database';
 import type { TASKBAR_APPEARANCE } from 'common/electron-common/taskbar';
-import type { IWallpaperConfiguration, IWallpaperConfigurationFile, IWallpaperPlayerPlayListChangeEvent, IWallpaperPlayProgress, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer';
+import type { IWallpaperConfiguration, IWallpaperConfigurationFile, IWallpaperPlayerMode, IWallpaperPlayerPlayListChangeEvent, IWallpaperPlayProgress, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer';
 import type { ProgressInfo, UpdateInfo } from 'electron-updater';
 
 declare namespace LiveMoe {
@@ -51,6 +51,7 @@ declare namespace LiveMoe {
     seek(value: number): Promise<boolean>;
     volume(value: number): Promise<boolean>;
     toggle(): Promise<boolean>;
+    mode(mode: IWallpaperPlayerMode): Promise<boolean>;
 
     onPlay(): Promise<Event<any>>;
     onConfigChange(): Promise<Event<PlayRuntimeConfiguration>>;
