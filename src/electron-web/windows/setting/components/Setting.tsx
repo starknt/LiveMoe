@@ -1,11 +1,5 @@
 import type { PaletteMode } from '@mui/material'
-import {
-  Box,
-  Button,
-  Paper,
-  createTheme,
-  styled,
-} from '@mui/material'
+import { Box, Button, Paper, createTheme, styled } from '@mui/material'
 import { ThemeProvider } from '@mui/system'
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined'
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined'
@@ -13,14 +7,8 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import useLocalStorageState from 'electron-web/hooks/useLocalStorageState'
 import { useCallback, useEffect } from 'react'
 import { useAppDispatch } from 'electron-web/store/store'
-import {
-  initalizeApplicationState,
-  updateConfigurationAll,
-} from 'electron-web/features/applicationSlice'
-import {
-  initalizePlayerState,
-  updateConfigurationAll as updatePlayerConfigurationAll,
-} from 'electron-web/features/playerSlice'
+import { initalizeApplicationState, updateConfigurationAll } from 'electron-web/features/applicationSlice'
+import { initalizePlayerState, updateConfigurationAll as updatePlayerConfigurationAll } from 'electron-web/features/playerSlice'
 import useAsyncEffect from 'electron-web/hooks/useAsyncEffect'
 import SettingWidget from './SettingWidget'
 

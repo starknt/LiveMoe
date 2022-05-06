@@ -64,6 +64,12 @@ export type IWallpaperPlayerState = 'pending' | 'play' | 'pause';
 
 export type IWallpaperPlayerTypes = 1 | 2 | 3; // video html html
 
+export const enum WallpaperPlayerTypes {
+  Video = 1,
+  Html = 2,
+  Image = 3,
+}
+
 export interface IWallpaperPlayProgress {
   currentTime: number;
   duration: number;

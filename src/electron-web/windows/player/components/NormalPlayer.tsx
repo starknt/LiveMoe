@@ -13,11 +13,12 @@ import VolumeDownRounded from '@mui/icons-material/VolumeDownRounded'
 import RepeatOneRoundedIcon from '@mui/icons-material/RepeatOneRounded'
 import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined'
 import RepeatRoundedIcon from '@mui/icons-material/RepeatRounded'
-import { Paper, SvgIcon, Tooltip } from '@mui/material'
+import { Paper, Tooltip } from '@mui/material'
 import type { PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 import Widget from 'electron-web/components/Widget'
-import type { FC, PropsWithChildren, ReactNode } from 'react'
+import type { FC } from 'react'
 import { memo, useCallback, useState } from 'react'
+import { PlayerRandomIcon } from 'electron-web/styles/icons/PlayerRandomIcon'
 import Progress from './Progress'
 
 const CoverImage = styled('div')({
@@ -34,17 +35,6 @@ const CoverImage = styled('div')({
     width: '100%',
   },
 })
-
-const RandomIcon = (props: any) => {
-  return (
-    <SvgIcon {...props} viewBox="0 0 1024 1024">
-      <path
-        d="M170.666667 725.333333a42.666667 42.666667 0 0 1 0-85.333333h85.333333l128-128-128-128H170.666667a42.709333 42.709333 0 0 1 0-85.333333h128l170.666666 170.666666 170.666667-170.666666h85.333333V213.333333l170.666667 128.042667L725.333333 469.333333V384h-42.666666l-128 128 128 128h42.666666v-85.333333l170.666667 128-170.666667 128v-85.333334h-85.333333l-170.666667-170.666666-170.666666 170.666666H170.666667z"
-        p-id="2659"
-      ></path>
-    </SvgIcon>
-  )
-}
 
 interface PlayerProps {
   configuration: PlayRuntimeConfiguration
@@ -86,7 +76,7 @@ const NormalPlayer: FC<PlayerProps> = memo(({ configuration }) => {
 
   const renderPlayModeIcon = useCallback(() => {
     if (configuration.mode === 'random')
-      return <RandomIcon />
+      return <PlayerRandomIcon />
 
     if (configuration.mode === 'order')
       return <PlaylistPlayOutlinedIcon />
@@ -268,6 +258,8 @@ const NormalPlayer: FC<PlayerProps> = memo(({ configuration }) => {
       </Widget>
     </Paper>
   )
+}, (prevProps, nextProps) => {
+  return prevProps.configuration.mode === nextProps.configuration.mode
 })
 
 export default NormalPlayer

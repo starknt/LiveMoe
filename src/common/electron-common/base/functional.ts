@@ -63,7 +63,7 @@ export function debounce<T extends Function>(
     maxWait: 0,
     trailing: true,
   }
-) {
+): any {
   let lastArgs: unknown,
     lastThis: unknown,
     maxWait: number = 0,

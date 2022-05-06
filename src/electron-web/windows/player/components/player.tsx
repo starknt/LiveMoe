@@ -1,19 +1,10 @@
 import type { PaletteMode } from '@mui/material'
-import {
-  Box,
-  Button,
-  ThemeProvider,
-  createTheme,
-} from '@mui/material'
+import { Box, Button, ThemeProvider, createTheme } from '@mui/material'
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined'
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import { useCallback, useEffect, useState } from 'react'
-import {
-  initalizePlayerState,
-  selectPlayerConfiguration,
-  updateConfigurationAll,
-} from 'electron-web/features/playerSlice'
+import { initalizePlayerState, selectPlayerConfiguration, updateConfigurationAll } from 'electron-web/features/playerSlice'
 import { useAppDispatch } from 'electron-web/store/store'
 import { useSelector } from 'react-redux'
 import useOnceEffect from 'electron-web/hooks/useOnceEffect'

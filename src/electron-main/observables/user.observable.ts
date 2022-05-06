@@ -1,5 +1,5 @@
 import { Emitter } from 'common/electron-common/base/event'
-import { win } from 'common/electron-common/environment'
+import { dev, win } from 'common/electron-common/environment'
 
 export const enum QUERY_USER_FULLSCREEN_STATE {
   QUNS_NOT_PRESENT = 1,
@@ -37,7 +37,7 @@ const queryUserStateCreater = () => {
         return
 
       queryUserState.fire(
-        mapFullScreenState[require('win-func-tools').QueryUserState()],
+        mapFullScreenState[dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools').QueryUserState()],
       )
     }
   }, 1000)

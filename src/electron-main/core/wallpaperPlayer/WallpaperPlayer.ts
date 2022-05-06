@@ -304,6 +304,12 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
       case 'playlist':
         return this.playlist
 
+      case 'mode':
+        if (typeof preload.arg === 'string')
+          this.mode(preload.arg as IWallpaperPlayerMode)
+
+        return true
+
       case 'configuration': {
         if (typeof preload.arg === 'object') {
           // TODO: 待优化
@@ -490,6 +496,10 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
     })
 
     this.window.onEnded(() => {
+      console.log('壁纸播放结束')
+
+      this.handleWallpaperEnded()
+
       this.endedEmitter.fire()
     })
 
@@ -499,6 +509,10 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
 
     this.window.onVolumeChange(({ nVolume }) => {
       this.rtConfiguration.volume = nVolume
+    })
+
+    this.window.onModeChange((mode) => {
+      this.rtConfiguration.mode = mode
     })
 
     this.onViewMode(
@@ -608,6 +622,19 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
     })
   }
 
+  handleWallpaperEnded() {
+    switch (this.rtConfiguration.mode) {
+      case 'single':
+        break
+      case 'list-loop':
+        this.next()
+        break
+      case 'order':
+        this.next()
+        break
+    }
+  }
+
   private initalizeService() {
     this.server.registerChannel(this.channelName, this.service)
 
@@ -653,6 +680,7 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
 
     this.window.setVolume(this.rtConfiguration.volume)
     this.window.setMute(this.rtConfiguration.mute)
+    this.window.mode(this.rtConfiguration.mode)
 
     const configuration = this.rtConfiguration.wallpaperConfiguration
 
@@ -781,7 +809,13 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
   }
 
   // mode
-  async mode(mode: IWallpaperPlayerMode) {}
+  async mode(mode: IWallpaperPlayerMode) {
+    console.log('mode', mode)
+
+    this.rtConfiguration.mode = mode
+
+    this.window.mode(mode)
+  }
 
   // #endregion
 
