@@ -20,6 +20,7 @@ node_modules
 
 dist
 release/app/dist
+release/app/plugins
 release/build
 .erb/dll
 
