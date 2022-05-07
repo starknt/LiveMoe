@@ -6,6 +6,6 @@
   "author": "Seven",
   "pluginType": "backend",
   "backend": {
-    "entry": "./dist/taskbar.backend"
+    "entry": "./dist/LivelyInfoSchema.backend"
   }
 }
