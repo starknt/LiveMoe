@@ -15,6 +15,8 @@ export default function useAsyncState<S>(initialStateFunc: (() => Promise<Awaite
       if (isPromise(initialState)) {
         initialState.then(setState).catch(() => {
           console.error('useAsyncState', 'initialState is a promise, but it failed to resolve')
+        }).catch((err) => {
+          console.error('useAsyncState', err)
         })
       }
     }
