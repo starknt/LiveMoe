@@ -1,0 +1,11 @@
+{
+  "name": "LivelyInfoSchema",
+  "displayName": "Lively Schema",
+  "version": "1.0.0",
+  "description": "任务栏优化",
+  "author": "Seven",
+  "pluginType": "backend",
+  "backend": {
+    "entry": "./dist/taskbar.backend"
+  }
+}

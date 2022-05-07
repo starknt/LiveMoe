@@ -1,7 +1,10 @@
-import {
-  IWallpaperConfiguration,
-  IWallpaperConfigurationFile,
-} from './wallpaperPlayer';
+import { IWallpaperConfiguration, IWallpaperConfigurationFile } from './wallpaperPlayer';
+
+export interface IWallpaperChangeEvent {
+  type: 'deleted' | 'added'
+  path: string
+  configuration: IWallpaperConfiguration | null
+}
 
 export interface IWallpaperResourceLoadEvent {
   resourcePath: string;

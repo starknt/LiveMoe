@@ -7,8 +7,8 @@ import { app } from 'electron'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
 import type { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer'
 import type { IServerChannel } from 'common/electron-common'
-import type { IWallpaperChangeEvent } from 'electron-main/core/wallpaperPlayer/wallpaperResouceLoader'
 import { createResoucePath } from 'electron-main/utils'
+import type { IWallpaperChangeEvent, IWallpaperConfigurationFileSchema } from 'common/electron-common/wallpaperLoader'
 import type { IDialogWindowOptions, IWindow } from './windows'
 
 export const DEFAULT_CONFIGURATION: IApplicationConfiguration = {
@@ -68,6 +68,8 @@ export interface CoreApi {
   unregisterWindow(windowId: WindowId): boolean
   /** 注册服务 */
   registerService(channelName: string, channel: IServerChannel<string>): boolean
+  /** 注册一个壁纸配置加载模型 */
+  registerWallpaperSchema(schema: IWallpaperConfigurationFileSchema): void
 }
 
 export interface IApplicationGUI {

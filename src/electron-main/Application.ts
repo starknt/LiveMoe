@@ -169,6 +169,9 @@ export default class Application extends ApplicationEventBus {
 
           return true
         },
+        registerWallpaperSchema: (schema) => {
+          return this.wallpaperLoader.registerWallpaperSchema(schema)
+        },
       },
       lifecycle: {
         // TODO: 生命周期函数待完善
