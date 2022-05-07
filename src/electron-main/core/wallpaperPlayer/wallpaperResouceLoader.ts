@@ -5,7 +5,7 @@ import type { IWallpaperConfiguration, IWallpaperConfigurationFile } from 'commo
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import { FileHelper } from 'common/electron-main/fileHelper'
 import applicationLogger from 'common/electron-common/applicationLogger'
-import type { IWallpaperConfigurationFileSchema, IWallpaperConfigurationFileWithBasePath } from 'common/electron-common/wallpaperLoader'
+import type { IWallpaperChangeEvent, IWallpaperConfigurationFileSchema, IWallpaperConfigurationFileWithBasePath } from 'common/electron-common/wallpaperLoader'
 import { validateWallpaperConfiguration } from 'electron-main/common/wallpaperPlayer'
 import type Application from 'electron-main/Application'
 import { WallpaperResource } from 'electron-main/common/resource'
@@ -16,12 +16,6 @@ import { ApplicationNotification } from 'electron-main/common/notification'
 import { retry } from 'common/electron-common/utils'
 import { generateUuid } from 'common/electron-common/base/uuid'
 import WallpaperResourceWatcher from './wallpaperResourceWatcher'
-
-export interface IWallpaperChangeEvent {
-  type: 'deleted' | 'added'
-  path: string
-  configuration: IWallpaperConfiguration | null
-}
 
 export default class WallpaperLoader implements IDestroyable {
   private resourcePath!: string
@@ -48,10 +42,11 @@ export default class WallpaperLoader implements IDestroyable {
 
   constructor(private readonly application: Application) {
     this.resourcePath = application.configuration.resourcePath
+    this.initalizWallpaperSchema()
   }
 
   async initalize() {
-    this.initalizWallpaperSchema()
+    console.log(this.validWallpaperSchema)
 
     this.resourceWatcher = new WallpaperResourceWatcher(this.application.context)
 
@@ -81,11 +76,6 @@ export default class WallpaperLoader implements IDestroyable {
       name: 'theme',
       ext: 'upup',
       transform: WallpaperResource.transformUpUpConfiguration,
-    })
-    this.registerWallpaperSchema({
-      name: 'LivelyInfo',
-      ext: 'json',
-      transform: WallpaperResource.transformLivelyInfoConfiguration,
     })
   }
 
