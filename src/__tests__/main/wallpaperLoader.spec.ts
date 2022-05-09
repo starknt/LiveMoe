@@ -4,8 +4,8 @@ import path from 'path'
 import type { IWallpaperConfigurationFileSchema, IWallpaperConfigurationUpUpFile } from 'common/electron-common/wallpaperLoader'
 import { describe, expect, test } from 'vitest'
 import type { IWallpaperConfigurationFile } from 'common/electron-common/wallpaperPlayer'
-import { isNil } from '../../common/electron-common/types'
-import { FileHelper } from '../../common/electron-main/fileHelper'
+import { isNil } from 'common/electron-common/types'
+import { FileHelper } from 'common/electron-main/fileHelper'
 
 const resourcePath = path.join('F:\\LiveMoeResource')
 

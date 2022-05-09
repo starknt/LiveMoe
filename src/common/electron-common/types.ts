@@ -1,5 +1,5 @@
 export function isClass(x: any) {
-  return isVaildValue(x) && typeof x?.constructor === 'function';
+  return isVaildValue(x) && typeof x.constructor === 'function';
 }
 
 export function isPromise(x: any) {
@@ -10,15 +10,15 @@ export function isVaildValue(x: any) {
   return !isNil(x) && x ? true : false;
 }
 
-export function isNull(x: any) {
+export function isNull(x: any): x is null {
   return x === null ? true : false;
 }
 
-export function isUndefined(x: any) {
+export function isUndefined(x: any): x is undefined {
   return x === undefined ? true : false;
 }
 
-export function isNil(x: any) {
+export function isNil(x: any): x is null | undefined {
   return isNull(x) || isUndefined(x) ? true : false;
 }
 
