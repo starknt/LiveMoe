@@ -3,10 +3,7 @@ import { Readable } from 'stream';
 import { open as _openZip, Entry, ZipFile } from 'yauzl';
 import * as yazl from 'yazl';
 import path from 'path';
-import {
-  CancellationToken,
-  createCancelablePromise,
-} from 'common/electron-common/base/cancelablePromise';
+import { CancellationToken, createCancelablePromise } from 'common/electron-common/base/cancelablePromise';
 import { Sequencer } from 'common/electron-common/async';
 
 export interface IExtractOptions {
@@ -77,9 +74,9 @@ async function extractEntry(
   const targetDirName = path.join(targetPath, dirName);
   if (!targetDirName.startsWith(targetPath)) {
     return Promise.reject(
-      new Error(
-        'invalid file' + 'Error extracting {0}. Invalid file.' + fileName
-      )
+      new Error(`
+        invalid file .Error extracting ${fileName}.
+      `)
     );
   }
   const targetFileName = path.join(targetPath, fileName);

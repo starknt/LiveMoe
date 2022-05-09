@@ -4,7 +4,7 @@ import { constants } from 'os'
 import { Emitter } from 'common/electron-common/base/event'
 import { win } from 'common/electron-common/environment'
 import { resolveExtraPath } from 'electron-main/utils'
-import type { IDestroyable } from '../../common/lifecycle'
+import type { IDestroyable } from 'electron-main/common/lifecycle'
 
 export interface IWallpaperPlayerMsgProcessError {
   name: string

@@ -24,7 +24,7 @@ import WallpaperLoader from './core/wallpaperPlayer/wallpaperResouceLoader'
 import PlayerWindow from './windows/PlayerWindow'
 import { AutoStartup } from './common/autoStartup'
 import { setTrayVisible } from './observables/user.observable'
-import Service from './core/services'
+import ApplicationService from './core/services'
 import PluginManager from './core/pluginCore/PluginManager'
 import UpdateManager from './core/UpdateManager'
 
@@ -58,7 +58,7 @@ export default class Application extends ApplicationEventBus {
 
   private pluginManager!: PluginManager
 
-  private service!: Service
+  private service!: ApplicationService
 
   private readonly readyEmitter = new Emitter<void>()
 
@@ -204,7 +204,7 @@ export default class Application extends ApplicationEventBus {
       },
     }
 
-    this.service = new Service(this.context, this.server)
+    this.service = new ApplicationService(this.context, this.server)
 
     this.pluginManager = new PluginManager(this.context)
 
