@@ -5,16 +5,21 @@ import CardMedia from '@mui/material/CardMedia'
 import { CardActionArea, Skeleton } from '@mui/material'
 import type { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer'
 import TinyText from 'electron-web/components/TinyText'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
 interface WallpaperCardProps extends CardProps {
   configuration: IWallpaperConfiguration
-  playing?: boolean
-  onContextMenu?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, configuration: IWallpaperConfiguration, playing: boolean) => void
+  playing: boolean
+  onContextMenu?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }
 
 const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
-  ({ configuration, playing = false, onContextMenu, ...props }) => {
+  ({ configuration, playing, onContextMenu, ...props }) => {
+    const onContextMenuHandler = useCallback((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      if (onContextMenu)
+        onContextMenu(event)
+    }, [onContextMenu])
+
     const [isLoading, setLoading] = useState(true)
     return (
       <Card
@@ -24,10 +29,7 @@ const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
           minWidth: 'calc( 25% - 1rem )',
           maxWidth: 'calc( 25% - 1rem )',
         }}
-        onContextMenu={(event: any) => {
-          if (onContextMenu)
-            onContextMenu?.(event, configuration, playing)
-        }}
+        onContextMenu={onContextMenuHandler}
         elevation={playing ? 15 : 1}
         disabled={isLoading}
         title={`

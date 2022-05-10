@@ -25,5 +25,13 @@ export default function createWallpaperService(wallpaperService: IChannel): Live
         arg: configuration,
       })
     },
+
+    deleteWallpaper: async(configuration) => {
+      return await wallpaperService.call(WINDOW_MESSAGE_TYPE.IPC_CALL, {
+        type: WINDOW_MESSAGE_TYPE.IPC_CALL,
+        event: 'delete',
+        arg: configuration,
+      })
+    },
   }
 }

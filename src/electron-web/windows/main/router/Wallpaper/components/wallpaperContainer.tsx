@@ -38,7 +38,7 @@ function handleUpdate(
 
 const WallpaperContainer: React.FC<WallpaperContainerProps> = React.memo(
   ({ configurations, playerConfiguration, onContextMenu }) => {
-    const play = (configuration: IWallpaperConfiguration) => {
+    const toggle = (configuration: IWallpaperConfiguration) => {
       if (!playerConfiguration.wallpaperConfiguration)
         return
 
@@ -54,17 +54,20 @@ const WallpaperContainer: React.FC<WallpaperContainerProps> = React.memo(
 
     const renderWallpaperCards = useCallback((configurations: IWallpaperConfiguration[]) => {
       return configurations.map((configuration) => {
-        return (
-            <WallpaperCard
-              onClick={() => play(configuration)}
-              onContextMenu={onContextMenu}
-              configuration={configuration}
-              playing={
-                playerConfiguration.wallpaperConfiguration?.id
+        const playing = playerConfiguration.wallpaperConfiguration?.id
                   === configuration.id
                 || playerConfiguration.wallpaperConfiguration?.playPath
                   === configuration.playPath
-              }
+
+        return (
+            <WallpaperCard
+              onClick={() => toggle(configuration)}
+              onContextMenu={(e) => {
+                if (onContextMenu)
+                  onContextMenu(e, configuration, playing)
+              }}
+              configuration={configuration}
+              playing={ playing }
               key={configuration.name}
             />
         )
