@@ -91,6 +91,12 @@ class WallpaperPlayerView implements IWallpaperView {
     return this._view.webContents.loadFile(filePath, options)
   }
 
+  openDevTools() {
+    this._view.webContents.openDevTools({
+      mode: 'detach',
+    })
+  }
+
   setMute(value: boolean) {
     this._view.webContents.setAudioMuted(value)
   }
@@ -440,6 +446,9 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
     view.onDidFinshLoad(() => {
       this.didLoadFinshEmitter.fire()
 
+      if (dev())
+        view.openDevTools()
+
       view.send('lm:wallpaper:init', {
         src: this._activeWalpaper?.playPath,
       })
@@ -470,6 +479,8 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
     await this.whenPlayReady()
 
     ipcMain.removeAllListeners('ipc:wp:stop:canceltoken')
+
+    this.getTopView()
 
     return new Promise<Function>((resolve) => {
       if (this._activeWalpaper)

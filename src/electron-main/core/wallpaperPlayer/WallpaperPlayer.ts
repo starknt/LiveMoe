@@ -4,7 +4,7 @@ import type { IWallpaperPlayerPlayListChangeEvent } from 'common/electron-common
 import { DEFAULT_CONFIGURATION, DEFAULT_PLAY_RUNTIME_CONFIGURATION, type IWallpaperConfiguration, type IWallpaperPlayProgress, type IWallpaperPlayerConfiguration, type IWallpaperPlayerMode, type PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 import type { IPCMainServer } from 'common/electron-main'
 import { type IWallpaperFailLoadEvent, type IWallpaperPlayer, validateWallpaperConfiguration } from 'electron-main/common/wallpaperPlayer'
-import WallpaperPlayerWindow from 'electron-main/windows/wallpaperPlayerWindow'
+import WallpaperPlayerWindow from 'electron-main/windows/WallpaperPlayerWindow'
 import { type Display, globalShortcut, ipcMain, screen } from 'electron'
 import { dev, win } from 'common/electron-common/environment'
 import { screenWatcher } from 'electron-main/observables/screen.observable'
@@ -17,7 +17,7 @@ import { Service } from 'common/electron-common'
 import type { DocRes } from 'common/electron-common/database'
 import { reactive } from 'common/electron-common/reactive'
 import { QueryUserState } from 'electron-main/observables/user.observable'
-import type { IWallpaperChangeEvent } from './wallpaperResouceLoader'
+import type { IWallpaperChangeEvent } from 'common/electron-common/wallpaperLoader'
 
 export default class WallpaperPlayer implements IWallpaperPlayer {
   private readonly channelName = 'lm:wallpaper:player'
@@ -496,8 +496,6 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
     })
 
     this.window.onEnded(() => {
-      console.log('壁纸播放结束')
-
       this.handleWallpaperEnded()
 
       this.endedEmitter.fire()
