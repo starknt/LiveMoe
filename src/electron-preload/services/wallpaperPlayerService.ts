@@ -1,8 +1,5 @@
 import type { IChannel } from 'common/electron-common'
-import type {
-  IWallpaperConfiguration,
-  PlayRuntimeConfiguration,
-} from 'common/electron-common/wallpaperPlayer'
+import type { IWallpaperConfiguration, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { LiveMoe } from 'livemoe'
 

@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs'
 import { Service } from 'common/electron-common'
-import type { IWallpaperConfigurationFile } from 'common/electron-common/wallpaperPlayer'
+import type { IWallpaperConfiguration, IWallpaperConfigurationFile } from 'common/electron-common/wallpaperPlayer'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { IPCMainServer } from 'common/electron-main'
@@ -15,6 +15,7 @@ import { extract } from 'common/electron-main/zip'
 import { createCancelablePromise } from 'common/electron-common/base/cancelablePromise'
 import { app } from 'electron'
 import { Emitter, Event } from 'common/electron-common/base/event'
+import trash from 'trash'
 
 export default class WallpaperService {
   private readonly channelName = 'lm:wallpaper'
@@ -71,6 +72,11 @@ export default class WallpaperService {
         if (typeof preload.arg === 'object')
           return await this.createPicture(preload.arg)
         return false
+      case 'delete':
+        if (typeof preload.arg === 'object')
+          return await this.delete(preload.arg)
+
+        return false
       default:
         return false
     }
@@ -85,6 +91,22 @@ export default class WallpaperService {
       default:
         return Event.None
     }
+  }
+
+  async delete(configuration: IWallpaperConfiguration) {
+    if (fs.existsSync(configuration.resourcePath)) {
+      try {
+        await trash(configuration.resourcePath)
+        return true
+      }
+      catch (err) {
+        console.error('删除失败', err)
+
+        return false
+      }
+    }
+
+    return false
   }
 
   async createVideo(configuration: IWallpaperConfigurationFile) {

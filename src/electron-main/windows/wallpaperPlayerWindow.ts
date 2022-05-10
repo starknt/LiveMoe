@@ -446,7 +446,7 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
     view.onDidFinshLoad(() => {
       this.didLoadFinshEmitter.fire()
 
-      if (dev())
+      if (dev() && process.env.WALLPAPER_PLAYER_DEBUG)
         view.openDevTools()
 
       view.send('lm:wallpaper:init', {
@@ -479,8 +479,6 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
     await this.whenPlayReady()
 
     ipcMain.removeAllListeners('ipc:wp:stop:canceltoken')
-
-    this.getTopView()
 
     return new Promise<Function>((resolve) => {
       if (this._activeWalpaper)
