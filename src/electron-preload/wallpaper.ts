@@ -28,7 +28,29 @@ window.addEventListener('load', () => {
   })
 
   ipcRenderer.on(ipcWPStop, () => {
-    ipcRenderer.sendSync(ipcWPStopCancelToken)
+    const nodeList = document.querySelectorAll('*')
+
+    nodeList.forEach((el) => {
+      // @ts-expect-error ok
+      if (el.style)
+      // @ts-expect-error ok
+        el.style.webkitAnimationPlayState = 'paused'
+      // @ts-expect-error ok
+      el.style.animationPlayState = 'paused'
+    })
+
+    setTimeout(() => {
+      ipcRenderer.sendSync(ipcWPStopCancelToken)
+
+      nodeList.forEach((el) => {
+      // @ts-expect-error ok
+        if (el.style)
+        // @ts-expect-error ok
+          el.style.webkitAnimationPlayState = 'running'
+        // @ts-expect-error ok
+        el.style.animationPlayState = 'running'
+      })
+    }, 100)
   })
 
   liveVideoDiv = document.getElementById('__live_video__')
