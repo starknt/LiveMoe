@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import useMemoizedFn from './useMemoFn'
+import useMemoizedFn from './useMemoizedFn'
 import useUpdateEffect from './useUpdateEffect'
 
 export default function useLocalStorageState<T>(

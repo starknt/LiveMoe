@@ -21,6 +21,7 @@ const Wallpaper: React.FC = () => {
   const [snackbar, setSnackbar] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState<string | React.ReactNode>('')
   const [filterType] = useLocalStorageState('filterType', 'all', true)
+  const [searchKeyword] = useLocalStorageState('searchKeyword', '', true)
   const player = useSelector(selectPlayerConfiguration)
   const playList = useSelector(selectPlayList)
   const [contextMenu, setContextMenu] = useState<{
@@ -164,6 +165,11 @@ const Wallpaper: React.FC = () => {
       return filterVideo(item)
 
     return true
+  }).filter((item) => {
+    if (!searchKeyword)
+      return true
+
+    return item.name.includes(searchKeyword) || item.author.includes(searchKeyword) || item.description.includes(searchKeyword)
   })
 
   return (
