@@ -1,5 +1,5 @@
 import Box, { type BoxProps } from '@mui/material/Box'
-import useMemoizedFn from 'electron-web/hooks/useMemoFn'
+import useMemoizedFn from 'electron-web/hooks/useMemoizedFn'
 import React from 'react'
 
 const SettingBox: React.FC<BoxProps> = ({ children, ...props }) => {
