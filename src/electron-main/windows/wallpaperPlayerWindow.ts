@@ -695,7 +695,15 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
       this.playlist.push(wallpaper)
   }
 
-  async removeWallpaperFromPlaylist(id: string) {
+  async removeWallpaperFromPlaylist(id?: string) {
+    if (!id) {
+      this.playlist = []
+      this._activeWalpaper = null
+      this._cursor = 0
+
+      return
+    }
+
     this.playlist = this.playlist.filter(wallpaper => wallpaper.id !== id)
   }
 

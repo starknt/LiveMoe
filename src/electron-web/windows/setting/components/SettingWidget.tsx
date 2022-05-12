@@ -98,7 +98,9 @@ export default function Setting() {
     window?.livemoe?.guiService.openFolder(appConfiguration.resourcePath)
   }, [appConfiguration])
 
-  const handleChangeWallpaperRepository = useCallback(() => {}, [])
+  const handleChangeWallpaperRepository = useCallback(() => {
+    window?.livemoe?.wallpaperService.changeRepository()
+  }, [])
 
   const handleViewModeChange = useCallback(
     (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {

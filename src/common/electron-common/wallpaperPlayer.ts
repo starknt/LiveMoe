@@ -83,6 +83,8 @@ export interface IWallpaperConfiguration {
   resourcePath: string;
   preview: string;
   description: string;
+  baseResourcePath: string;
+  dirName: string;
   rawConfiguration: IWallpaperConfigurationFile;
 }
 

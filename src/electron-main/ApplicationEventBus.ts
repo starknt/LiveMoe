@@ -6,7 +6,6 @@ import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { IPCMainServer } from 'common/electron-main'
 import { Event } from 'common/electron-common/base/event'
 import type { IApplicationEventBus } from './common/application'
-import { info } from './core/Logger/logger'
 
 export default class ApplicationEventBus
   extends EventEmitter
@@ -75,7 +74,12 @@ export default class ApplicationEventBus
     channelName: string,
     preload: EventPreloadType,
   ): any | Event<any> {
-    info('sendWindowMessage:', channelName, preload)
+    console.info('sendWindowMessage:', channelName, preload)
+
+    if (Array.isArray(preload.arg) && preload.arg.length <= 0)
+      preload.arg = undefined
+    else if (Array.isArray(preload.arg) && preload.arg.length === 1)
+      preload.arg = preload.arg[0]
 
     if (this.events.has(channelName))
       return this.dispatchEvents(channelName, preload)

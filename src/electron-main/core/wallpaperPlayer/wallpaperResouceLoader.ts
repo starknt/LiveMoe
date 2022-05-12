@@ -46,8 +46,6 @@ export default class WallpaperLoader implements IDestroyable {
   }
 
   async initalize() {
-    console.log(this.validWallpaperSchema)
-
     this.resourceWatcher = new WallpaperResourceWatcher(this.application.context)
 
     await this.initalizeWallpaperResource()
@@ -125,8 +123,8 @@ export default class WallpaperLoader implements IDestroyable {
           configurationFiles.filter(Boolean)
         )
       })
-      .then(this.transform2WallpaperResult)
-      .then(this.validateConfiguration)
+      .then(this.transform2WallpaperResult.bind(this))
+      .then(this.validateConfiguration.bind(this))
       .catch(err => console.error(err))
 
     this.afterLoadEmitter.fire(wallpaperConfigurations!)
@@ -231,6 +229,8 @@ export default class WallpaperLoader implements IDestroyable {
         description: configuration.description,
         playPath: path.join(configuration.basePath, configuration.src),
         resourcePath: configuration.basePath,
+        baseResourcePath: this.resourcePath,
+        dirName: path.parse(configuration.basePath).name,
         rawConfiguration: {
           type: configuration.type,
           used: configuration.used,
@@ -259,7 +259,10 @@ export default class WallpaperLoader implements IDestroyable {
 
   private async registerListener() {
     this.application.onConfigChange(() => {
-      this.resourcePath = this.application.configuration.resourcePath
+      if (this.application.configuration.resourcePath !== this.resourcePath) {
+        this.resourcePath = this.application.configuration.resourcePath
+        this.loadWallpapers()
+      }
     })
 
     this.resourceWatcher?.onAddedDir(async(dirPath) => {

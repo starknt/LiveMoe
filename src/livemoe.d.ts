@@ -64,7 +64,12 @@ declare namespace LiveMoe {
     createImageWallpaper(configuration: IWallpaperConfigurationFile): Promise<boolean>;
     createHtmlWallpaper(configuration: IWallpaperConfigurationFile): Promise<boolean>;
 
+    changeRepository(): Promise<boolean>;
+
     deleteWallpaper(configuration: IWallpaperConfiguration): Promise<boolean>;
+
+    onChangeRepositoryBefore(): Promise<Event<void>>;
+    onChangeRepositoryAfter(): Promise<Event<void>>;
   }
   interface ApplicationService {
     getConfiguration(): Promise<IApplicationConfiguration>;

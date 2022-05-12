@@ -8,6 +8,7 @@ import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
 import { dev } from 'common/electron-common/environment'
+import type { MoveRepositoryEvent } from 'common/electron-common/wallpaper.service'
 import type { IApplicationContext } from './common/application'
 import { DEFAULT_CONFIGURATION } from './common/application'
 import WallpaperPlayer from './core/wallpaperPlayer/WallpaperPlayer'
@@ -292,6 +293,21 @@ export default class Application extends ApplicationEventBus {
           event: 'window',
           arg: ['main', true],
         })
+      })
+
+      const onMoveRepositoryAfter = this.sendWindowMessage('lm:wallpaper', {
+        type: WINDOW_MESSAGE_TYPE.WINDOW_LISTEN,
+        event: 'move:repository:before',
+      })
+
+      onMoveRepositoryAfter((event: MoveRepositoryEvent) => {
+        switch (event.type) {
+          case 'success':
+          // TODO: 改变壁纸的储存仓库
+            // this.configuration.resourcePath = event.repositoryPath
+            // this.updateApplicationConfiguration()
+            break
+        }
       })
     })
 

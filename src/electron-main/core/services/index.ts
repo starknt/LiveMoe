@@ -4,7 +4,7 @@ import GuiService from './gui.service'
 import WallpaperService from './wallpaper.service'
 
 export default class ApplicationService {
-  guiService = new GuiService(this.server)
+  guiService = new GuiService(this.server, this.context)
 
   wallpaperService = new WallpaperService(this.server, this.context)
 

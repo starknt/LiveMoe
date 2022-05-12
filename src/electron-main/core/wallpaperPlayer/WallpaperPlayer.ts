@@ -1,3 +1,4 @@
+import path from 'path'
 import applicationLogger from 'common/electron-common/applicationLogger'
 import { Emitter, Event } from 'common/electron-common/base/event'
 import type { IWallpaperPlayerPlayListChangeEvent } from 'common/electron-common/wallpaperPlayer'
@@ -18,6 +19,8 @@ import type { DocRes } from 'common/electron-common/database'
 import { reactive } from 'common/electron-common/reactive'
 import { QueryUserState } from 'electron-main/observables/user.observable'
 import type { IWallpaperChangeEvent } from 'common/electron-common/wallpaperLoader'
+import type { MoveRepositoryEvent } from 'common/electron-common/wallpaper.service'
+import { isNil } from 'common/electron-common/types'
 
 export default class WallpaperPlayer implements IWallpaperPlayer {
   private readonly channelName = 'lm:wallpaper:player'
@@ -388,6 +391,40 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
     if (!this.electronScreen)
       this.electronScreen = screen.getPrimaryDisplay()
 
+    const { context } = this.application
+
+    context.lifecycle.onReady(() => {
+      let moveRepositoryDisabled = false
+
+      const onMoveRepositoryBefore = context.sendListenWindowMessage('lm:wallpaper', 'move:repository:before')
+      const onMoveRepositoryAfter = context.sendListenWindowMessage('lm:wallpaper', 'move:repository:after')
+
+      onMoveRepositoryBefore(() => {
+        if (!this.isDisabled()) {
+          this.disable()
+          moveRepositoryDisabled = true
+        }
+      })
+
+      onMoveRepositoryAfter((event: MoveRepositoryEvent) => {
+        switch (event.type) {
+          case 'success':
+            if (moveRepositoryDisabled) {
+              if (this.rtConfiguration.wallpaperConfiguration) {
+                this.rtConfiguration.wallpaperConfiguration.resourcePath = this.rtConfiguration.wallpaperConfiguration.resourcePath.replace(this.rtConfiguration.wallpaperConfiguration.baseResourcePath, event.repositoryPath)
+                this.rtConfiguration.wallpaperConfiguration.preview = this.rtConfiguration.wallpaperConfiguration.preview.replace(this.rtConfiguration.wallpaperConfiguration.baseResourcePath, event.repositoryPath)
+                this.rtConfiguration.wallpaperConfiguration.playPath = this.rtConfiguration.wallpaperConfiguration.playPath.replace(this.rtConfiguration.wallpaperConfiguration.baseResourcePath, event.repositoryPath)
+                console.log(this.rtConfiguration.wallpaperConfiguration)
+              }
+
+              this.enable()
+              moveRepositoryDisabled = false
+            }
+            break
+        }
+      })
+    })
+
     screenWatcher((e) => {
       this.electronScreen = e.display
     })
@@ -669,6 +706,24 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
   private async initWallpaperWindow() {
     applicationLogger.info('wallpaper list: ', this.playlist.length)
 
+    const configuration = this.rtConfiguration.wallpaperConfiguration
+
+    if (!isNil(configuration)) {
+      const playingConfiguration = this.playlist.find((configuration) => {
+        return this.rtConfiguration.wallpaperConfiguration?.playPath === configuration.playPath || this.rtConfiguration.wallpaperConfiguration?.resourcePath === configuration.resourcePath
+      })
+
+      if (playingConfiguration) {
+        this.rtConfiguration.wallpaperConfiguration = playingConfiguration
+        this.configuration.wallpaper = {
+          ...this.configuration.wallpaper,
+          configuration: playingConfiguration,
+        }
+        this.updateRuntimeConfiguration()
+        this.updatePersistentConfiguration()
+      }
+    }
+
     this.window = new WallpaperPlayerWindow(
       this.playlist,
       this.rtConfiguration,
@@ -679,8 +734,6 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
     this.window.setVolume(this.rtConfiguration.volume)
     this.window.setMute(this.rtConfiguration.mute)
     this.window.mode(this.rtConfiguration.mode)
-
-    const configuration = this.rtConfiguration.wallpaperConfiguration
 
     if (this.rtConfiguration.disabled) {
       if (
