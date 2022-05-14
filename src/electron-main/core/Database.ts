@@ -14,6 +14,7 @@ import type { EventPreloadType } from 'common/electron-common/windows'
 import {
   WINDOW_MESSAGE_TYPE,
 } from 'common/electron-common/windows'
+import { dev } from 'common/electron-common/environment'
 
 export default class DataBase {
   private static instance: DataBase | null = null
@@ -54,7 +55,8 @@ export default class DataBase {
 
     this.db.setMaxListeners(Infinity)
 
-    console.info('database info: ', await this.db.info())
+    if (dev())
+      console.info('database info: ', await this.db.info())
 
     this.initalizeService()
   }
@@ -267,6 +269,8 @@ export default class DataBase {
 
   async put<T>(name: string, doc: Doc<T>): Promise<DBError | DocRes> {
     try {
+      this.checkDocSize(doc)
+
       const id = this.getDocId(name, doc._id)
       doc._id = id
       const result = await this.db.put(doc)
