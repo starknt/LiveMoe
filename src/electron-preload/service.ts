@@ -9,9 +9,9 @@ import createApplicationService from './services/applicationService'
 import createTrayService from './services/trayService'
 import createServerService from './services/serverService'
 import createGuiService from './services/guiService'
-import { when } from './helper'
 import createWallpaperService from './services/wallpaperService'
 import createUpdateService from './services/updateService'
+import { when } from './helper'
 
 // TODO: 注入服务, 服务注入到全局预加载脚本时, 会导致IPC服务器出错
 // 1. 数据库服务
@@ -21,6 +21,7 @@ import createUpdateService from './services/updateService'
 // 5. 文件服务
 // 6. 任务栏服务
 // 7. 窗口托盘服务
+// 8. 更新服务
 async function getAllMainServiceChannel(server: IPCRendererServer) {
   const dbService = await retry(async() => server.getChannel('lm:db'))
   const windowsService = await retry(async() =>

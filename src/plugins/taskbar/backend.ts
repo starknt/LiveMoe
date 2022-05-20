@@ -181,7 +181,7 @@ export default class Taskbar implements IBackendPlugin {
       this.timer?.restore()
     }
 
-    this.context.tool.SetTaskbar(this.appearance)
+    this.context.tool.SetTaskbar(this.appearance as any)
   }
 
   restoreTaskbarStyle() {
@@ -191,7 +191,7 @@ export default class Taskbar implements IBackendPlugin {
     this.appearance = withT1AsT2<TASKBAR_APPEARANCE>(START_APPEARANCE)
 
     try {
-      this.context.tool.SetTaskbar(this.appearance)
+      this.context.tool.SetTaskbar(this.appearance as any)
     }
     catch (err) {
       console.error(err)

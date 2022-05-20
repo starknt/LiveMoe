@@ -64,7 +64,7 @@ export default class ApplicationTray implements IDestroyable {
 
             e(() => {
               this.window?.show()
-              this.window?.focus()
+              setTimeout(() => this.window?.focus())
             })
           })
           .catch((e) => {

@@ -41,3 +41,15 @@ export function timeout<T>(promise: () => Promise<T>, ms: number = 1000): Promis
     }, ms);
   });
 }
+
+
+export async function when(condition: () => boolean) {
+  return new Promise<void>((resolve) => {
+    const interval = setInterval(() => {
+      if (condition()) {
+        clearInterval(interval)
+        resolve()
+      }
+    }, 50)
+  })
+}

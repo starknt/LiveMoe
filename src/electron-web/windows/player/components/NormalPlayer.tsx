@@ -14,7 +14,7 @@ import RepeatOneRoundedIcon from '@mui/icons-material/RepeatOneRounded'
 import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined'
 import RepeatRoundedIcon from '@mui/icons-material/RepeatRounded'
 import { Paper, Tooltip } from '@mui/material'
-import type { PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
+import type { PlayerRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 import Widget from 'electron-web/components/Widget'
 import type { FC } from 'react'
 import { memo, useCallback, useState } from 'react'
@@ -37,7 +37,7 @@ const CoverImage = styled('div')({
 })
 
 interface PlayerProps {
-  configuration: PlayRuntimeConfiguration
+  configuration: PlayerRuntimeConfiguration
 }
 
 const NormalPlayer: FC<PlayerProps> = memo(({ configuration }) => {
@@ -260,6 +260,10 @@ const NormalPlayer: FC<PlayerProps> = memo(({ configuration }) => {
   )
 }, (prevProps, nextProps) => {
   return prevProps.configuration.mode === nextProps.configuration.mode
+  && prevProps.configuration.volume === nextProps.configuration.volume
+  && prevProps.configuration.status === nextProps.configuration.status
+  && prevProps.configuration.disabled === nextProps.configuration.disabled
+  && prevProps.configuration.wallpaperConfiguration?.id === nextProps.configuration.wallpaperConfiguration?.id
 })
 
 export default NormalPlayer

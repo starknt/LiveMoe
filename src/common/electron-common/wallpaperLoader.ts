@@ -1,9 +1,9 @@
 import { IWallpaperConfiguration, IWallpaperConfigurationFile } from './wallpaperPlayer';
 
 export interface IWallpaperChangeEvent {
-  type: 'deleted' | 'added'
+  type: 'deleted' | 'added' | 'all'
   path: string
-  configuration: IWallpaperConfiguration | null
+  configuration: IWallpaperConfiguration | null | IWallpaperConfiguration[]
 }
 
 export interface IWallpaperResourceLoadEvent {

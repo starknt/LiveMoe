@@ -58,7 +58,7 @@ const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
             onError={() => setLoading(true)}
             component="img"
             height="165"
-            image={configuration.preview}
+            image={`${configuration.resourcePath}//${configuration.preview}`}
             loading="lazy"
           />
 

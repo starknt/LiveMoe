@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react'
-import type { IWallpaperConfiguration, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
+import type { IWallpaperConfiguration, PlayerRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 import { Box } from '@mui/material'
 import { isNil } from 'common/electron-common/types'
 import WallpaperCard from './wallpaperCard'
 import WallpaperController from './WallpaperController'
 
 interface WallpaperContainerProps {
-  playerConfiguration: PlayRuntimeConfiguration
+  playerConfiguration: PlayerRuntimeConfiguration
   configurations: IWallpaperConfiguration[]
   onContextMenu?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, configuration: IWallpaperConfiguration, playing: boolean) => void
 }

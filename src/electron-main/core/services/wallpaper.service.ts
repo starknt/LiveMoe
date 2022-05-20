@@ -104,6 +104,8 @@ export default class WallpaperService {
   }
 
   dispatchListenerEvent(preload: EventPreloadType) {
+    console.log('dispatchListenerEvent', preload)
+
     switch (preload.event) {
       case 'create:start':
         return this.onCreateStart
@@ -294,6 +296,15 @@ export default class WallpaperService {
     if (Array.isArray(result) && result.length > 0) {
       const repositoryPath = result[0]
 
+      if (path.normalize(repositoryPath) === path.normalize(this.context.core.getApplicationConfiguration().resourcePath)) {
+        this.onChangeRepositoryAfterEmitter.fire({
+          type: 'cancel',
+          repositoryPath,
+        })
+
+        return true
+      }
+
       this.onChangeRepositoryAfterEmitter.fire({
         type: 'success',
         repositoryPath,
@@ -316,12 +327,36 @@ export default class WallpaperService {
     return false
   }
 
-  moveRepository(repositoryPath: string) {
+  async moveRepository(repositoryPath: string) {
     const resourcePath = path.join(repositoryPath, 'LiveMoeResource')
     this.onMoveRepositoryBeforeEmitter.fire(resourcePath)
     try {
-      // 先复制壁纸到新的仓库
-      fsExtra.copySync(this.context.core.getApplicationConfiguration().resourcePath, resourcePath)
+      const oldResourcePath = this.context.core.getApplicationConfiguration().resourcePath
+
+      // 检查文件夹是否存在
+      if (fsExtra.existsSync(resourcePath)) {
+        // noop
+      }
+      else {
+        // 先复制壁纸到新的仓库
+        fsExtra.copySync(this.context.core.getApplicationConfiguration().resourcePath, resourcePath)
+      }
+
+      this.context.lifecycle.onChange(async(e) => {
+        switch (e.type) {
+          case 'all':
+            try {
+              console.log('oldResourcePath:', oldResourcePath)
+
+              await fsExtra.emptyDir(oldResourcePath)
+              fsExtra.removeSync(oldResourcePath)
+            }
+            catch (error) {
+              console.error(error)
+            }
+            break
+        }
+      })
 
       this.onMoveRepositoryAfterEmitter.fire({
         type: 'success',
@@ -329,7 +364,7 @@ export default class WallpaperService {
       })
     }
     catch (error) {
-      console.error(error)
+      console.error('Error: ', error)
       this.onMoveRepositoryAfterEmitter.fire({
         type: 'error',
         repositoryPath: resourcePath,

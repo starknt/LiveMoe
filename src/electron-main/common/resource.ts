@@ -8,7 +8,7 @@ import { FileHelper } from 'common/electron-main/fileHelper'
 export namespace WallpaperResource {
   export function getPreviewPath(basePath: string, preview?: string) {
     if (preview && fs.existsSync(path.join(basePath, preview)))
-      return path.join(basePath, preview)
+      return preview
 
     if (preview && fs.existsSync(preview))
       return preview
@@ -19,7 +19,7 @@ export namespace WallpaperResource {
         `preview${FileHelper.ImageExt[i]}`,
       )
       if (fs.existsSync(previewPath))
-        return previewPath
+        return `preview${FileHelper.ImageExt[i]}`
     }
 
     return null

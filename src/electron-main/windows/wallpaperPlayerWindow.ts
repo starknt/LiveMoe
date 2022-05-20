@@ -1,6 +1,6 @@
 import type { IpcMainEvent, LoadFileOptions, LoadURLOptions, Rectangle } from 'electron'
 import type { IWallpaperPlayerViewConfiguration, IWallpaperPlayerWindowConfiguration } from 'electron-main/common/windowConfiguration'
-import type { IWallpaperConfiguration, IWallpaperPlayProgress, IWallpaperPlayerMode, IWallpaperPlayerState, IWallpaperPlayerTypes, IWallpaperPlayingConfiguration, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
+import type { IWallpaperConfiguration, IWallpaperPlayProgress, IWallpaperPlayerMode, IWallpaperPlayerState, IWallpaperPlayerTypes, IWallpaperPlayingConfiguration, PlayerRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 import { WallpaperPlayerTypes } from 'common/electron-common/wallpaperPlayer'
 import type { IWallpaperFailLoadEvent, IWallpaperView } from 'electron-main/common/wallpaperPlayer'
 import type { IWallpaperPlayerAudioChangeEvent, IWallpaperPlayerDisabledChangeEvent, IWallpaperPlayerPlayFailEvent, IWallpaperPlayerVolumeChangeEvent } from 'common/electron-common/wallpaperPlayerWindow'
@@ -217,7 +217,7 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
 
   constructor(
     private playlist: IWallpaperConfiguration[],
-    private defaultState: PlayRuntimeConfiguration,
+    private defaultState: PlayerRuntimeConfiguration,
     windowOptions: IWallpaperPlayerWindowConfiguration = WallpaperPlayerWindowConfiguration,
     private readonly viewOptions: IWallpaperPlayerViewConfiguration = WallpaperPlayerViewConfiguration,
   ) {
@@ -458,7 +458,7 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
       if (!this.isVisible())
         this.show()
 
-      view.send('ipc:mute', this.mute && this.mutePlay)
+      view.send('ipc:mute', this.mute || this.mutePlay)
 
       // if (this._mutePlay) view.send('ipc:mute', true);
 
@@ -578,7 +578,7 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
     for (let i = 0; i < this.playlist.length; i += 1) {
       const _configuration = this.playlist[i]
 
-      if (_configuration.playPath === configuration.playPath)
+      if (_configuration.playPath === configuration.playPath || _configuration.id === configuration.id)
         return i
     }
 
@@ -686,6 +686,10 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
     }
   }
 
+  setPlaylist(playlist: IWallpaperConfiguration[]) {
+    this.playlist = playlist
+  }
+
   async addWallpaper2Playlist(
     wallpaper: IWallpaperConfiguration | IWallpaperConfiguration[],
   ) {
@@ -769,6 +773,13 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
       return Promise.resolve()
 
     return Event.toPromise(this.onPlayReady)
+  }
+
+  /**
+   * 释放锁定的资源
+   */
+  release() {
+    this.getTopView().loadURL(resolveWallpaperHtmlPath('transparent'))
   }
 
   async destroy() {

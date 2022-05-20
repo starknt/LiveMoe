@@ -42,15 +42,39 @@ export default function createWallpaperService(wallpaperService: IChannel): Live
     },
 
     onChangeRepositoryBefore: async() => {
-      return await wallpaperService.call(WINDOW_MESSAGE_TYPE.IPC_LISTEN, {
+      return wallpaperService.listen(WINDOW_MESSAGE_TYPE.IPC_LISTEN, {
         type: WINDOW_MESSAGE_TYPE.IPC_LISTEN,
         event: 'change:repository:before',
       })
     },
     onChangeRepositoryAfter: async() => {
-      return await wallpaperService.call(WINDOW_MESSAGE_TYPE.IPC_LISTEN, {
+      return wallpaperService.listen(WINDOW_MESSAGE_TYPE.IPC_LISTEN, {
         type: WINDOW_MESSAGE_TYPE.IPC_LISTEN,
         event: 'change:repository:after',
+      })
+    },
+    onCreateStart: async() => {
+      return wallpaperService.listen(WINDOW_MESSAGE_TYPE.IPC_LISTEN, {
+        type: WINDOW_MESSAGE_TYPE.IPC_LISTEN,
+        event: 'create:start',
+      })
+    },
+    onCreateEnd: async() => {
+      return wallpaperService.listen(WINDOW_MESSAGE_TYPE.IPC_LISTEN, {
+        type: WINDOW_MESSAGE_TYPE.IPC_LISTEN,
+        event: 'create:end',
+      })
+    },
+    onMoveRepositoryBefore: async() => {
+      return wallpaperService.listen(WINDOW_MESSAGE_TYPE.IPC_LISTEN, {
+        type: WINDOW_MESSAGE_TYPE.IPC_LISTEN,
+        event: 'move:repository:before',
+      })
+    },
+    onMoveRepositoryAfter: async() => {
+      return wallpaperService.listen(WINDOW_MESSAGE_TYPE.IPC_LISTEN, {
+        type: WINDOW_MESSAGE_TYPE.IPC_LISTEN,
+        event: 'move:repository:after',
       })
     },
   }

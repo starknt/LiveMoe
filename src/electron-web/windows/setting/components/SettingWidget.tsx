@@ -1,7 +1,8 @@
 import { Box, Button, Divider, styled } from '@mui/material'
 import TinyText from 'electron-web/components/TinyText'
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useAppStore } from 'electron-web/store/store'
+import useAsyncEffect from 'electron-web/hooks/useAsyncEffect'
 import SettingCheckbox from './SettingCheckbox'
 import SettingBox from './SettingBox'
 import SettingTypography from './SettingTypography'
@@ -27,9 +28,28 @@ const CenterBox = styled(Box)(() => ({
 
 export default function Setting() {
   const store = useAppStore()
+  const [changeRepository, setChangeRepository] = useState(false)
 
   const appConfiguration = store.applicationConfiguration
   const playerConfiguration = store.playerConfiguration
+
+  useAsyncEffect(async() => {
+    try {
+      const onMoveWallpaperBefore = await livemoe.wallpaperService.onMoveRepositoryBefore()
+      const onMoveWallpaperAfter = await livemoe.wallpaperService.onMoveRepositoryAfter()
+
+      onMoveWallpaperBefore(() => {
+        setChangeRepository(true)
+      })
+
+      onMoveWallpaperAfter(() => {
+        setChangeRepository(false)
+      })
+    }
+    catch (error) {
+      console.error(error)
+    }
+  }, [])
 
   const handleSelfStartChange = useCallback(
     (_: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
@@ -220,8 +240,9 @@ export default function Setting() {
               <Button
                 onClick={handleChangeWallpaperRepository}
                 variant="contained"
+                disabled={changeRepository}
               >
-                修改仓库目录
+                { changeRepository ? '正在移动仓库' : '修改仓库目录' }
               </Button>
               <Button
                 onClick={handleOpenWallpaperRepository}

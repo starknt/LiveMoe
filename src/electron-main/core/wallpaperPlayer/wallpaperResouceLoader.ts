@@ -130,11 +130,35 @@ export default class WallpaperLoader implements IDestroyable {
     this.afterLoadEmitter.fire(wallpaperConfigurations!)
   }
 
+  private async reloadWallpapers() {
+    const rawWallpaperResources = await this.loadRawWallpaperResources()
+
+    const baseWallpaperResources = rawWallpaperResources.map(
+      this.parseWallpaperBaseConfiguration.bind(this),
+    )
+
+    const wallpaperConfigurations = await Promise.all(baseWallpaperResources)
+      .then((configurationFiles) => {
+        return <IWallpaperConfigurationFileWithBasePath[]>(
+          configurationFiles.filter(Boolean)
+        )
+      })
+      .then(this.transform2WallpaperResult.bind(this))
+      .then(this.validateConfiguration.bind(this))
+      .catch(err => console.error(err))
+
+    this.onChangeEmitter.fire({
+      type: 'all',
+      configuration: wallpaperConfigurations!,
+      path: this.resourcePath,
+    })
+  }
+
   private async loadRawWallpaperResources() {
     applicationLogger.info(
       `本次加载壁纸资源, 所有的壁纸文件配置文件: ${this.validWallpaperSchema
         .map(schema => `${schema.name}.${schema.ext}`)
-        .join(', ')}`,
+        .join(', ')}, 仓库地址为: ${this.resourcePath}`,
     )
 
     return (
@@ -162,6 +186,8 @@ export default class WallpaperLoader implements IDestroyable {
   private async parseWallpaperBaseConfiguration(value: Dirent) {
     const basePath = path.join(this.resourcePath, value.name)
 
+    console.log('basePath', basePath)
+
     return await this.readWallpaperConfiguration(basePath)
   }
 
@@ -185,17 +211,17 @@ export default class WallpaperLoader implements IDestroyable {
           rawConfiguration,
         )
 
-        if (transformRest !== null) {
-          await FileHelper.writeJSON(path.join(basePath, 'theme.lmw'), transformRest)
-            .then(v => v)
-            .catch(err => console.error(err))
-            .catch(err =>
-              applicationLogger.error(
-                'wallpaper loader output theme.lmw failed',
-                err,
-              ),
-            )
-        }
+        // if (transformRest !== null) {
+        //   await FileHelper.writeJSON(path.join(basePath, 'theme.lmw'), transformRest)
+        //     .then(v => v)
+        //     .catch(err => console.error(err))
+        //     .catch(err =>
+        //       applicationLogger.error(
+        //         'wallpaper loader output theme.lmw failed',
+        //         err,
+        //       ),
+        //     )
+        // }
 
         if (transformRest === null)
           return null
@@ -251,6 +277,8 @@ export default class WallpaperLoader implements IDestroyable {
   }
 
   private validateConfiguration(configurationFiles: IWallpaperConfiguration[]) {
+    console.log('validateConfiguration', configurationFiles.length)
+
     return configurationFiles.filter(
       async configuration =>
         await validateWallpaperConfiguration(configuration),
@@ -261,7 +289,8 @@ export default class WallpaperLoader implements IDestroyable {
     this.application.onConfigChange(() => {
       if (this.application.configuration.resourcePath !== this.resourcePath) {
         this.resourcePath = this.application.configuration.resourcePath
-        this.loadWallpapers()
+        this.resourceWatcher?.restart(this.resourcePath)
+        setTimeout(() => this.reloadWallpapers(), 1000)
       }
     })
 

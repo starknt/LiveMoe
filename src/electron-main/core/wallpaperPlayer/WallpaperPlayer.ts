@@ -1,15 +1,14 @@
-import path from 'path'
+import { type Display, globalShortcut, ipcMain, screen } from 'electron'
 import applicationLogger from 'common/electron-common/applicationLogger'
 import { Emitter, Event } from 'common/electron-common/base/event'
 import type { IWallpaperPlayerPlayListChangeEvent } from 'common/electron-common/wallpaperPlayer'
-import { DEFAULT_CONFIGURATION, DEFAULT_PLAY_RUNTIME_CONFIGURATION, type IWallpaperConfiguration, type IWallpaperPlayProgress, type IWallpaperPlayerConfiguration, type IWallpaperPlayerMode, type PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
+import { DEFAULT_CONFIGURATION, DEFAULT_PLAY_RUNTIME_CONFIGURATION, type IWallpaperConfiguration, type IWallpaperPlayProgress, type IWallpaperPlayerConfiguration, type IWallpaperPlayerMode, type PlayerRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 import type { IPCMainServer } from 'common/electron-main'
 import { type IWallpaperFailLoadEvent, type IWallpaperPlayer, validateWallpaperConfiguration } from 'electron-main/common/wallpaperPlayer'
 import WallpaperPlayerWindow from 'electron-main/windows/WallpaperPlayerWindow'
-import { type Display, globalShortcut, ipcMain, screen } from 'electron'
 import { dev, win } from 'common/electron-common/environment'
 import { screenWatcher } from 'electron-main/observables/screen.observable'
-import type { IWallpaperPlayerAudioChangeEvent, IWallpaperPlayerDisabledChangeEvent, IWallpaperPlayerLoopChangeEvent, IWallpaperPlayerVolumeChangeEvent } from 'common/electron-common/wallpaperPlayerWindow'
+import type { IWallpaperPlayerAudioChangeEvent, IWallpaperPlayerDisabledChangeEvent, IWallpaperPlayerVolumeChangeEvent } from 'common/electron-common/wallpaperPlayerWindow'
 import { lockScreenWatcher, unLockScreenWatcher } from 'electron-main/observables/power.observable'
 import { debounce } from 'common/electron-common/base/functional'
 import type Application from 'electron-main/Application'
@@ -19,7 +18,6 @@ import type { DocRes } from 'common/electron-common/database'
 import { reactive } from 'common/electron-common/reactive'
 import { QueryUserState } from 'electron-main/observables/user.observable'
 import type { IWallpaperChangeEvent } from 'common/electron-common/wallpaperLoader'
-import type { MoveRepositoryEvent } from 'common/electron-common/wallpaper.service'
 import { isNil } from 'common/electron-common/types'
 
 export default class WallpaperPlayer implements IWallpaperPlayer {
@@ -33,7 +31,7 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
 
   private configuration!: IWallpaperPlayerConfiguration
 
-  private rtConfiguration!: PlayRuntimeConfiguration
+  private rtConfiguration!: PlayerRuntimeConfiguration
 
   private electronScreen: Display | null = null
 
@@ -49,7 +47,9 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
 
   private cancelPauseToken: (() => void) | null = null
 
-  private readonly playlist: IWallpaperConfiguration[] = []
+  private playlist: IWallpaperConfiguration[] = []
+
+  private moveRepositoryDisabled = false
 
   private readonly service = new Service()
 
@@ -65,9 +65,6 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
 
   private readonly volumeEmitter
     = new Emitter<IWallpaperPlayerVolumeChangeEvent>()
-
-  private readonly onLoopChangeEmitter
-    = new Emitter<IWallpaperPlayerLoopChangeEvent>()
 
   private readonly onAudioMuteChangeEmitter
     = new Emitter<IWallpaperPlayerAudioChangeEvent>()
@@ -111,8 +108,6 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
   readonly onVolumeChange = this.volumeEmitter.event
 
   readonly onAudioMuteChange = this.onAudioMuteChangeEmitter.event
-
-  readonly onLoopChange = this.onLoopChangeEmitter.event
 
   readonly onEnded = this.endedEmitter.event
 
@@ -394,33 +389,15 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
     const { context } = this.application
 
     context.lifecycle.onReady(() => {
-      let moveRepositoryDisabled = false
+      this.moveRepositoryDisabled = false
 
       const onMoveRepositoryBefore = context.sendListenWindowMessage('lm:wallpaper', 'move:repository:before')
-      const onMoveRepositoryAfter = context.sendListenWindowMessage('lm:wallpaper', 'move:repository:after')
 
       onMoveRepositoryBefore(() => {
         if (!this.isDisabled()) {
           this.disable()
-          moveRepositoryDisabled = true
-        }
-      })
-
-      onMoveRepositoryAfter((event: MoveRepositoryEvent) => {
-        switch (event.type) {
-          case 'success':
-            if (moveRepositoryDisabled) {
-              if (this.rtConfiguration.wallpaperConfiguration) {
-                this.rtConfiguration.wallpaperConfiguration.resourcePath = this.rtConfiguration.wallpaperConfiguration.resourcePath.replace(this.rtConfiguration.wallpaperConfiguration.baseResourcePath, event.repositoryPath)
-                this.rtConfiguration.wallpaperConfiguration.preview = this.rtConfiguration.wallpaperConfiguration.preview.replace(this.rtConfiguration.wallpaperConfiguration.baseResourcePath, event.repositoryPath)
-                this.rtConfiguration.wallpaperConfiguration.playPath = this.rtConfiguration.wallpaperConfiguration.playPath.replace(this.rtConfiguration.wallpaperConfiguration.baseResourcePath, event.repositoryPath)
-                console.log(this.rtConfiguration.wallpaperConfiguration)
-              }
-
-              this.enable()
-              moveRepositoryDisabled = false
-            }
-            break
+          this.window.release()
+          this.moveRepositoryDisabled = true
         }
       })
     })
@@ -465,8 +442,10 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
     this.onPlayListChange((event) => {
       switch (event.type) {
         case 'added':
-          this.playlist.push(event.configuration!)
-          this.window.addWallpaper2Playlist(event.configuration!)
+          if (!Array.isArray(event.configuration)) {
+            this.playlist.push(event.configuration!)
+            this.window.addWallpaper2Playlist(event.configuration!)
+          }
           break
         case 'deleted': {
           const index = this.playlist.findIndex(configuration => configuration.id === event.id)
@@ -613,10 +592,41 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
         case 'deleted':
           this.handleDeletedWallpaper(e)
           break
+        case 'all':
+          this.handlePatchAllWallpaper(e)
+          break
         default:
           break
       }
     })
+  }
+
+  private async handlePatchAllWallpaper(e: IWallpaperChangeEvent) {
+    if (Array.isArray(e.configuration)) {
+      this.playlist = e.configuration
+      this.window.setPlaylist(e.configuration)
+
+      if (this.rtConfiguration.wallpaperConfiguration) {
+        this.rtConfiguration.wallpaperConfiguration.resourcePath = this.rtConfiguration.wallpaperConfiguration.resourcePath.replace(this.rtConfiguration.wallpaperConfiguration.baseResourcePath, e.path)
+        this.rtConfiguration.wallpaperConfiguration.playPath = this.rtConfiguration.wallpaperConfiguration.playPath.replace(this.rtConfiguration.wallpaperConfiguration.baseResourcePath, e.path)
+        this.rtConfiguration.wallpaperConfiguration.baseResourcePath = e.path
+
+        const config = this.playlist.find(configuration => configuration.playPath === this.rtConfiguration.wallpaperConfiguration!.playPath)
+
+        if (config)
+          this.rtConfiguration.wallpaperConfiguration = config
+
+        if (this.isDisabled() && this.moveRepositoryDisabled)
+          this.enable()
+
+        setTimeout(() => this.play(this.rtConfiguration.wallpaperConfiguration!), 1000)
+      }
+
+      this.onPlayListChangeEmitter.fire({
+        configuration: this.playlist,
+        type: 'all',
+      })
+    }
   }
 
   private handleRegisterShortcutFailedWithViewMode() {
@@ -632,7 +642,7 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
 
   private handleAddedWallpaper(event: IWallpaperChangeEvent) {
     const { configuration } = event
-    if (configuration) {
+    if (configuration && !Array.isArray(configuration)) {
       this.onPlayListChangeEmitter.fire({
         type: 'added',
         configuration: configuration!,
@@ -886,7 +896,6 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
       this.didLoadFinshEmiiter.dispose()
       this.onDisableChangeEmitter.dispose()
       this.volumeEmitter.dispose()
-      this.onLoopChangeEmitter.dispose()
       this.onPlayListChangeEmitter.dispose()
 
       /** 保存壁纸播放进度 */

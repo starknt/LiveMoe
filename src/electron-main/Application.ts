@@ -1,3 +1,4 @@
+import { existsSync } from 'fs'
 import { app, protocol, session } from 'electron'
 import { Emitter, Event } from 'common/electron-common/base/event'
 import type { IPCMainServer } from 'common/electron-main'
@@ -116,11 +117,10 @@ export default class Application extends ApplicationEventBus {
     // 处理命令行参数
     if (this.args.LiveMoe_autoStartup)
       await AutoStartup.enable()
-      //
     else if (await AutoStartup.isEnable())
-      AutoStartup.enable()
+      await AutoStartup.enable()
     else
-      AutoStartup.disable()
+      await AutoStartup.disable()
   }
 
   async initalize() {
@@ -297,15 +297,19 @@ export default class Application extends ApplicationEventBus {
 
       const onMoveRepositoryAfter = this.sendWindowMessage('lm:wallpaper', {
         type: WINDOW_MESSAGE_TYPE.WINDOW_LISTEN,
-        event: 'move:repository:before',
+        event: 'move:repository:after',
       })
 
       onMoveRepositoryAfter((event: MoveRepositoryEvent) => {
         switch (event.type) {
           case 'success':
           // TODO: 改变壁纸的储存仓库
-            // this.configuration.resourcePath = event.repositoryPath
-            // this.updateApplicationConfiguration()
+            if (existsSync(event.repositoryPath)) {
+              console.log(`change wallpaper repository: ${event.repositoryPath}`)
+
+              this.configuration.resourcePath = event.repositoryPath
+              this.updateApplicationConfiguration()
+            }
             break
         }
       })
@@ -399,7 +403,7 @@ export default class Application extends ApplicationEventBus {
     this.applicationNamespace
       .get('configuration')
       .then((doc) => {
-        this.applicationNamespace.put({
+        return this.applicationNamespace.put({
           _id: 'configuration',
           data: this.configuration,
           _rev: doc?._rev,

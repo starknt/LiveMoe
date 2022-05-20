@@ -99,12 +99,12 @@ export async function validateWallpaperConfiguration(
     !(await FileHelper.exists(
       path.join(
         configuration.resourcePath,
-        configuration.rawConfiguration.preview,
+        configuration.preview,
       ),
     ))
   ) {
     if (
-      await FileHelper.exists(path.join(configuration.rawConfiguration.preview))
+      await FileHelper.exists(path.join(configuration.resourcePath, configuration.preview))
     )
       return true
 

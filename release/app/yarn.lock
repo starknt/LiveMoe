@@ -940,10 +940,10 @@ which@^2.0.1:
   dependencies:
     isexe "^2.0.0"
 
-win-func-tools@latest:
-  version "1.0.4"
-  resolved "https://registry.npmjs.org/win-func-tools/-/win-func-tools-1.0.4.tgz#3d69cf7570c88218f53d5654e938b6f60366534a"
-  integrity sha512-JfSo4yaEL+bedFP6sxn85Lle723kehYwrnSfoO2s1Tu+G8WxvS9kKZ9BhQKeJ+2+nxkmOWtwmZR/NHVaPq1tTw==
+win-func-tools@^1.0.6:
+  version "1.0.8"
+  resolved "https://registry.npmjs.org/win-func-tools/-/win-func-tools-1.0.8.tgz#82516694177e3ffdbbfb5dfedb038898cdafa9c4"
+  integrity sha512-B7xbM4z4ZpRNevfKas/hSq9T7V6XdYApq9k5sx86hmvwmtwkJSNxp3I44B1LKX9yUBNtDFl2r+ID2j0A/BRY6g==
   dependencies:
     bindings "^1.5.0"
     node-addon-api "^4.2.0"
