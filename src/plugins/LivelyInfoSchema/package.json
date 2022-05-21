@@ -2,7 +2,7 @@
   "name": "LivelyInfoSchema",
   "displayName": "Lively Schema",
   "version": "1.0.0",
-  "description": "任务栏优化",
+  "description": "Lively 壁纸配置解析",
   "author": "Seven",
   "pluginType": "backend",
   "backend": {

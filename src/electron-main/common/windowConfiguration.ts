@@ -1,8 +1,5 @@
 import { dev } from 'common/electron-common/environment'
-import type {
-  BrowserViewConstructorOptions,
-  BrowserWindowConstructorOptions,
-} from 'electron'
+import type { BrowserViewConstructorOptions, BrowserWindowConstructorOptions } from 'electron'
 import { resolvePreloadPath } from 'electron-main/utils'
 
 export type IWallpaperPlayerViewConfiguration = BrowserViewConstructorOptions

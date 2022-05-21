@@ -643,6 +643,9 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
   private handleAddedWallpaper(event: IWallpaperChangeEvent) {
     const { configuration } = event
     if (configuration && !Array.isArray(configuration)) {
+      if (this.playlist.find(config => config.playPath === configuration.playPath))
+        return
+
       this.onPlayListChangeEmitter.fire({
         type: 'added',
         configuration: configuration!,
