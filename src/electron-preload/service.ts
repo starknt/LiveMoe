@@ -1,7 +1,7 @@
 import * as is from 'common/electron-common/environment'
 import { contextBridge, ipcRenderer } from 'electron'
-import { IPCRendererServer } from 'common/electron-renderer'
-import { retry } from 'common/electron-common/utils'
+import { Client as IPCRendererServer } from '@livemoe/ipc/renderer'
+import { retry } from '@livemoe/utils'
 import createDatabaseService from './services/dbService'
 import createWindowsService from './services/windowService'
 import createWallpaperPlayerService from './services/wallpaperPlayerService'
@@ -9,9 +9,9 @@ import createApplicationService from './services/applicationService'
 import createTrayService from './services/trayService'
 import createServerService from './services/serverService'
 import createGuiService from './services/guiService'
-import { when } from './helper'
 import createWallpaperService from './services/wallpaperService'
 import createUpdateService from './services/updateService'
+import { when } from './helper'
 
 // TODO: 注入服务, 服务注入到全局预加载脚本时, 会导致IPC服务器出错
 // 1. 数据库服务
@@ -21,24 +21,28 @@ import createUpdateService from './services/updateService'
 // 5. 文件服务
 // 6. 任务栏服务
 // 7. 窗口托盘服务
+// 8. 更新服务
 async function getAllMainServiceChannel(server: IPCRendererServer) {
-  const dbService = await retry(async() => server.getChannel('lm:db'))
+  const dbService = await retry(async() => server.getChannel('lm:db'), 50, 2)
   const windowsService = await retry(async() =>
     server.getChannel('lm:windows'),
+  50, 2,
   )
   const wallpaperPlayerService = await retry(async() =>
     server.getChannel('lm:wallpaper:player'),
+  50, 2,
   )
   const applicationService = await retry(async() =>
     server.getChannel('lm:application'),
+  50, 2,
   )
-  const trayService = await retry(async() => server.getChannel('lm:tray'))
+  const trayService = await retry(async() => server.getChannel('lm:tray'), 50, 2)
 
-  const guiService = await retry(async() => server.getChannel('lm:gui'))
+  const guiService = await retry(async() => server.getChannel('lm:gui'), 50, 2)
 
-  const wallpaperService = await retry(async() => server.getChannel('lm:wallpaper'))
+  const wallpaperService = await retry(async() => server.getChannel('lm:wallpaper'), 50, 2)
 
-  const updateService = await retry(async() => server.getChannel('lm:update'))
+  const updateService = await retry(async() => server.getChannel('lm:update'), 50, 2)
 
   return {
     dbService,

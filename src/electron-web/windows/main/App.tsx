@@ -1,5 +1,5 @@
 import { initalizeApplicationState, updateConfigurationAll as updateApplicationConfigurationAll } from 'electron-web/features/applicationSlice'
-import { addWallpaper, deleteWallpaperById, initalizePlayerState, updateConfigurationAll as updatePlayerConfigurationAll } from 'electron-web/features/playerSlice'
+import { addWallpaper, deleteWallpaperById, initalizePlayerState, updateAllWallpaper, updateConfigurationAll as updatePlayerConfigurationAll } from 'electron-web/features/playerSlice'
 import { useAppDispatch } from 'electron-web/store/store'
 import { useRoutes } from 'react-router'
 import useOnceEffect from 'electron-web/hooks/useOnceEffect'
@@ -59,6 +59,9 @@ export default function App() {
         case 'deleted':
           if (event.id)
             dispatch(deleteWallpaperById(event.id!))
+          break
+        case 'all':
+          dispatch(updateAllWallpaper(event.configuration))
           break
       }
     })

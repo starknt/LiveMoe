@@ -1,6 +1,7 @@
+import path from 'node:path'
 import applicationLogger from 'common/electron-common/applicationLogger'
-import type { Event } from 'common/electron-common/base/event'
-import { Emitter } from 'common/electron-common/base/event'
+import type { Event } from '@livemoe/utils'
+import { Emitter } from '@livemoe/utils'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import Chokidar from 'chokidar'
 import type { IApplicationContext } from 'electron-main/common/application'
@@ -36,6 +37,7 @@ export default class WallpaperResourceWatcher implements IDestroyable {
     this.resourcePath = this.context.core.getApplicationConfiguration().resourcePath
 
     this.initalize()
+    this.registerListener()
   }
 
   initalize() {
@@ -45,24 +47,6 @@ export default class WallpaperResourceWatcher implements IDestroyable {
       awaitWriteFinish: true,
       followSymlinks: false,
       ignorePermissionErrors: true,
-    })
-
-    this.context.lifecycle.onReady(() => {
-      this.onCreateWallpaperStart = this.context.sendListenWindowMessage('lm:wallpaper', 'create:start')
-
-      this.onCreateWallpaperEnded = this.context.sendListenWindowMessage('lm:wallpaper', 'create:ended')
-
-      this.onCreateWallpaperStart((dir) => {
-        console.log(`[WallpaperResourceWatcher] Create wallpaper start: ${dir}`)
-
-        this.awaitDirs.push(dir)
-      })
-
-      this.onCreateWallpaperEnded((dir) => {
-        console.log(`[WallpaperResourceWatcher] Create wallpaper ended: ${dir}`)
-
-        this.awaitDirs.splice(this.awaitDirs.indexOf(dir), 1)
-      })
     })
 
     this.watcher
@@ -82,7 +66,8 @@ export default class WallpaperResourceWatcher implements IDestroyable {
           }, 100)
         })
 
-        setTimeout(() => this.onAddedDirEmitter.fire(dirPath), 1000)
+        if (path.resolve(dirPath, '..') === this.resourcePath)
+          setTimeout(() => this.onAddedDirEmitter.fire(dirPath), 1000)
 
         console.log(`${dirPath} added`)
       })
@@ -102,6 +87,38 @@ export default class WallpaperResourceWatcher implements IDestroyable {
       .on('error', error =>
         applicationLogger.error(`[LiveMoe ResouceWatcher] error: ${error}`),
       )
+  }
+
+  registerListener() {
+    this.context.lifecycle.onReady(() => {
+      this.onCreateWallpaperStart = this.context.sendListenWindowMessage('lm:wallpaper', 'create:start')
+
+      this.onCreateWallpaperEnded = this.context.sendListenWindowMessage('lm:wallpaper', 'create:ended')
+
+      this.onCreateWallpaperStart((dir) => {
+        console.log(`[WallpaperResourceWatcher] Create wallpaper start: ${dir}`)
+
+        this.awaitDirs.push(dir)
+      })
+
+      this.onCreateWallpaperEnded((dir) => {
+        console.log(`[WallpaperResourceWatcher] Create wallpaper ended: ${dir}`)
+
+        this.awaitDirs.splice(this.awaitDirs.indexOf(dir), 1)
+      })
+    })
+  }
+
+  restart(path: string) {
+    this.resourcePath = path
+
+    if (this.watcher) {
+      this.ready = false
+      this.watcher.close()
+      this.watcher = null
+    }
+
+    this.initalize()
   }
 
   destroy(): void {

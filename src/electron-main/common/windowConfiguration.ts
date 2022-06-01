@@ -1,8 +1,5 @@
 import { dev } from 'common/electron-common/environment'
-import type {
-  BrowserViewConstructorOptions,
-  BrowserWindowConstructorOptions,
-} from 'electron'
+import type { BrowserViewConstructorOptions, BrowserWindowConstructorOptions } from 'electron'
 import { resolvePreloadPath } from 'electron-main/utils'
 
 export type IWallpaperPlayerViewConfiguration = BrowserViewConstructorOptions
@@ -17,6 +14,7 @@ const WindowConfiguration: BrowserWindowConstructorOptions = {
   transparent: true,
   backgroundColor: '#FF3e3e3e',
   webPreferences: {
+    devTools: !dev(),
     webSecurity: !dev(),
     nodeIntegration: false,
     contextIsolation: true,

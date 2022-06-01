@@ -1,5 +1,5 @@
 import { stat } from 'fs/promises'
-import type { IChannel } from 'common/electron-common'
+import type { IChannel } from '@livemoe/ipc'
 import { shell } from 'electron'
 import type { LiveMoe } from 'livemoe'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'

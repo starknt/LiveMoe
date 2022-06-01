@@ -1,19 +1,13 @@
 import path from 'path'
-import { Service } from 'common/electron-common'
-import type { IPCMainServer } from 'common/electron-main'
+import { IPCService as Service } from '@livemoe/ipc'
+import type { Server as IPCMainServer } from '@livemoe/ipc/main'
 import type Application from 'electron-main/Application'
-import type {
-  DBError,
-  DatabaseNamespace,
-  Doc,
-  DocRes,
-} from 'common/electron-common/database'
+import type { DBError, DatabaseNamespace, Doc, DocRes } from 'common/electron-common/database'
 import PouchDB from 'pouchdb'
-import { Emitter, Event } from 'common/electron-common/base/event'
+import { Emitter, Event } from '@livemoe/utils'
 import type { EventPreloadType } from 'common/electron-common/windows'
-import {
-  WINDOW_MESSAGE_TYPE,
-} from 'common/electron-common/windows'
+import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
+import { dev } from 'common/electron-common/environment'
 
 export default class DataBase {
   private static instance: DataBase | null = null
@@ -54,7 +48,8 @@ export default class DataBase {
 
     this.db.setMaxListeners(Infinity)
 
-    console.info('database info: ', await this.db.info())
+    if (dev())
+      console.info('database info: ', await this.db.info())
 
     this.initalizeService()
   }
@@ -267,6 +262,8 @@ export default class DataBase {
 
   async put<T>(name: string, doc: Doc<T>): Promise<DBError | DocRes> {
     try {
+      this.checkDocSize(doc)
+
       const id = this.getDocId(name, doc._id)
       doc._id = id
       const result = await this.db.put(doc)

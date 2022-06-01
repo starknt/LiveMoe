@@ -1,5 +1,5 @@
 import { IApplicationContext } from "electron-main/common/application";
-import type WinFuncTools from 'win-func-tools'
+import type WinFuncTools from '@livemoe/tool'
 
 
 export interface PluginLifecycle {

@@ -1,6 +1,6 @@
 import type { Display } from 'electron'
 import { screen } from 'electron'
-import { Event } from 'common/electron-common/base/event'
+import { Event } from '@livemoe/utils'
 
 interface ScreenEvent {
   event: Electron.Event

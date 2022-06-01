@@ -1,21 +1,21 @@
 import path from 'path'
 import fs from 'fs'
-import { Service } from 'common/electron-common'
+import { IPCService as Service } from '@livemoe/ipc'
 import type { IWallpaperConfiguration, IWallpaperConfigurationFile } from 'common/electron-common/wallpaperPlayer'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
-import type { IPCMainServer } from 'common/electron-main'
+import type { Server as IPCMainServer } from '@livemoe/ipc/main'
 import type { IApplicationContext } from 'electron-main/common/application'
-import { generateUuid } from 'common/electron-common/base/uuid'
+import { Emitter, Event, createCancelablePromise, generateUuid } from '@livemoe/utils'
 import { FileHelper } from 'common/electron-main/fileHelper'
 import template from 'art-template'
 import { resolveArtTemplate } from 'electron-main/utils'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
 import { extract } from 'common/electron-main/zip'
-import { createCancelablePromise } from 'common/electron-common/base/cancelablePromise'
 import { app } from 'electron'
-import { Emitter, Event } from 'common/electron-common/base/event'
+import fsExtra from 'fs-extra'
 import trash from 'trash'
+import type { ChangeRepositoryEvent, MoveRepositoryEvent } from 'common/electron-common/wallpaper.service'
 
 export default class WallpaperService {
   private readonly channelName = 'lm:wallpaper'
@@ -26,17 +26,33 @@ export default class WallpaperService {
 
   private readonly onCreateEndedEmitter = new Emitter<string>()
 
+  private readonly onChangeRepositoryBeforeEmitter = new Emitter<void>()
+
+  private readonly onChangeRepositoryAfterEmitter = new Emitter<ChangeRepositoryEvent>()
+
+  private readonly onMoveRepositoryBeforeEmitter = new Emitter<string>()
+
+  private readonly onMoveRepositoryAfterEmitter = new Emitter<MoveRepositoryEvent>()
+
   readonly onCreateStart = this.onCreateStartEmitter.event
+
+  readonly onChangeRepositoryBefore = this.onChangeRepositoryBeforeEmitter.event
+
+  readonly onChangeRepositoryAfter = this.onChangeRepositoryAfterEmitter.event
+
+  readonly onMoveRepositoryBefore = this.onMoveRepositoryBeforeEmitter.event
+
+  readonly onMoveRepositoryAfter = this.onMoveRepositoryAfterEmitter.event
 
   readonly onCreateEnd = this.onCreateEndedEmitter.event
 
   constructor(private readonly server: IPCMainServer, private readonly context: IApplicationContext) {
-    this.server.registerChannel(this.channelName, this.service)
-
     this.registerListener()
   }
 
   registerListener() {
+    this.server.registerChannel(this.channelName, this.service)
+
     this.context.registerMessageHandler(this.channelName, (type, preload) => {
       switch (type) {
         case WINDOW_MESSAGE_TYPE.WINDOW_CALL:
@@ -72,6 +88,9 @@ export default class WallpaperService {
         if (typeof preload.arg === 'object')
           return await this.createPicture(preload.arg)
         return false
+
+      case 'change:repository':
+        return await this.changeRepository()
       case 'delete':
         if (typeof preload.arg === 'object')
           return await this.delete(preload.arg)
@@ -83,11 +102,21 @@ export default class WallpaperService {
   }
 
   dispatchListenerEvent(preload: EventPreloadType) {
+    console.log('dispatchListenerEvent', preload)
+
     switch (preload.event) {
       case 'create:start':
         return this.onCreateStart
       case 'create:end':
         return this.onCreateEnd
+      case 'change:repository:before':
+        return this.onChangeRepositoryBefore
+      case 'change:repository:after':
+        return this.onChangeRepositoryAfter
+      case 'move:repository:before':
+        return this.onMoveRepositoryBefore
+      case 'move:repository:after':
+        return this.onMoveRepositoryAfter
       default:
         return Event.None
     }
@@ -245,6 +274,102 @@ export default class WallpaperService {
     }
   }
 
+  async changeRepository() {
+    this.onChangeRepositoryBeforeEmitter.fire()
+
+    const result: string[] | undefined = await this.context.sendCallWindowMessage('lm:gui', 'open-dir', {
+      title: '选择新的壁纸仓库',
+      defaultPath: this.context.core.getApplicationConfiguration().resourcePath,
+    } as Electron.OpenDialogOptions)
+
+    if (!result) {
+      this.onChangeRepositoryAfterEmitter.fire({
+        type: 'cancel',
+        repositoryPath: '',
+      })
+
+      return false
+    }
+
+    if (Array.isArray(result) && result.length > 0) {
+      const repositoryPath = result[0]
+
+      if (path.normalize(repositoryPath) === path.normalize(this.context.core.getApplicationConfiguration().resourcePath)) {
+        this.onChangeRepositoryAfterEmitter.fire({
+          type: 'cancel',
+          repositoryPath,
+        })
+
+        return true
+      }
+
+      this.onChangeRepositoryAfterEmitter.fire({
+        type: 'success',
+        repositoryPath,
+      })
+
+      // 开始移动壁纸仓库
+      setTimeout(() => {
+        this.moveRepository(repositoryPath)
+      }, 1000)
+
+      return true
+    }
+    else {
+      this.onChangeRepositoryAfterEmitter.fire({
+        type: 'cancel',
+        repositoryPath: '',
+      })
+    }
+
+    return false
+  }
+
+  async moveRepository(repositoryPath: string) {
+    const resourcePath = path.join(repositoryPath, 'LiveMoeResource')
+    this.onMoveRepositoryBeforeEmitter.fire(resourcePath)
+    try {
+      const oldResourcePath = this.context.core.getApplicationConfiguration().resourcePath
+
+      // 检查文件夹是否存在
+      if (fsExtra.existsSync(resourcePath)) {
+        // noop
+      }
+      else {
+        // 先复制壁纸到新的仓库
+        fsExtra.copySync(this.context.core.getApplicationConfiguration().resourcePath, resourcePath)
+      }
+
+      this.context.lifecycle.onChange(async(e) => {
+        switch (e.type) {
+          case 'all':
+            try {
+              console.log('oldResourcePath:', oldResourcePath)
+
+              await fsExtra.emptyDir(oldResourcePath)
+              fsExtra.removeSync(oldResourcePath)
+            }
+            catch (error) {
+              console.error(error)
+            }
+            break
+        }
+      })
+
+      this.onMoveRepositoryAfterEmitter.fire({
+        type: 'success',
+        repositoryPath: resourcePath,
+      })
+    }
+    catch (error) {
+      console.error('Error: ', error)
+      this.onMoveRepositoryAfterEmitter.fire({
+        type: 'error',
+        repositoryPath: resourcePath,
+      })
+    }
+  }
+
   generateDir(applicationConfiguration: IApplicationConfiguration) {
     // 创建文件夹
     let dirName = this.generateDirName()
@@ -266,5 +391,9 @@ export default class WallpaperService {
   destroy() {
     this.onCreateStartEmitter.dispose()
     this.onCreateEndedEmitter.dispose()
+    this.onChangeRepositoryBeforeEmitter.dispose()
+    this.onChangeRepositoryAfterEmitter.dispose()
+    this.onMoveRepositoryBeforeEmitter.dispose()
+    this.onMoveRepositoryAfterEmitter.dispose()
   }
 }

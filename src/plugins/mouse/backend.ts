@@ -1,4 +1,4 @@
-import { Service } from 'common/electron-common'
+import { IPCService as Service } from '@livemoe/ipc'
 import type { IBackendPlugin, IPluginContext } from 'common/electron-common/plugin'
 
 export default class MousePlugin implements IBackendPlugin {

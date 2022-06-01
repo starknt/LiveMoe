@@ -1,6 +1,7 @@
+import { existsSync } from 'fs'
 import { app, protocol, session } from 'electron'
-import { Emitter, Event } from 'common/electron-common/base/event'
-import type { IPCMainServer } from 'common/electron-main'
+import { Emitter, Event } from '@livemoe/utils'
+import type { Server as IPCMainServer } from '@livemoe/ipc/main'
 import type minimist from 'minimist'
 import applicationLogger from 'common/electron-common/applicationLogger'
 import i18next from 'i18next'
@@ -8,6 +9,7 @@ import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
 import { dev } from 'common/electron-common/environment'
+import type { MoveRepositoryEvent } from 'common/electron-common/wallpaper.service'
 import type { IApplicationContext } from './common/application'
 import { DEFAULT_CONFIGURATION } from './common/application'
 import WallpaperPlayer from './core/wallpaperPlayer/WallpaperPlayer'
@@ -115,11 +117,10 @@ export default class Application extends ApplicationEventBus {
     // 处理命令行参数
     if (this.args.LiveMoe_autoStartup)
       await AutoStartup.enable()
-      //
     else if (await AutoStartup.isEnable())
-      AutoStartup.enable()
+      await AutoStartup.enable()
     else
-      AutoStartup.disable()
+      await AutoStartup.disable()
   }
 
   async initalize() {
@@ -293,6 +294,25 @@ export default class Application extends ApplicationEventBus {
           arg: ['main', true],
         })
       })
+
+      const onMoveRepositoryAfter = this.sendWindowMessage('lm:wallpaper', {
+        type: WINDOW_MESSAGE_TYPE.WINDOW_LISTEN,
+        event: 'move:repository:after',
+      })
+
+      onMoveRepositoryAfter((event: MoveRepositoryEvent) => {
+        switch (event.type) {
+          case 'success':
+          // TODO: 改变壁纸的储存仓库
+            if (existsSync(event.repositoryPath)) {
+              console.log(`change wallpaper repository: ${event.repositoryPath}`)
+
+              this.configuration.resourcePath = event.repositoryPath
+              this.updateApplicationConfiguration()
+            }
+            break
+        }
+      })
     })
 
     this.onConfigChange(async(configuration) => {
@@ -383,7 +403,7 @@ export default class Application extends ApplicationEventBus {
     this.applicationNamespace
       .get('configuration')
       .then((doc) => {
-        this.applicationNamespace.put({
+        return this.applicationNamespace.put({
           _id: 'configuration',
           data: this.configuration,
           _rev: doc?._rev,

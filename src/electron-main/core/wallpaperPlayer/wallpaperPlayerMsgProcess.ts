@@ -1,7 +1,7 @@
 import type { ChildProcessWithoutNullStreams } from 'child_process'
 import { spawn } from 'child_process'
 import { constants } from 'os'
-import { Emitter } from 'common/electron-common/base/event'
+import { Emitter } from '@livemoe/utils'
 import { win } from 'common/electron-common/environment'
 import { resolveExtraPath } from 'electron-main/utils'
 import type { IDestroyable } from 'electron-main/common/lifecycle'

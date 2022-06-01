@@ -14,11 +14,12 @@ import RepeatOneRoundedIcon from '@mui/icons-material/RepeatOneRounded'
 import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined'
 import RepeatRoundedIcon from '@mui/icons-material/RepeatRounded'
 import { Paper, Tooltip } from '@mui/material'
-import type { PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
+import type { PlayerRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 import Widget from 'electron-web/components/Widget'
 import type { FC } from 'react'
 import { memo, useCallback, useState } from 'react'
 import { PlayerRandomIcon } from 'electron-web/styles/icons/PlayerRandomIcon'
+import useAsyncEffect from 'electron-web/hooks/useAsyncEffect'
 import Progress from './Progress'
 
 const CoverImage = styled('div')({
@@ -37,7 +38,7 @@ const CoverImage = styled('div')({
 })
 
 interface PlayerProps {
-  configuration: PlayRuntimeConfiguration
+  configuration: PlayerRuntimeConfiguration
 }
 
 const NormalPlayer: FC<PlayerProps> = memo(({ configuration }) => {
@@ -46,6 +47,19 @@ const NormalPlayer: FC<PlayerProps> = memo(({ configuration }) => {
   const handlePrev = useCallback(() => {
     window.livemoe.wallpaperPlayerService.prev()
   }, [])
+  const [previewPath, setPreviewPath] = useState('')
+
+  useAsyncEffect(async() => {
+    if (!window.livemoe || !configuration.wallpaperConfiguration)
+      return
+
+    const { preview, resourcePath } = configuration.wallpaperConfiguration
+
+    if (await window.livemoe.guiService.checkFileExists(preview))
+      setPreviewPath(preview)
+    else if (await window.livemoe.guiService.checkFileExists(`${resourcePath}//${preview}`))
+      setPreviewPath(`${resourcePath}//${preview}`)
+  }, [window.livemoe, configuration.wallpaperConfiguration])
 
   const handlePlayPause = useCallback(() => {
     if (configuration.status === 'playing')
@@ -114,8 +128,7 @@ const NormalPlayer: FC<PlayerProps> = memo(({ configuration }) => {
             <img
               alt="poster"
               src={
-                configuration?.wallpaperConfiguration?.preview
-                ?? 'https://picsum.photos/367/167'
+                previewPath ?? 'https://picsum.photos/367/167'
               }
             />
           </CoverImage>
@@ -260,6 +273,10 @@ const NormalPlayer: FC<PlayerProps> = memo(({ configuration }) => {
   )
 }, (prevProps, nextProps) => {
   return prevProps.configuration.mode === nextProps.configuration.mode
+  && prevProps.configuration.volume === nextProps.configuration.volume
+  && prevProps.configuration.status === nextProps.configuration.status
+  && prevProps.configuration.disabled === nextProps.configuration.disabled
+  && prevProps.configuration.wallpaperConfiguration?.id === nextProps.configuration.wallpaperConfiguration?.id
 })
 
 export default NormalPlayer

@@ -1,5 +1,5 @@
 if (typeof process === 'undefined' || typeof module === 'undefined') {
-  throw new TypeError('Not running in an Node environment!');
+  throw new TypeError('Not running in an Node.js environment!');
 }
 
 export const isRenderer = () => process.type === 'renderer';

@@ -1,4 +1,4 @@
-import { once } from 'common/electron-common/base/functional'
+import { once } from '@livemoe/utils'
 import { Notification } from 'electron'
 
 export namespace ApplicationNotification {

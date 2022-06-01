@@ -1,6 +1,6 @@
-import type { IDisposable } from 'common/electron-common/base/lifecycle'
+import type { IDisposable } from '@livemoe/utils'
 import type { BrowserWindowConstructorOptions, Display } from 'electron'
-import { Emitter, Event } from 'common/electron-common/base/event'
+import { Emitter, Event } from '@livemoe/utils'
 import { BrowserWindow } from 'electron'
 import { screenWatcher } from 'electron-main/observables/screen.observable'
 import { delay } from 'common/electron-common/utils'

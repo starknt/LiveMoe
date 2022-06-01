@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { retry } from 'common/electron-common/utils'
 import type {
   IWallpaperConfiguration,
-  PlayRuntimeConfiguration,
+  PlayerRuntimeConfiguration,
 } from 'common/electron-common/wallpaperPlayer'
 import {
   DEFAULT_PLAY_RUNTIME_CONFIGURATION,
@@ -21,7 +21,7 @@ export interface PlayerStatus {
 
 export const initalizePlayerState = createAsyncThunk<{
   playList: IWallpaperConfiguration[]
-  configuration: PlayRuntimeConfiguration
+  configuration: PlayerRuntimeConfiguration
 }>(
   'wallpaper-player-configuration/initalize',
   async() =>
@@ -49,7 +49,7 @@ export const enum PlayerInitalizeState {
 export interface IPlayerStore {
   state: PlayerInitalizeState
   playList: IWallpaperConfiguration[]
-  configuration: PlayRuntimeConfiguration
+  configuration: PlayerRuntimeConfiguration
 }
 
 const initialState: IPlayerStore = {
@@ -71,6 +71,9 @@ const playerConfiguration = createSlice({
     deleteWallpaperById: (state, action) => {
       state.playList = state.playList.filter(wallpaper => wallpaper.id !== action.payload)
     },
+    updateAllWallpaper(state, action) {
+      state.playList = action.payload
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -91,7 +94,7 @@ const playerConfiguration = createSlice({
   },
 })
 
-export const { updateConfigurationAll, addWallpaper, deleteWallpaperById } = playerConfiguration.actions
+export const { updateConfigurationAll, addWallpaper, deleteWallpaperById, updateAllWallpaper } = playerConfiguration.actions
 
 export const selectPlayerConfiguration = (state: rootStore) => state.playerConfiguration
 

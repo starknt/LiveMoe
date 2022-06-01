@@ -1,4 +1,4 @@
-import { Emitter } from 'common/electron-common/base/event'
+import { Emitter } from '@livemoe/utils'
 import type { CPUUsage, ProcessMemoryInfo, SystemMemoryInfo } from 'electron'
 
 export async function getApplicationUsage() {

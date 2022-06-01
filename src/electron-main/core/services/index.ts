@@ -1,10 +1,10 @@
-import type { IPCMainServer } from 'common/electron-main'
+import type { Server as IPCMainServer } from '@livemoe/ipc/main'
 import type { IApplicationContext } from 'electron-main/common/application'
 import GuiService from './gui.service'
 import WallpaperService from './wallpaper.service'
 
 export default class ApplicationService {
-  guiService = new GuiService(this.server)
+  guiService = new GuiService(this.server, this.context)
 
   wallpaperService = new WallpaperService(this.server, this.context)
 

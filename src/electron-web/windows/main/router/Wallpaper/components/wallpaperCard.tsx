@@ -6,6 +6,7 @@ import { CardActionArea, Skeleton } from '@mui/material'
 import type { IWallpaperConfiguration } from 'common/electron-common/wallpaperPlayer'
 import TinyText from 'electron-web/components/TinyText'
 import React, { useCallback, useState } from 'react'
+import useAsyncEffect from 'electron-web/hooks/useAsyncEffect'
 
 interface WallpaperCardProps extends CardProps {
   configuration: IWallpaperConfiguration
@@ -19,6 +20,20 @@ const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
       if (onContextMenu)
         onContextMenu(event)
     }, [onContextMenu])
+
+    const [previewPath, setPreviewPath] = useState('')
+
+    useAsyncEffect(async() => {
+      if (!window.livemoe)
+        return
+
+      const { preview, resourcePath } = configuration
+
+      if (await window.livemoe.guiService.checkFileExists(preview))
+        setPreviewPath(preview)
+      else if (await window.livemoe.guiService.checkFileExists(`${resourcePath}//${preview}`))
+        setPreviewPath(`${resourcePath}//${preview}`)
+    }, [window.livemoe, configuration])
 
     const [isLoading, setLoading] = useState(true)
     return (
@@ -58,7 +73,7 @@ const WallpaperCard: React.FC<WallpaperCardProps> = React.memo(
             onError={() => setLoading(true)}
             component="img"
             height="165"
-            image={configuration.preview}
+            image={previewPath}
             loading="lazy"
           />
 

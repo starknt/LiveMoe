@@ -14,11 +14,15 @@ deleteSourceMaps();
 
 const config: webpack.Configuration = {
   devtool: process.env.DEBUG_PROD === 'true' ? 'source-map' : false,
+
   mode: 'production',
+
   target: 'electron-main',
+
   entry: {
     main: path.join(webpackPaths.srcMainPath, 'main.ts'),
   },
+
   output: {
     path: webpackPaths.distMainPath,
     filename: '[name].js',

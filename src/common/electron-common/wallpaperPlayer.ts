@@ -1,4 +1,4 @@
-export interface PlayRuntimeConfiguration {
+export interface PlayerRuntimeConfiguration {
   status: 'playing' | 'paused' | 'pendding';
   mode: IWallpaperPlayerMode;
   volume: number;
@@ -31,7 +31,7 @@ export interface IWallpaperPlayerConfiguration {
 }
 
 // 非持久化的配置
-export const DEFAULT_PLAY_RUNTIME_CONFIGURATION: PlayRuntimeConfiguration = {
+export const DEFAULT_PLAY_RUNTIME_CONFIGURATION: PlayerRuntimeConfiguration = {
   status: 'pendding',
   mode: 'order',
   volume: 50,
@@ -83,6 +83,8 @@ export interface IWallpaperConfiguration {
   resourcePath: string;
   preview: string;
   description: string;
+  baseResourcePath: string;
+  dirName: string;
   rawConfiguration: IWallpaperConfigurationFile;
 }
 
@@ -119,7 +121,7 @@ export type IWallpaperPlayerMode = 'single' | 'random' | 'order' | 'list-loop';
 
 
 export interface IWallpaperPlayerPlayListChangeEvent {
-  type: 'added' | 'deleted'
-  configuration?: IWallpaperConfiguration
+  type: 'added' | 'deleted' | 'all'
+  configuration?: IWallpaperConfiguration | IWallpaperConfiguration[]
   id?: string
 }

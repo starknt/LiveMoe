@@ -1,9 +1,9 @@
-import type { IEventListener, IListener } from 'common/electron-common';
+import type { IEventListener, IListener } from '@livemoe/ipc';
 import type { IApplicationConfiguration } from 'common/electron-common/application';
-import type { Event } from 'common/electron-common/base/event';
+import type { Event } from '@livemoe/utils';
 import type { DatabaseNamespace, Doc } from 'common/electron-common/database';
 import type { TASKBAR_APPEARANCE } from 'common/electron-common/taskbar';
-import type { IWallpaperConfiguration, IWallpaperConfigurationFile, IWallpaperPlayerMode, IWallpaperPlayerPlayListChangeEvent, IWallpaperPlayProgress, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer';
+import type { IWallpaperConfiguration, IWallpaperConfigurationFile, IWallpaperPlayerMode, IWallpaperPlayerPlayListChangeEvent, IWallpaperPlayProgress, PlayerRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer';
 import type { ProgressInfo, UpdateInfo } from 'electron-updater';
 
 declare namespace LiveMoe {
@@ -37,8 +37,8 @@ declare namespace LiveMoe {
 
   interface WallpaperPlayerService {
     getPlayList(): Promise<IWallpaperConfiguration[]>;
-    getConfiguration(): Promise<PlayRuntimeConfiguration>;
-    setConfiguration(configuration: PlayRuntimeConfiguration): Promise<PlayRuntimeConfiguration>;
+    getConfiguration(): Promise<PlayerRuntimeConfiguration>;
+    setConfiguration(configuration: PlayerRuntimeConfiguration): Promise<PlayerRuntimeConfiguration>;
 
     play(configuration?: IWallpaperConfiguration): Promise<boolean>;
     pause(): Promise<boolean>;
@@ -54,7 +54,7 @@ declare namespace LiveMoe {
     mode(mode: IWallpaperPlayerMode): Promise<boolean>;
 
     onPlay(): Promise<Event<any>>;
-    onConfigChange(): Promise<Event<PlayRuntimeConfiguration>>;
+    onConfigChange(): Promise<Event<PlayerRuntimeConfiguration>>;
     onProgress(): Promise<Event<IWallpaperPlayProgress>>;
     onPlaylistChange(): Promise<Event<IWallpaperPlayerPlayListChangeEvent>>;
   }
@@ -64,7 +64,16 @@ declare namespace LiveMoe {
     createImageWallpaper(configuration: IWallpaperConfigurationFile): Promise<boolean>;
     createHtmlWallpaper(configuration: IWallpaperConfigurationFile): Promise<boolean>;
 
+    changeRepository(): Promise<boolean>;
+
     deleteWallpaper(configuration: IWallpaperConfiguration): Promise<boolean>;
+
+    onChangeRepositoryBefore(): Promise<Event<void>>;
+    onChangeRepositoryAfter(): Promise<Event<void>>;
+    onMoveRepositoryBefore(): Promise<Event<void>>;
+    onMoveRepositoryAfter(): Promise<Event<void>>;
+    onCreateStart(): Promise<Event<void>>;
+    onCreateEnd(): Promise<Event<void>>;
   }
   interface ApplicationService {
     getConfiguration(): Promise<IApplicationConfiguration>;

@@ -1,7 +1,6 @@
 import path from 'path'
 import applicationLogger from 'common/electron-common/applicationLogger'
-import { Emitter, Event } from 'common/electron-common/base/event'
-import type { IEnvironmentConfiguration } from 'common/electron-common/configuration'
+import { Emitter, Event } from '@livemoe/utils'
 import type { IWallpaperConfigurationFileSchema } from 'common/electron-common/wallpaperLoader'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import Chokidar from 'chokidar'
@@ -26,7 +25,7 @@ export default class WallpaperResourceWatcher implements IDestroyable {
   private watcher: Chokidar.FSWatcher | null = null
 
   constructor(
-    private readonly configuration: IEnvironmentConfiguration,
+    private readonly configuration: any,
     private readonly validWallpaperSchema: IWallpaperConfigurationFileSchema[],
   ) {
     this.resourcePath = <string>(

@@ -1,5 +1,6 @@
-import { Emitter } from 'common/electron-common/base/event'
+import { Emitter } from '@livemoe/utils'
 import { dev, win } from 'common/electron-common/environment'
+import type { Tools } from 'win-func-tools'
 
 export const enum QUERY_USER_FULLSCREEN_STATE {
   QUNS_NOT_PRESENT = 1,
@@ -36,11 +37,13 @@ const queryUserStateCreater = () => {
       if (trayVisible)
         return
 
+      const tools: Tools = dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools')
+
       queryUserState.fire(
-        mapFullScreenState[dev() ? require('win-func-tools') : __non_webpack_require__('win-func-tools').QueryUserState()],
+        mapFullScreenState[tools.QueryUserState()],
       )
     }
-  }, 1000)
+  }, 500)
 }
 
 let timer: NodeJS.Timeout | null = queryUserStateCreater()

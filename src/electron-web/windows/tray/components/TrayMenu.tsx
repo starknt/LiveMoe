@@ -12,8 +12,8 @@ import PauseRoundedIcon from '@mui/icons-material/PauseRounded'
 import SportsEsportsRoundedIcon from '@mui/icons-material/SportsEsportsRounded'
 import React, { useCallback } from 'react'
 import { Divider, ListItemIcon, ListItemText, MenuItem, Tooltip, Typography } from '@mui/material'
-import { generateUuid } from 'common/electron-common/base/uuid'
-import type { PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
+import { generateUuid } from '@livemoe/utils'
+import type { PlayerRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 
 export interface IMenuItem {
   accelerator?: string
@@ -66,7 +66,7 @@ function handleUpdate(
 }
 
 interface Props {
-  configuration: PlayRuntimeConfiguration
+  configuration: PlayerRuntimeConfiguration
 }
 
 const TrayMenu: React.FC<Props> = React.memo(({ configuration }) => {

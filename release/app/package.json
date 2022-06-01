@@ -14,9 +14,10 @@
     "postinstall": "npm run electron-rebuild && npm run link-modules"
   },
   "dependencies": {
+    "@livemoe/tool": "^0.0.2",
     "art-template": "^4.13.2",
     "pouchdb": "^7.2.2",
     "trash": "7.2.0",
-    "win-func-tools": "latest"
+    "win-func-tools": "^1.0.6"
   }
 }

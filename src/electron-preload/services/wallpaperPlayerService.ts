@@ -1,5 +1,5 @@
-import type { IChannel } from 'common/electron-common'
-import type { IWallpaperConfiguration, PlayRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
+import type { IChannel } from '@livemoe/ipc'
+import type { IWallpaperConfiguration, PlayerRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { LiveMoe } from 'livemoe'
 
@@ -22,7 +22,7 @@ const createWallpaperPlayerService = (
         event: 'configuration',
       })
     },
-    setConfiguration: async(configuration: PlayRuntimeConfiguration) => {
+    setConfiguration: async(configuration: PlayerRuntimeConfiguration) => {
       return await wallpaperPlayerService.call(WINDOW_MESSAGE_TYPE.IPC_CALL, {
         type: WINDOW_MESSAGE_TYPE.IPC_CALL,
         event: 'configuration',

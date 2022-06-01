@@ -1,4 +1,4 @@
-import { Event } from 'common/electron-common/base/event'
+import { Event } from '@livemoe/utils'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import { IWindow } from 'electron-main/common/windows'

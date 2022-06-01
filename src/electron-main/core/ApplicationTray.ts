@@ -1,13 +1,13 @@
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import type { IApplicationContext } from 'electron-main/common/application'
 import type { IWindow } from 'electron-main/common/windows'
-import type { IPCMainServer } from 'common/electron-main'
+import type { Server as IPCMainServer } from '@livemoe/ipc/main'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { Tray } from 'electron'
-import { Service } from 'common/electron-common'
+import { IPCService as Service } from '@livemoe/ipc'
 import { resolveGlobalAssets } from 'electron-main/utils'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
-import { Emitter, Event } from 'common/electron-common/base/event'
+import { Emitter, Event } from '@livemoe/utils'
 
 export default class ApplicationTray implements IDestroyable {
   private readonly channelName = 'lm:tray'
@@ -64,7 +64,7 @@ export default class ApplicationTray implements IDestroyable {
 
             e(() => {
               this.window?.show()
-              this.window?.focus()
+              setTimeout(() => this.window?.focus())
             })
           })
           .catch((e) => {

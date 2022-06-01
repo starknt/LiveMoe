@@ -366,6 +366,30 @@
     kolorist "^1.5.1"
     local-pkg "^0.4.1"
 
+"@livemoe/core@~0.0.2":
+  version "0.0.4-beta.1"
+  resolved "https://registry.npmmirror.com/@livemoe/core/-/core-0.0.4-beta.1.tgz#12507b1e6a71c942a23292d87eb85a868646b33f"
+  integrity sha512-/4lXrSlPCTKceG++2dIxpYJujvqStsEbqNWwPa8MFFYI3nlvmTvIgbmPg0lSlBVes5m+3jo4Ofg0E699jZSbDQ==
+  dependencies:
+    "@livemoe/utils" "0.0.4-beta.1"
+
+"@livemoe/ipc@~0.0.7":
+  version "0.0.7"
+  resolved "https://registry.npmmirror.com/@livemoe/ipc/-/ipc-0.0.7.tgz#b25f527a25c5a72a494f33c75dd79a1ad1e3249c"
+  integrity sha512-V5XsRUyLAQxvRFUr+MWN2OO9xI7jhR4zPpBi6KxZRKMdkX16RaiAAwXuqUT003q3TwuiPvMtb+VKb0V8OCuLZg==
+  dependencies:
+    "@livemoe/utils" "0.0.4"
+
+"@livemoe/utils@0.0.4", "@livemoe/utils@~0.0.4":
+  version "0.0.4"
+  resolved "https://registry.npmmirror.com/@livemoe/utils/-/utils-0.0.4.tgz#cdadef3ebf0a1f86359f1711e89df538446d779a"
+  integrity sha512-QzPrvp25vA9UzOqoSgdNu+N/lxxfibOhryk3/6N90rV5rVlOk7ARKeu24rAhW9vTDvMQ7kC+K8QKN9xUDbqX5w==
+
+"@livemoe/utils@0.0.4-beta.1":
+  version "0.0.4-beta.1"
+  resolved "https://registry.npmjs.org/@livemoe/utils/-/utils-0.0.4-beta.1.tgz#5311cc6911a0b999dae8fcf309b276853e431e4f"
+  integrity sha512-c6ggJ/TC2ovja2AXWhCUwvLloqL6kSe5QJjh5/54p9G1m5cOzbAsX0mvJL2GvmEjdYCwfk+ezu6Gw+byqfkqLg==
+
 "@malept/cross-spawn-promise@^1.1.0":
   version "1.1.1"
   resolved "https://registry.npmmirror.com/@malept/cross-spawn-promise/-/cross-spawn-promise-1.1.1.tgz#504af200af6b98e198bce768bc1730c6936ae01d"
