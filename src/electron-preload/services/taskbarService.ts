@@ -1,4 +1,4 @@
-import type { IChannel } from 'common/electron-common'
+import type { IChannel } from '@livemoe/ipc'
 import type { LiveMoe } from 'livemoe'
 import type { TASKBAR_APPEARANCE } from 'common/electron-common/taskbar'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'

@@ -3,8 +3,7 @@ import { Readable } from 'stream';
 import { open as _openZip, Entry, ZipFile } from 'yauzl';
 import * as yazl from 'yazl';
 import path from 'path';
-import { CancellationToken, createCancelablePromise } from 'common/electron-common/base/cancelablePromise';
-import { Sequencer } from 'common/electron-common/async';
+import { CancellationToken, createCancelablePromise, Sequencer } from '@livemoe/utils';
 
 export interface IExtractOptions {
   overwrite?: boolean;

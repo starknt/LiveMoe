@@ -1,6 +1,7 @@
+import path from 'node:path'
 import applicationLogger from 'common/electron-common/applicationLogger'
-import type { Event } from 'common/electron-common/base/event'
-import { Emitter } from 'common/electron-common/base/event'
+import type { Event } from '@livemoe/utils'
+import { Emitter } from '@livemoe/utils'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import Chokidar from 'chokidar'
 import type { IApplicationContext } from 'electron-main/common/application'
@@ -65,7 +66,8 @@ export default class WallpaperResourceWatcher implements IDestroyable {
           }, 100)
         })
 
-        setTimeout(() => this.onAddedDirEmitter.fire(dirPath), 1000)
+        if (path.resolve(dirPath, '..') === this.resourcePath)
+          setTimeout(() => this.onAddedDirEmitter.fire(dirPath), 1000)
 
         console.log(`${dirPath} added`)
       })
@@ -111,6 +113,7 @@ export default class WallpaperResourceWatcher implements IDestroyable {
     this.resourcePath = path
 
     if (this.watcher) {
+      this.ready = false
       this.watcher.close()
       this.watcher = null
     }

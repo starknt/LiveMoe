@@ -1,10 +1,10 @@
 import type { IEventListener, IListener } from 'common/electron-common'
-import { Service } from 'common/electron-common'
-import { Event } from 'common/electron-common/base/event'
+import { IPCService as Service } from '@livemoe/ipc'
+import { Event } from '@livemoe/utils'
 import { retry } from 'common/electron-common/utils'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
-import type { IPCRendererServer } from 'common/electron-renderer'
+import type { Client as IPCRendererServer } from '@livemoe/ipc/renderer'
 import type { LiveMoe } from 'livemoe'
 /**
  * 创建可提供给主进程的服务, 和 IPCMainService 构成一个完整的IPC通信服务

@@ -1,5 +1,5 @@
 import path from 'path'
-import type { Event } from 'common/electron-common/base/event'
+import type { Event } from '@livemoe/utils'
 import { isNil } from 'common/electron-common/types'
 import type {
   IWallpaperConfiguration,

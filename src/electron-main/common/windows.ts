@@ -1,10 +1,8 @@
-import { Event } from 'common/electron-common/base/event'
+import { Event } from '@livemoe/utils'
 import { BaseAutoResizeWindow } from 'electron-main/windows/base/baseWindow'
 import type { IWindowOptions } from 'electron-main/core/windowManager/WindowPool'
 import type { EventPreloadType } from 'common/electron-common/windows'
-import {
-  WINDOW_MESSAGE_TYPE,
-} from 'common/electron-common/windows'
+import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 
 export class IWindow
   extends BaseAutoResizeWindow
@@ -15,8 +13,7 @@ export class IWindow
 
   processEvents(
     type: WINDOW_MESSAGE_TYPE,
-    // @ts-expect-error ok
-    preload: EventPreloadType,
+    _preload: EventPreloadType,
   ): any | Event<any> {
     if (
       type === WINDOW_MESSAGE_TYPE.IPC_LISTEN

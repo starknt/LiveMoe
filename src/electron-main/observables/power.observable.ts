@@ -1,4 +1,4 @@
-import { Event } from 'common/electron-common/base/event'
+import { Event } from '@livemoe/utils'
 import { powerMonitor } from 'electron'
 /**
  * @platfrom macOS, Windows

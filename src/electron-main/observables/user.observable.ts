@@ -1,4 +1,4 @@
-import { Emitter } from 'common/electron-common/base/event'
+import { Emitter } from '@livemoe/utils'
 import { dev, win } from 'common/electron-common/environment'
 import type { Tools } from 'win-func-tools'
 

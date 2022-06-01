@@ -1,4 +1,4 @@
-import { Event } from 'common/electron-common/base/event'
+import { Event } from '@livemoe/utils'
 import { app } from 'electron'
 
 export const appReady = Event.fromNodeEventEmitter(app, 'ready')

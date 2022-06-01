@@ -1,7 +1,7 @@
 import { app, protocol } from 'electron'
 import minimist from 'minimist'
 import { dev, production, win } from 'common/electron-common/environment'
-import { Emitter, Event } from 'common/electron-common/base/event'
+import { Emitter, Event } from '@livemoe/utils'
 import applicationLogger from 'common/electron-common/applicationLogger'
 import bootstrap from './bootstrap'
 import 'common/locales'

@@ -1,5 +1,5 @@
-import { Service } from 'common/electron-common'
-import { Emitter, Event } from 'common/electron-common/base/event'
+import { IPCService as Service } from '@livemoe/ipc'
+import { Emitter, Event } from '@livemoe/utils'
 import { dev } from 'common/electron-common/environment'
 import type { IBackendPlugin, IPluginContext, PluginPackage } from 'common/electron-common/plugin'
 import { isClass } from 'common/electron-common/types'

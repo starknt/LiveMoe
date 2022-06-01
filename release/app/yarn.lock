@@ -2,6 +2,14 @@
 # yarn lockfile v1
 
 
+"@livemoe/tool@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.npmjs.org/@livemoe/tool/-/tool-0.0.2.tgz#39aa0d14123ab9f74a713cef66a34bcfcc92f8af"
+  integrity sha512-Y4MAGRIjqYxEISWBBEgAtCKSsgyx04gosbeDNZwyZDW6/YMWMBRpKb/QpUAs7XcLsl5yRA8wB1ubc7pNIP6Z2Q==
+  dependencies:
+    bindings "^1.5.0"
+    node-addon-api "^5.0.0"
+
 "@sindresorhus/df@^1.0.1":
   version "1.0.1"
   resolved "https://registry.npmmirror.com/@sindresorhus/df/-/df-1.0.1.tgz#c69b66f52f6fcdd287c807df210305dbaf78500d"
@@ -591,6 +599,11 @@ node-addon-api@^4.2.0:
   version "4.3.0"
   resolved "https://registry.npmjs.org/node-addon-api/-/node-addon-api-4.3.0.tgz#52a1a0b475193e0928e98e0426a0d1254782b77f"
   integrity sha512-73sE9+3UaLYYFmDsFZnqCInzPyh3MqIwZO9cw58yIqAZhONrrabrYyYe3TuIqtIiOuTXVhsGau8hcrhhwSsDIQ==
+
+node-addon-api@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.npmjs.org/node-addon-api/-/node-addon-api-5.0.0.tgz#7d7e6f9ef89043befdb20c1989c905ebde18c501"
+  integrity sha512-CvkDw2OEnme7ybCykJpVcKH+uAOLV2qLqiyla128dN9TkEWfrYmxG6C2boDe5KcNQqZF3orkqzGgOMvZ/JNekA==
 
 node-fetch@2.6.0:
   version "2.6.0"

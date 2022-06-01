@@ -12,7 +12,7 @@ import PauseRoundedIcon from '@mui/icons-material/PauseRounded'
 import SportsEsportsRoundedIcon from '@mui/icons-material/SportsEsportsRounded'
 import React, { useCallback } from 'react'
 import { Divider, ListItemIcon, ListItemText, MenuItem, Tooltip, Typography } from '@mui/material'
-import { generateUuid } from 'common/electron-common/base/uuid'
+import { generateUuid } from '@livemoe/utils'
 import type { PlayerRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
 
 export interface IMenuItem {

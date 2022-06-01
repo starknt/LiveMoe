@@ -1,6 +1,5 @@
-import { Emitter } from 'common/electron-common/base/event'
-import { generateUuid } from 'common/electron-common/base/uuid'
-import type { IPCMainServer } from 'common/electron-main'
+import { Emitter, generateUuid } from '@livemoe/utils'
+import type { Server as IPCMainServer } from '@livemoe/ipc/main'
 import type { BrowserWindow, BrowserWindowConstructorOptions } from 'electron'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import type { IWindowConstructor, IWindowContext } from 'electron-main/common/windows'

@@ -1,4 +1,4 @@
-import type { IChannel } from 'common/electron-common'
+import type { IChannel } from '@livemoe/ipc'
 import type {
   DBError,
   DatabaseNamespace,

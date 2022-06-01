@@ -1,4 +1,4 @@
-import { debounce } from 'common/electron-common/base/functional'
+import { debounce } from '@livemoe/utils'
 import { ipcRenderer } from 'electron'
 
 /// **************************************************************  ///

@@ -1,4 +1,4 @@
-import { Event } from "./base/event";
+import { Event } from "@livemoe/utils";
 
 type RevisionId = string;
 

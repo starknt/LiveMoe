@@ -1,4 +1,4 @@
-import type { IChannel } from 'common/electron-common'
+import type { IChannel } from '@livemoe/ipc'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { LiveMoe } from 'livemoe'

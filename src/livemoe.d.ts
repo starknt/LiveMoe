@@ -1,6 +1,6 @@
-import type { IEventListener, IListener } from 'common/electron-common';
+import type { IEventListener, IListener } from '@livemoe/ipc';
 import type { IApplicationConfiguration } from 'common/electron-common/application';
-import type { Event } from 'common/electron-common/base/event';
+import type { Event } from '@livemoe/utils';
 import type { DatabaseNamespace, Doc } from 'common/electron-common/database';
 import type { TASKBAR_APPEARANCE } from 'common/electron-common/taskbar';
 import type { IWallpaperConfiguration, IWallpaperConfigurationFile, IWallpaperPlayerMode, IWallpaperPlayerPlayListChangeEvent, IWallpaperPlayProgress, PlayerRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer';

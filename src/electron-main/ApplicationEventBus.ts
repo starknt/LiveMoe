@@ -1,10 +1,10 @@
 import EventEmitter from 'events'
-import { Service } from 'common/electron-common'
+import { IPCService as Service } from '@livemoe/ipc'
 import applicationLogger from 'common/electron-common/applicationLogger'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
-import type { IPCMainServer } from 'common/electron-main'
-import { Event } from 'common/electron-common/base/event'
+import type { Server as IPCMainServer } from '@livemoe/ipc/main'
+import { Event } from '@livemoe/utils'
 import type { IApplicationEventBus } from './common/application'
 
 export default class ApplicationEventBus

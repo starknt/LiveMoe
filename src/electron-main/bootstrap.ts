@@ -1,6 +1,6 @@
 import type minimist from 'minimist'
 import { app } from 'electron'
-import { IPCMainServer } from 'common/electron-main'
+import { Server as IPCMainServer } from '@livemoe/ipc/main'
 import Application from './Application'
 
 const server = new IPCMainServer()

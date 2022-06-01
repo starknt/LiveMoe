@@ -14,6 +14,7 @@ const WindowConfiguration: BrowserWindowConstructorOptions = {
   transparent: true,
   backgroundColor: '#FF3e3e3e',
   webPreferences: {
+    devTools: !dev(),
     webSecurity: !dev(),
     nodeIntegration: false,
     contextIsolation: true,

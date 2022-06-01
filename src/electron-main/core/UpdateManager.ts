@@ -1,5 +1,5 @@
-import { Service } from 'common/electron-common'
-import { Event } from 'common/electron-common/base/event'
+import { IPCService as Service } from '@livemoe/ipc'
+import { Event } from '@livemoe/utils'
 import { UPDATER_EVENT } from 'common/electron-common/updateManager'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'

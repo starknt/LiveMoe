@@ -1,11 +1,9 @@
 import { existsSync, mkdirSync } from 'fs'
-import { Service } from 'common/electron-common'
-import { Event } from 'common/electron-common/base/event'
+import { IPCService as Service } from '@livemoe/ipc'
+import { Event } from '@livemoe/utils'
 import type { EventPreloadType } from 'common/electron-common/windows'
-import {
-  WINDOW_MESSAGE_TYPE,
-} from 'common/electron-common/windows'
-import type { IPCMainServer } from 'common/electron-main'
+import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
+import type { Server as IPCMainServer } from '@livemoe/ipc/main'
 import { BrowserWindow, dialog } from 'electron'
 import type { IApplicationContext } from 'electron-main/common/application'
 
