@@ -8,7 +8,6 @@ import type { IDestroyable } from 'electron-main/common/lifecycle'
 import type { IWindow, IWindowMessageOptions } from 'electron-main/common/windows'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
-import { info } from '../Logger/logger'
 import type { WindowId } from './WindowManager'
 
 export abstract class IWindowEventBus extends EventEmitter {
@@ -78,32 +77,24 @@ export default class WindowEventBus
     this.service.registerCaller(
       WINDOW_MESSAGE_TYPE.IPC_CALL,
       async(preload: EventPreloadType) => {
-        info('IPC_CALL 接收: ', preload)
         const result = await this.dispatchCallerWindowMessage(preload)
-        info('IPC_CALL 结果: ', result)
         return result ?? false
       },
     )
 
     this.service.registerListener(WINDOW_MESSAGE_TYPE.IPC_LISTEN, (preload) => {
-      info('IPC_LISTEN 接收: ', preload)
       const result = this.dispatchListenWindowMessage(preload)
-      info('IPC_LISTEN 结果: ', result)
       return result ?? Event.None
     })
 
     this.application.registerEvent(this.channelName, async(type, preload) => {
       switch (type) {
         case WINDOW_MESSAGE_TYPE.WINDOW_CALL: {
-          info('WINDOW_CALL 接收: ', preload)
           const result = await this.dispatchCallerWindowMessage(preload)
-          info('WINDOW_CALL 结果: ', result)
           return result ?? false
         }
         case WINDOW_MESSAGE_TYPE.WINDOW_LISTEN: {
-          info('WINDOW_LISTEN 接收: ', preload)
           const result = this.dispatchListenWindowMessage(preload)
-          info('WINDOW_LISTEN 结果: ', result)
           return result ?? Event.None
         }
         default:

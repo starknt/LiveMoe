@@ -1,7 +1,7 @@
 import { existsSync } from 'fs'
 import { app, protocol, session } from 'electron'
 import { Emitter, Event } from '@livemoe/utils'
-import type { Server as IPCMainServer } from '@livemoe/ipc/main'
+import type { IPCMainServer } from '@livemoe/ipc/main'
 import type minimist from 'minimist'
 import applicationLogger from 'common/electron-common/applicationLogger'
 import i18next from 'i18next'
@@ -10,6 +10,7 @@ import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
 import { dev } from 'common/electron-common/environment'
 import type { MoveRepositoryEvent } from 'common/electron-common/wallpaper.service'
+import { createDecorator } from '@livemoe/core'
 import type { IApplicationContext } from './common/application'
 import { DEFAULT_CONFIGURATION } from './common/application'
 import WallpaperPlayer from './core/wallpaperPlayer/WallpaperPlayer'
@@ -29,13 +30,13 @@ import { setTrayVisible } from './observables/user.observable'
 import ApplicationService from './core/services'
 import PluginManager from './core/pluginCore/PluginManager'
 import UpdateManager from './core/UpdateManager'
+import { IEnviromentService } from './core/services/environmentService'
+import { ILoggerService } from './core/services/log'
 
-/**
- * @feature 初始化应用程序
- * @feature 初始化应用程序环境
- * @feature 初始化应用程序配置
- * @feature 初始化应用程序日志 // TODO: 初始化应用程序日志
- */
+export interface IApplicationService {}
+
+export const IApplicationService = createDecorator<IApplicationService>('IApplicationService')
+
 export default class Application extends ApplicationEventBus {
   private readonly database = DataBase.getInstance(
     resolveGlobalAssets(),
@@ -92,10 +93,14 @@ export default class Application extends ApplicationEventBus {
   constructor(
     private readonly args: minimist.ParsedArgs,
     server: IPCMainServer,
+    @IEnviromentService private readonly environmentService: IEnviromentService,
+    @ILoggerService private readonly loggerService: ILoggerService,
   ) {
     super(server)
 
     this.handleArgs()
+
+    this.initalize()
   }
 
   setupProtocol() {
@@ -124,6 +129,8 @@ export default class Application extends ApplicationEventBus {
   }
 
   async initalize() {
+    this.loggerService.create('Application').info(`env: ${this.environmentService.dev()} initalize`)
+
     this.setupProtocol()
 
     this.setupGlabalPreload()

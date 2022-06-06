@@ -1,7 +1,7 @@
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import type { IApplicationContext } from 'electron-main/common/application'
 import type { IWindow } from 'electron-main/common/windows'
-import type { Server as IPCMainServer } from '@livemoe/ipc/main'
+import type { IPCMainServer } from '@livemoe/ipc/main'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { Tray } from 'electron'
 import { IPCService as Service } from '@livemoe/ipc'

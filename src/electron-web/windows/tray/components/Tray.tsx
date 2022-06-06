@@ -97,7 +97,7 @@ export default function Tray() {
     service.addEventHandler('show', () => {
       return readToShowEmitter.event
     })
-  }, [window.livemoe])
+  }, [])
 
   useAsyncEffect(async() => {
     if (!window.livemoe)
@@ -144,7 +144,7 @@ export default function Tray() {
 
       readToShowEmitter.fire()
     })
-  }, [window.livemoe])
+  }, [])
 
   return (
     <ThemeProvider theme={theme}>

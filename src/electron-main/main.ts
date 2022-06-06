@@ -6,8 +6,6 @@ import applicationLogger from 'common/electron-common/applicationLogger'
 import bootstrap from './bootstrap'
 import 'common/locales'
 
-applicationLogger.error(`Is Dev ${dev()}`)
-
 const skipArgv = dev() ? 4 : 2
 
 const argv = minimist(process.argv.slice(skipArgv), { boolean: '--' })

@@ -8,6 +8,10 @@
     ],
     "react/display-name": "off",
     "no-console": "off",
-    "import/export": "off"
+    "import/export": "off",
+    "@typescript-eslint/no-redeclare": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "import/no-mutable-exports": "off",
+    "prefer-rest-params": "off"
   }
 }

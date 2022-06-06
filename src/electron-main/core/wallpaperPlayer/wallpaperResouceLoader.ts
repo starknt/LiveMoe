@@ -184,8 +184,6 @@ export default class WallpaperLoader implements IDestroyable {
   private async parseWallpaperBaseConfiguration(value: Dirent) {
     const basePath = path.join(this.resourcePath, value.name)
 
-    console.log('basePath', basePath)
-
     return await this.readWallpaperConfiguration(basePath)
   }
 
