@@ -1,4 +1,4 @@
-import type { Server as IPCMainServer } from '@livemoe/ipc/main'
+import type { IPCMainServer } from '@livemoe/ipc/main'
 import type Application from 'electron-main/Application'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import type { IDialogWindowOptions, IWindow, IWindowConstructor } from 'electron-main/common/windows'

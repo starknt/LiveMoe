@@ -1,9 +1,9 @@
 import EventEmitter from 'events'
 import { IPCService as Service } from '@livemoe/ipc'
-import applicationLogger from 'common/electron-common/applicationLogger'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
-import type { Server as IPCMainServer } from '@livemoe/ipc/main'
+import type { IPCMainServer } from '@livemoe/ipc/main'
+import { InjectedServer } from '@livemoe/ipc/main'
 import { Event } from '@livemoe/utils'
 import type { IApplicationEventBus } from './common/application'
 
@@ -11,6 +11,9 @@ export default class ApplicationEventBus
   extends EventEmitter
   implements IApplicationEventBus {
   protected readonly MAX_LISTENERS = 0
+
+  @InjectedServer()
+  protected readonly server!: IPCMainServer
 
   protected readonly channelName = 'lm:application'
 
@@ -24,7 +27,7 @@ export default class ApplicationEventBus
     ) => void | Promise<any> | Event<any>
   >
 
-  constructor(protected readonly server: IPCMainServer) {
+  constructor() {
     super()
     this.setMaxListeners(this.MAX_LISTENERS)
 
@@ -40,7 +43,7 @@ export default class ApplicationEventBus
     }
     catch (err) {
       if (err instanceof Error)
-        applicationLogger.error(`RegisterChannel Exception: ${err.message}`)
+        console.error(`RegisterChannel Exception: ${err.message}`)
     }
 
     return false

@@ -1,8 +1,7 @@
 import EventEmitter from 'node:events'
 import { Event } from '@livemoe/utils'
-import applicationLogger from 'common/electron-common/applicationLogger'
 import { IPCService as Service } from '@livemoe/ipc'
-import type { Server as IPCMainServer } from '@livemoe/ipc/main'
+import type { IPCMainServer } from '@livemoe/ipc/main'
 import type Application from 'electron-main/Application'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import type { IWindow, IWindowMessageOptions } from 'electron-main/common/windows'
@@ -36,10 +35,10 @@ export abstract class IWindowEventBus extends EventEmitter {
     }
     catch (err) {
       if (err instanceof Error) {
-        applicationLogger.error(`RegisterChannel Exception: ${err.message}`)
+        console.error(`RegisterChannel Exception: ${err.message}`)
       }
       else {
-        applicationLogger.error(
+        console.error(
           `RegisterChannel Exception, channelName: ${this.channelName}`,
         )
       }

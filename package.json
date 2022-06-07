@@ -46,7 +46,7 @@
   "dependencies": {
     "@fontsource/roboto": "^4.5.3",
     "@livemoe/core": "^0.0.10",
-    "@livemoe/ipc": "^0.0.13",
+    "@livemoe/ipc": "^0.0.14",
     "@livemoe/utils": "^0.0.10",
     "@mui/icons-material": "^5.5.1",
     "@mui/material": "^5.5.2",

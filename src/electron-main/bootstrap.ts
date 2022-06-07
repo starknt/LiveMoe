@@ -1,18 +1,13 @@
 import type minimist from 'minimist'
 import { app } from 'electron'
-import { IPCMainServer } from '@livemoe/ipc/main'
 import { InstantiationService, ServiceCollection, SyncDescriptor } from '@livemoe/core'
 import Application from './Application'
 import { EnviromentService, IEnviromentService } from './core/services/environmentService'
 import { ILoggerService, LoggerService } from './core/services/log'
 
-const server = new IPCMainServer()
-
 function registerListener() {
   app.on('before-quit', () => {
     console.log('dispose server ...')
-
-    server.dispose()
   })
 
   app.on('will-quit', () => {
@@ -28,7 +23,7 @@ async function bootstrap(args: minimist.ParsedArgs) {
   serviceCollection.set(ILoggerService, new SyncDescriptor(LoggerService))
   const instantiationService = new InstantiationService(serviceCollection)
 
-  instantiationService.createInstance(new SyncDescriptor(Application, [args, server]))
+  instantiationService.createInstance(new SyncDescriptor(Application, [args]))
 }
 
 export default bootstrap

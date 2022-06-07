@@ -4,7 +4,6 @@ import { Emitter, createCancelablePromise, generateUuid } from '@livemoe/utils'
 import type { IWallpaperConfiguration, IWallpaperConfigurationFile } from 'common/electron-common/wallpaperPlayer'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import { FileHelper } from 'common/electron-main/fileHelper'
-import applicationLogger from 'common/electron-common/applicationLogger'
 import type { IWallpaperChangeEvent, IWallpaperConfigurationFileSchema, IWallpaperConfigurationFileWithBasePath } from 'common/electron-common/wallpaperLoader'
 import { validateWallpaperConfiguration } from 'electron-main/common/wallpaperPlayer'
 import type Application from 'electron-main/Application'
@@ -153,7 +152,7 @@ export default class WallpaperLoader implements IDestroyable {
   }
 
   private async loadRawWallpaperResources() {
-    applicationLogger.info(
+    console.info(
       `本次加载壁纸资源, 所有的壁纸文件配置文件: ${this.validWallpaperSchema
         .map(schema => `${schema.name}.${schema.ext}`)
         .join(', ')}, 仓库地址为: ${this.resourcePath}`,
@@ -225,9 +224,7 @@ export default class WallpaperLoader implements IDestroyable {
         return { basePath, ...transformRest }
       }
       catch (err) {
-        console.error(err)
-
-        applicationLogger.error(
+        console.error(
           'wallpaper loader read configuration file failed',
           err,
         )

@@ -1,9 +1,7 @@
 import { existsSync } from 'fs'
 import { app, protocol, session } from 'electron'
 import { Emitter, Event } from '@livemoe/utils'
-import type { IPCMainServer } from '@livemoe/ipc/main'
 import type minimist from 'minimist'
-import applicationLogger from 'common/electron-common/applicationLogger'
 import i18next from 'i18next'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
@@ -88,15 +86,16 @@ export default class Application extends ApplicationEventBus {
     },
   )
 
+  readonly logger = this.loggerService.create('Application')
+
   context!: IApplicationContext
 
   constructor(
     private readonly args: minimist.ParsedArgs,
-    server: IPCMainServer,
     @IEnviromentService private readonly environmentService: IEnviromentService,
     @ILoggerService private readonly loggerService: ILoggerService,
   ) {
-    super(server)
+    super()
 
     this.handleArgs()
 
@@ -129,7 +128,7 @@ export default class Application extends ApplicationEventBus {
   }
 
   async initalize() {
-    this.loggerService.create('Application').info(`env: ${this.environmentService.dev()} initalize`)
+    this.logger.info(`env: ${this.environmentService.dev()} initalize`)
 
     this.setupProtocol()
 
@@ -401,8 +400,8 @@ export default class Application extends ApplicationEventBus {
         PlayerWindow.configuration,
       )
     }
-    catch (err) {
-      applicationLogger.error(err)
+    catch (err: any) {
+      this.logger.error(err)
     }
   }
 
