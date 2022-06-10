@@ -7,7 +7,6 @@ import PouchDB from 'pouchdb'
 import { Emitter, Event } from '@livemoe/utils'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
-import { dev } from 'common/electron-common/environment'
 import { Injectable, createDecorator } from '@livemoe/core'
 
 export interface IDatabaseService {}
