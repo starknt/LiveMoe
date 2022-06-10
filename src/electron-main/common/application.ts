@@ -9,6 +9,7 @@ import type { IWallpaperConfiguration } from 'common/electron-common/wallpaperPl
 import type { IServerChannel } from '@livemoe/ipc'
 import { createResoucePath } from 'electron-main/utils'
 import type { IWallpaperChangeEvent, IWallpaperConfigurationFileSchema } from 'common/electron-common/wallpaperLoader'
+import { createDecorator } from '@livemoe/core'
 import type { IDialogWindowOptions, IWindow } from './windows'
 
 export const DEFAULT_CONFIGURATION: IApplicationConfiguration = {
@@ -129,3 +130,9 @@ export interface IApplicationEventBus<T = WINDOW_MESSAGE_TYPE> {
 
   dispatchEvents(channelName: string, preload: EventPreloadType): void
 }
+
+export interface IApplcationService {}
+
+export const IApplcationService = createDecorator<IApplcationService>('IApplcationService')
+
+export class ApplicationService implements IApplcationService {}

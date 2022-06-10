@@ -1,15 +1,15 @@
 import { existsSync } from 'fs'
 import { app, protocol, session } from 'electron'
 import { Emitter, Event } from '@livemoe/utils'
-import type { Server as IPCMainServer } from '@livemoe/ipc/main'
 import type minimist from 'minimist'
-import applicationLogger from 'common/electron-common/applicationLogger'
 import i18next from 'i18next'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
 import { dev } from 'common/electron-common/environment'
 import type { MoveRepositoryEvent } from 'common/electron-common/wallpaper.service'
+import type { InstantiationService, ServiceCollection } from '@livemoe/core'
+import { SyncDescriptor } from '@livemoe/core'
 import type { IApplicationContext } from './common/application'
 import { DEFAULT_CONFIGURATION } from './common/application'
 import WallpaperPlayer from './core/wallpaperPlayer/WallpaperPlayer'
@@ -29,13 +29,11 @@ import { setTrayVisible } from './observables/user.observable'
 import ApplicationService from './core/services'
 import PluginManager from './core/pluginCore/PluginManager'
 import UpdateManager from './core/UpdateManager'
+import { IEnviromentService } from './core/services/environmentService'
+import { ILoggerService } from './core/services/log'
+import { FileService, IFileService } from './common/file'
+import { INativeService, NativeService } from './common/native'
 
-/**
- * @feature 初始化应用程序
- * @feature 初始化应用程序环境
- * @feature 初始化应用程序配置
- * @feature 初始化应用程序日志 // TODO: 初始化应用程序日志
- */
 export default class Application extends ApplicationEventBus {
   private readonly database = DataBase.getInstance(
     resolveGlobalAssets(),
@@ -45,8 +43,7 @@ export default class Application extends ApplicationEventBus {
 
   configuration!: IApplicationConfiguration
 
-  private readonly applicationNamespace
-    = this.database.getNamespace('application')
+  private readonly applicationNamespace = this.database.getNamespace('application')
 
   private wallpaperLoader!: WallpaperLoader
 
@@ -87,15 +84,22 @@ export default class Application extends ApplicationEventBus {
     },
   )
 
+  readonly logger = this.loggerService.create('Application')
+
   context!: IApplicationContext
 
   constructor(
     private readonly args: minimist.ParsedArgs,
-    server: IPCMainServer,
+    private readonly instantiationService: InstantiationService,
+    private readonly serviceCollection: ServiceCollection,
+    @IEnviromentService private readonly environmentService: IEnviromentService,
+    @ILoggerService private readonly loggerService: ILoggerService,
   ) {
-    super(server)
+    super(loggerService)
 
     this.handleArgs()
+
+    this.initalize()
   }
 
   setupProtocol() {
@@ -124,6 +128,8 @@ export default class Application extends ApplicationEventBus {
   }
 
   async initalize() {
+    this.logger.info(`env: ${this.environmentService.dev()} initalize`)
+
     this.setupProtocol()
 
     this.setupGlabalPreload()
@@ -132,7 +138,10 @@ export default class Application extends ApplicationEventBus {
 
     this.initalizeService()
 
-    this.wallpaperLoader = new WallpaperLoader(this)
+    this.serviceCollection.set(IFileService, new SyncDescriptor(FileService))
+    this.serviceCollection.set(INativeService, new SyncDescriptor(NativeService))
+
+    this.wallpaperLoader = this.instantiationService.createInstance(new SyncDescriptor(WallpaperLoader, [this]))
 
     this.context = {
       gui: {
@@ -205,7 +214,7 @@ export default class Application extends ApplicationEventBus {
       },
     }
 
-    this.service = new ApplicationService(this.context, this.server)
+    this.service = new ApplicationService(this.context)
 
     this.pluginManager = new PluginManager(this.context)
 
@@ -217,13 +226,11 @@ export default class Application extends ApplicationEventBus {
 
     await this.wallpaperLoader.initalize()
 
-    this.windowManager = new WindowManager(this, this.server)
+    this.windowManager = this.instantiationService.createInstance(new SyncDescriptor(WindowManager, [this, this.server]))
 
     this.registerWindows()
 
-    this.applicationTray = new ApplicationTray(this.context, this.server)
-
-    await this.applicationTray.initalize()
+    this.applicationTray = this.instantiationService.createInstance(new SyncDescriptor(ApplicationTray, [this.context, this.server]))
 
     this.registerListener()
 
@@ -253,7 +260,7 @@ export default class Application extends ApplicationEventBus {
         case WINDOW_MESSAGE_TYPE.WINDOW_LISTEN:
           return this.dispatchListenWindowMessage(preload)
         default:
-          return false ?? Event.None
+          return Event.None
       }
     })
   }
@@ -394,8 +401,8 @@ export default class Application extends ApplicationEventBus {
         PlayerWindow.configuration,
       )
     }
-    catch (err) {
-      applicationLogger.error(err)
+    catch (err: any) {
+      this.logger.error(err)
     }
   }
 
