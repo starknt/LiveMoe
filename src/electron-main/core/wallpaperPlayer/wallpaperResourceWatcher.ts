@@ -30,9 +30,7 @@ export default class WallpaperResourceWatcher implements IDestroyable {
 
   private watcher: Chokidar.FSWatcher | null = null
 
-  constructor(
-    private readonly context: IApplicationContext,
-  ) {
+  constructor(private readonly context: IApplicationContext) {
     this.resourcePath = this.context.core.getApplicationConfiguration().resourcePath
 
     this.initalize()
@@ -80,8 +78,6 @@ export default class WallpaperResourceWatcher implements IDestroyable {
       })
       .on('ready', () => {
         this.ready = true
-
-        console.info('wallpaper watcher ready')
       })
       .on('error', error =>
         console.error(`[LiveMoe ResouceWatcher] error: ${error}`),

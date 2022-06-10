@@ -1,61 +1,40 @@
 import EventEmitter from 'events'
-import { IPCService as Service } from '@livemoe/ipc'
+import type { IPCService } from '@livemoe/ipc'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { IPCMainServer } from '@livemoe/ipc/main'
-import { InjectedServer } from '@livemoe/ipc/main'
+import { InjectedServer, InjectedService } from '@livemoe/ipc/main'
 import { Event } from '@livemoe/utils'
 import type { IApplicationEventBus } from './common/application'
+import { ILoggerService } from './core/services/log'
 
-export default class ApplicationEventBus
-  extends EventEmitter
-  implements IApplicationEventBus {
+export interface IEventListener {
+  (event: WINDOW_MESSAGE_TYPE, preload: EventPreloadType): void | Promise<any> | Event<any>
+}
+
+export default class ApplicationEventBus extends EventEmitter implements IApplicationEventBus {
   protected readonly MAX_LISTENERS = 0
 
-  @InjectedServer()
+  private readonly loggerEventBus = this._loggerService?.create('ApplicationEventBus')
+
+  @InjectedServer({ log: true, outgoingPrefix: 'main', incomingPrefix: 'othor' })
   protected readonly server!: IPCMainServer
 
   protected readonly channelName = 'lm:application'
 
-  protected readonly applicationService = new Service()
+  @InjectedService('lm:application')
+  protected readonly applicationService!: IPCService
 
-  events: Map<
-    string,
-    (
-      event: WINDOW_MESSAGE_TYPE,
-      preload: EventPreloadType
-    ) => void | Promise<any> | Event<any>
-  >
+  events: Map<string, IEventListener> = new Map()
 
-  constructor() {
+  constructor(@ILoggerService private readonly _loggerService?: ILoggerService) {
     super()
     this.setMaxListeners(this.MAX_LISTENERS)
-
-    this.events = new Map()
-
-    this.registerService()
   }
 
-  private registerService() {
-    try {
-      this.server.registerChannel(this.channelName, this.applicationService)
-      return true
-    }
-    catch (err) {
-      if (err instanceof Error)
-        console.error(`RegisterChannel Exception: ${err.message}`)
-    }
+  registerEvent(channelName: string, event: IEventListener): boolean {
+    this.loggerEventBus?.info(`registerEvent: ${channelName}`)
 
-    return false
-  }
-
-  registerEvent(
-    channelName: string,
-    event: (
-      event: WINDOW_MESSAGE_TYPE,
-      preload: EventPreloadType
-    ) => any | Promise<any> | Event<any>,
-  ): boolean {
     if (this.events.has(channelName))
       return false
 
@@ -73,12 +52,7 @@ export default class ApplicationEventBus
     return false
   }
 
-  sendWindowMessage(
-    channelName: string,
-    preload: EventPreloadType,
-  ): any | Event<any> {
-    console.info('sendWindowMessage:', channelName, preload)
-
+  sendWindowMessage(channelName: string, preload: EventPreloadType): any | Event<any> {
     if (Array.isArray(preload.arg) && preload.arg.length <= 0)
       preload.arg = undefined
     else if (Array.isArray(preload.arg) && preload.arg.length === 1)
@@ -98,6 +72,8 @@ export default class ApplicationEventBus
   }
 
   dispatchEvents(channelName: string, preload: EventPreloadType) {
+    this.loggerEventBus?.info(`dispatchEvents: ${channelName}`, preload)
+
     return this.events.get(channelName)?.(preload.type, preload)
   }
 }

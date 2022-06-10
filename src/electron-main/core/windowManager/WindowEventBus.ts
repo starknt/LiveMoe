@@ -1,7 +1,7 @@
 import EventEmitter from 'node:events'
 import { Event } from '@livemoe/utils'
-import { IPCService as Service } from '@livemoe/ipc'
-import type { IPCMainServer } from '@livemoe/ipc/main'
+import type { IPCService } from '@livemoe/ipc'
+import { InjectedService } from '@livemoe/ipc/main'
 import type Application from 'electron-main/Application'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import type { IWindow, IWindowMessageOptions } from 'electron-main/common/windows'
@@ -14,61 +14,23 @@ export abstract class IWindowEventBus extends EventEmitter {
 
   protected readonly MAX_LISTENERS = 0
 
-  protected readonly service = new Service()
+  @InjectedService('lm:windows')
+  protected readonly service!: IPCService
 
-  constructor(server: IPCMainServer) {
+  constructor() {
     super()
     this.setMaxListeners(this.MAX_LISTENERS)
-
-    this.registerService(this.channelName, this.service, server)
-  }
-
-  registerService(
-    channelName: string,
-    service: Service,
-    server: IPCMainServer,
-  ) {
-    try {
-      server.registerChannel(channelName, service)
-
-      return true
-    }
-    catch (err) {
-      if (err instanceof Error) {
-        console.error(`RegisterChannel Exception: ${err.message}`)
-      }
-      else {
-        console.error(
-          `RegisterChannel Exception, channelName: ${this.channelName}`,
-        )
-      }
-    }
-
-    return false
   }
 }
 
-export default class WindowEventBus
-  extends IWindowEventBus
-  implements IDestroyable {
+export default class WindowEventBus extends IWindowEventBus implements IDestroyable {
   private readonly windowEvent = new Map<WindowId, IWindow>()
 
-  private readonly willCreateWindow = new Map<
-    WindowId,
-    (show: boolean) => IWindow | null
-  >()
+  private readonly willCreateWindow = new Map<WindowId, (show: boolean) => IWindow | null>()
 
-  constructor(
-    server: IPCMainServer,
-    private readonly application: Application,
-  ) {
-    super(server)
+  constructor(private readonly application: Application) {
+    super()
 
-    /**
-     * 主信道 `lm:windows`
-     * 根据窗口的 id, 创建子信道 `lm:windows:${id}`
-     * @description 用于窗口间的跨进程通信
-     */
     this.initalizeService()
   }
 
@@ -183,11 +145,7 @@ export default class WindowEventBus
     return Promise.resolve(result)
   }
 
-  private handleWindowCallEvent(
-    windowId: string,
-    event: string,
-    args: unknown[],
-  ) {
+  private handleWindowCallEvent(windowId: string, event: string, args: unknown[]) {
     const window = this.windowEvent.get(windowId)
 
     if (window) {
@@ -201,11 +159,7 @@ export default class WindowEventBus
     return Promise.resolve(false)
   }
 
-  private handleWindowEvent(
-    windowId: string,
-    event: string,
-    args: any[],
-  ): Event<any> {
+  private handleWindowEvent(windowId: string, event: string, args: any[]): Event<any> {
     const window = this.windowEvent.get(windowId)
 
     if (window) {
@@ -229,10 +183,7 @@ export default class WindowEventBus
     return null
   }
 
-  registerWindowCreator(
-    id: WindowId,
-    creator: (show: boolean) => IWindow | null,
-  ) {
+  registerWindowCreator(id: WindowId, creator: (show: boolean) => IWindow | null) {
     if (this.willCreateWindow.has(id))
       throw new Error(`Window ${id} has been registered`)
 
@@ -266,19 +217,11 @@ export default class WindowEventBus
     window.once('closed', () => this.windowEvent.delete(id))
   }
 
-  sendWindowMessage(
-    channelName: string,
-    preload: EventPreloadType,
-    options: IWindowMessageOptions,
-  ) {
+  sendWindowMessage(channelName: string, preload: EventPreloadType, options: IWindowMessageOptions) {
     this.handleSendWindowMessage(channelName, preload, options)
   }
 
-  handleSendWindowMessage(
-    channelName: string,
-    preload: EventPreloadType,
-    options: IWindowMessageOptions,
-  ) {
+  handleSendWindowMessage(channelName: string, preload: EventPreloadType, options: IWindowMessageOptions) {
     // 广播消息
     if (options.boardcast) {
       if (channelName.includes(this.channelName)) {

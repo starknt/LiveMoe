@@ -23,7 +23,7 @@ async function bootstrap(args: minimist.ParsedArgs) {
   serviceCollection.set(ILoggerService, new SyncDescriptor(LoggerService))
   const instantiationService = new InstantiationService(serviceCollection)
 
-  instantiationService.createInstance(new SyncDescriptor(Application, [args]))
+  instantiationService.createInstance(new SyncDescriptor(Application, [args, instantiationService, serviceCollection]))
 }
 
 export default bootstrap

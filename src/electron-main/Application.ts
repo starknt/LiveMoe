@@ -8,7 +8,8 @@ import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
 import { dev } from 'common/electron-common/environment'
 import type { MoveRepositoryEvent } from 'common/electron-common/wallpaper.service'
-import { createDecorator } from '@livemoe/core'
+import type { InstantiationService, ServiceCollection } from '@livemoe/core'
+import { SyncDescriptor } from '@livemoe/core'
 import type { IApplicationContext } from './common/application'
 import { DEFAULT_CONFIGURATION } from './common/application'
 import WallpaperPlayer from './core/wallpaperPlayer/WallpaperPlayer'
@@ -30,10 +31,8 @@ import PluginManager from './core/pluginCore/PluginManager'
 import UpdateManager from './core/UpdateManager'
 import { IEnviromentService } from './core/services/environmentService'
 import { ILoggerService } from './core/services/log'
-
-export interface IApplicationService {}
-
-export const IApplicationService = createDecorator<IApplicationService>('IApplicationService')
+import { FileService, IFileService } from './common/file'
+import { INativeService, NativeService } from './common/native'
 
 export default class Application extends ApplicationEventBus {
   private readonly database = DataBase.getInstance(
@@ -44,8 +43,7 @@ export default class Application extends ApplicationEventBus {
 
   configuration!: IApplicationConfiguration
 
-  private readonly applicationNamespace
-    = this.database.getNamespace('application')
+  private readonly applicationNamespace = this.database.getNamespace('application')
 
   private wallpaperLoader!: WallpaperLoader
 
@@ -92,10 +90,12 @@ export default class Application extends ApplicationEventBus {
 
   constructor(
     private readonly args: minimist.ParsedArgs,
+    private readonly instantiationService: InstantiationService,
+    private readonly serviceCollection: ServiceCollection,
     @IEnviromentService private readonly environmentService: IEnviromentService,
     @ILoggerService private readonly loggerService: ILoggerService,
   ) {
-    super()
+    super(loggerService)
 
     this.handleArgs()
 
@@ -138,7 +138,10 @@ export default class Application extends ApplicationEventBus {
 
     this.initalizeService()
 
-    this.wallpaperLoader = new WallpaperLoader(this)
+    this.serviceCollection.set(IFileService, new SyncDescriptor(FileService))
+    this.serviceCollection.set(INativeService, new SyncDescriptor(NativeService))
+
+    this.wallpaperLoader = this.instantiationService.createInstance(new SyncDescriptor(WallpaperLoader, [this]))
 
     this.context = {
       gui: {
@@ -211,7 +214,7 @@ export default class Application extends ApplicationEventBus {
       },
     }
 
-    this.service = new ApplicationService(this.context, this.server)
+    this.service = new ApplicationService(this.context)
 
     this.pluginManager = new PluginManager(this.context)
 
@@ -223,13 +226,11 @@ export default class Application extends ApplicationEventBus {
 
     await this.wallpaperLoader.initalize()
 
-    this.windowManager = new WindowManager(this, this.server)
+    this.windowManager = this.instantiationService.createInstance(new SyncDescriptor(WindowManager, [this, this.server]))
 
     this.registerWindows()
 
-    this.applicationTray = new ApplicationTray(this.context, this.server)
-
-    await this.applicationTray.initalize()
+    this.applicationTray = this.instantiationService.createInstance(new SyncDescriptor(ApplicationTray, [this.context, this.server]))
 
     this.registerListener()
 
@@ -259,7 +260,7 @@ export default class Application extends ApplicationEventBus {
         case WINDOW_MESSAGE_TYPE.WINDOW_LISTEN:
           return this.dispatchListenWindowMessage(preload)
         default:
-          return false ?? Event.None
+          return Event.None
       }
     })
   }

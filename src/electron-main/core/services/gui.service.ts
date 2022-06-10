@@ -1,24 +1,23 @@
 import { existsSync, mkdirSync } from 'fs'
-import { IPCService as Service } from '@livemoe/ipc'
+import type { IPCService } from '@livemoe/ipc'
 import { Event } from '@livemoe/utils'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
-import type { Server as IPCMainServer } from '@livemoe/ipc/main'
+import { InjectedService } from '@livemoe/ipc/main'
 import { BrowserWindow, dialog } from 'electron'
 import type { IApplicationContext } from 'electron-main/common/application'
 
 export default class GuiService {
   private readonly channelName = 'lm:gui'
 
-  private readonly service = new Service()
+  @InjectedService('lm:gui')
+  private readonly service!: IPCService
 
-  constructor(private readonly server: IPCMainServer, private readonly context: IApplicationContext) {
+  constructor(private readonly context: IApplicationContext) {
     this.registerListener()
   }
 
   registerListener() {
-    this.server.registerChannel(this.channelName, this.service)
-
     this.context.registerMessageHandler(this.channelName, (type: WINDOW_MESSAGE_TYPE, preload: EventPreloadType) => {
       switch (type) {
         case WINDOW_MESSAGE_TYPE.WINDOW_CALL:

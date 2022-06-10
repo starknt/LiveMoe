@@ -411,10 +411,10 @@
   dependencies:
     "@livemoe/utils" "0.0.10"
 
-"@livemoe/ipc@^0.0.14":
-  version "0.0.14"
-  resolved "https://registry.npmjs.org/@livemoe/ipc/-/ipc-0.0.14.tgz#f75167363573ff18f511832db1442bcb0369fe38"
-  integrity sha512-jOrAVGlm03nOHa8i2PB1zTbEoKqH/XbJYZODjP+hUBr3nY5SBqmCjEhBwO5AO1R/URQnQt8mmzDeLYP7IAEDCg==
+"@livemoe/ipc@^0.0.19":
+  version "0.0.19"
+  resolved "https://registry.npmjs.org/@livemoe/ipc/-/ipc-0.0.19.tgz#daf96fe1bc96911643a4d40cca521fafabd0e4e6"
+  integrity sha512-6D/ShojoGIEyrclHkMllX7pBBJ3bZTfCW+DwbgaE6xax3f4OKxyFUX/gd2OhSdkoTyadeS5rxNEzC7pml4NMTQ==
   dependencies:
     "@livemoe/core" "0.0.10"
     "@livemoe/utils" "0.0.10"

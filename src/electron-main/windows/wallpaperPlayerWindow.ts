@@ -5,14 +5,13 @@ import { WallpaperPlayerTypes } from 'common/electron-common/wallpaperPlayer'
 import type { IWallpaperFailLoadEvent, IWallpaperView } from 'electron-main/common/wallpaperPlayer'
 import type { IWallpaperPlayerAudioChangeEvent, IWallpaperPlayerDisabledChangeEvent, IWallpaperPlayerPlayFailEvent, IWallpaperPlayerVolumeChangeEvent } from 'common/electron-common/wallpaperPlayerWindow'
 import type { IDisposable } from '@livemoe/utils'
-import { Emitter, Event, toDisposable } from '@livemoe/utils'
+import { Emitter, Event, PauseInterval, PauseTimeout, toDisposable } from '@livemoe/utils'
 import { dev, linux, macOS, win } from 'common/electron-common/environment'
 import { BrowserView, ipcMain } from 'electron'
 import { WallpaperPlayerViewConfiguration, WallpaperPlayerWindowConfiguration } from 'electron-main/common/windowConfiguration'
 import { validateWallpaperConfiguration } from 'electron-main/common/wallpaperPlayer'
 import { resolveWallpaperHtmlPath } from 'electron-main/utils'
 import WallpaperPlayerMsgProcess from 'electron-main/core/wallpaperPlayer/wallpaperPlayerMsgProcess'
-import { TimerHelper } from 'electron-main/common/timer'
 import BasePlayerWindow from './base/basePlayerWindow'
 
 class WallpaperPlayerView implements IWallpaperView {
@@ -210,9 +209,9 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
 
   private _isSetupDesktop = false
 
-  private _htmlProgress: TimerHelper.PausableIntervalTimer | null = null
+  private _htmlProgress: PauseInterval | null = null
 
-  private _htmlEnded: TimerHelper.PausableTimeoutTimer | null = null
+  private _htmlEnded: PauseTimeout | null = null
 
   constructor(
     private playlist: IWallpaperConfiguration[],
@@ -295,7 +294,7 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
       let now = 0
 
       if (!this._htmlProgress) {
-        this._htmlProgress = new TimerHelper.PausableIntervalTimer(1000, () => {
+        this._htmlProgress = new PauseInterval(1000, () => {
           now += 1000
 
           this.progressEmitter.fire({
@@ -307,7 +306,7 @@ export default class WallpaperPlayerWindow extends BasePlayerWindow {
       }
 
       if (!this._htmlEnded) {
-        this._htmlEnded = new TimerHelper.PausableTimeoutTimer(total, () => {
+        this._htmlEnded = new PauseTimeout(total, () => {
           this.endedEmitter.fire()
 
           switch (this._mode) {

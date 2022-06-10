@@ -2,12 +2,10 @@ import type { TASKBAR_APPEARANCE as CTASKBAR_APPEARANCE, ITaskbarCofniguration }
 import { START_APPEARANCE } from 'common/electron-common/taskbar'
 import type { TASKBAR_APPEARANCE } from 'win-func-tools'
 import { isNil, isNull, withMinAndMax, withT1AsT2 } from 'common/electron-common/types'
-import applicationLogger from 'common/electron-common/applicationLogger'
 import { IPCService as Service } from '@livemoe/ipc'
-import { Emitter, Event } from '@livemoe/utils'
+import { Emitter, Event, PauseInterval } from '@livemoe/utils'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
-import { TimerHelper } from 'electron-main/common/timer'
 import type { IBackendPlugin, IPluginContext } from 'common/electron-common/plugin'
 
 const DEFAULT_CONFIGURATION: ITaskbarCofniguration = {
@@ -48,7 +46,7 @@ export default class Taskbar implements IBackendPlugin {
 
   readonly onTaskbarStyleChange = this._onTaskbarStyleChange.event
 
-  private timer: TimerHelper.PausableIntervalTimer | null = null
+  private timer: PauseInterval | null = null
 
   constructor(
     private context: IPluginContext,
@@ -173,7 +171,7 @@ export default class Taskbar implements IBackendPlugin {
     }
 
     if (isNull(this.timer)) {
-      this.timer = new TimerHelper.PausableIntervalTimer(16 * 2, () => {
+      this.timer = new PauseInterval(16 * 2, () => {
         this.setTaskbarStyle()
       })
     }
@@ -195,7 +193,6 @@ export default class Taskbar implements IBackendPlugin {
     }
     catch (err) {
       console.error(err)
-      applicationLogger.error(err)
     }
   }
 

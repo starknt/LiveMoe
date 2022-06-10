@@ -1,6 +1,6 @@
 import path from 'path'
 import { IPCService as Service } from '@livemoe/ipc'
-import type { Server as IPCMainServer } from '@livemoe/ipc/main'
+import type { IPCMainServer } from '@livemoe/ipc/main'
 import type Application from 'electron-main/Application'
 import type { DBError, DatabaseNamespace, Doc, DocRes } from 'common/electron-common/database'
 import PouchDB from 'pouchdb'
@@ -8,6 +8,14 @@ import { Emitter, Event } from '@livemoe/utils'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import { dev } from 'common/electron-common/environment'
+import { Injectable, createDecorator } from '@livemoe/core'
+
+export interface IDatabaseService {}
+
+export const IDatabaseService = createDecorator<IDatabaseService>('IDatabaseService')
+
+@Injectable(IDatabaseService)
+export class DatabaseService implements IDatabaseService {}
 
 export default class DataBase {
   private static instance: DataBase | null = null
@@ -47,9 +55,6 @@ export default class DataBase {
     })
 
     this.db.setMaxListeners(Infinity)
-
-    if (dev())
-      console.info('database info: ', await this.db.info())
 
     this.initalizeService()
   }

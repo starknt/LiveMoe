@@ -34,16 +34,9 @@ export default class WindowManager implements IDestroyable {
   private readonly windowCollection = new Map<WindowId, IWindow>()
 
   // 提供窗口与进程间的通信
-  private readonly windowEventBus = new WindowEventBus(
-    this.server,
-    this.application,
-  )
+  private readonly windowEventBus = new WindowEventBus(this.application)
 
-  private readonly windowPool = new WindowPool(
-    this.server,
-    this.windowEventBus,
-    WindowManager.MaxPoolSize,
-  )
+  private readonly windowPool = new WindowPool(this.server, this.windowEventBus, WindowManager.MaxPoolSize)
 
   constructor(
     private readonly application: Application,

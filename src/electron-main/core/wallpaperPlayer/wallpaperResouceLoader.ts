@@ -1,20 +1,23 @@
 import path from 'path'
 import fs, { type Dirent, promises as fsPromises } from 'fs'
-import { Emitter, createCancelablePromise, generateUuid } from '@livemoe/utils'
+import { Emitter, generateUuid } from '@livemoe/utils'
 import type { IWallpaperConfiguration, IWallpaperConfigurationFile } from 'common/electron-common/wallpaperPlayer'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
 import { FileHelper } from 'common/electron-main/fileHelper'
 import type { IWallpaperChangeEvent, IWallpaperConfigurationFileSchema, IWallpaperConfigurationFileWithBasePath } from 'common/electron-common/wallpaperLoader'
 import { validateWallpaperConfiguration } from 'electron-main/common/wallpaperPlayer'
-import type Application from 'electron-main/Application'
 import { WallpaperResource } from 'electron-main/common/resource'
 import { resolveGlobalAssets } from 'electron-main/utils'
-import { extract } from 'common/electron-main/zip'
-import { ApplicationNotification } from 'electron-main/common/notification'
 import { retry } from 'common/electron-common/utils'
+import { INativeService } from 'electron-main/common/native'
+import type Application from 'electron-main/Application'
+import { IFileService } from 'electron-main/common/file'
+import { ILoggerService } from '../services/log'
 import WallpaperResourceWatcher from './wallpaperResourceWatcher'
 
 export default class WallpaperLoader implements IDestroyable {
+  private readonly logger = this.loggerService.create('WallpaperLoader')
+
   private resourcePath!: string
 
   private readonly validWallpaperSchema: IWallpaperConfigurationFileSchema[] = []
@@ -37,7 +40,12 @@ export default class WallpaperLoader implements IDestroyable {
 
   readonly onChange = this.onChangeEmitter.event
 
-  constructor(private readonly application: Application) {
+  constructor(
+    private readonly application: Application,
+    @INativeService private readonly nativeService: INativeService,
+    @IFileService private readonly fileService: IFileService,
+    @ILoggerService private readonly loggerService: ILoggerService,
+  ) {
     this.resourcePath = application.configuration.resourcePath
     this.initalizWallpaperSchema()
   }
@@ -51,10 +59,11 @@ export default class WallpaperLoader implements IDestroyable {
       await retry(this.loadWallpapers.bind(this), 3)
     }
     catch (err) {
-      ApplicationNotification.info(
+      this.nativeService.showNotification(
         '无法加载壁纸资源, 请检查资源文件是否存在',
         'LiveMoe 错误',
       )
+
       this.afterLoadEmitter.fire([])
     }
 
@@ -75,34 +84,19 @@ export default class WallpaperLoader implements IDestroyable {
   }
 
   private async initalizeWallpaperResource() {
-    if (fs.existsSync(this.resourcePath))
+    if (await this.fileService.exists(this.resourcePath))
       return
 
-    if (fs.existsSync(resolveGlobalAssets('LiveMoeResource.zip'))) {
-      const extractZip = createCancelablePromise(async(cancelToken) => {
-        try {
-          await extract(
-            resolveGlobalAssets('LiveMoeResource.zip'),
-            path.resolve(this.resourcePath, '..'),
-            {},
-            cancelToken,
-          )
-          return true
-        }
-        catch {
-          return false
-        }
-      })
+    const token = this.fileService.unzip(resolveGlobalAssets('LiveMoeResource.zip'), path.resolve(this.resourcePath, '..'))
 
-      await extractZip
-        .then((success) => {
-          console.log('壁纸资源解压完毕', success)
-        })
-        .catch((err) => {
-          console.error('壁纸资源解压失败', err)
-          ApplicationNotification.info('壁纸资源解压失败')
-        })
-    }
+    await token
+      .then((_token) => {
+        this.logger.info('资源解压完成')
+        return _token
+      })
+      .catch((err) => {
+        this.logger.error(err)
+      })
   }
 
   private async loadWallpapers() {
@@ -152,7 +146,7 @@ export default class WallpaperLoader implements IDestroyable {
   }
 
   private async loadRawWallpaperResources() {
-    console.info(
+    this.logger.info(
       `本次加载壁纸资源, 所有的壁纸文件配置文件: ${this.validWallpaperSchema
         .map(schema => `${schema.name}.${schema.ext}`)
         .join(', ')}, 仓库地址为: ${this.resourcePath}`,
@@ -206,25 +200,13 @@ export default class WallpaperLoader implements IDestroyable {
           rawConfiguration,
         )
 
-        // if (transformRest !== null) {
-        //   await FileHelper.writeJSON(path.join(basePath, 'theme.lmw'), transformRest)
-        //     .then(v => v)
-        //     .catch(err => console.error(err))
-        //     .catch(err =>
-        //       applicationLogger.error(
-        //         'wallpaper loader output theme.lmw failed',
-        //         err,
-        //       ),
-        //     )
-        // }
-
         if (transformRest === null)
           return null
 
         return { basePath, ...transformRest }
       }
       catch (err) {
-        console.error(
+        this.logger.error(
           'wallpaper loader read configuration file failed',
           err,
         )
@@ -236,9 +218,7 @@ export default class WallpaperLoader implements IDestroyable {
     return null
   }
 
-  private transform2WallpaperResult(
-    configurationFiles: IWallpaperConfigurationFileWithBasePath[],
-  ) {
+  private transform2WallpaperResult(configurationFiles: IWallpaperConfigurationFileWithBasePath[]) {
     return configurationFiles.map((configuration) => {
       return {
         id: generateUuid(),
@@ -270,8 +250,6 @@ export default class WallpaperLoader implements IDestroyable {
   }
 
   private validateConfiguration(configurationFiles: IWallpaperConfiguration[]) {
-    console.log('validateConfiguration', configurationFiles.length)
-
     return configurationFiles.filter(
       async configuration =>
         await validateWallpaperConfiguration(configuration),

@@ -50,14 +50,15 @@ async function beforeReady() {
     // app.setPath('userData', resolve);
   }
 
-  app.commandLine.appendSwitch('disable-site-isolation-trials')
+  // app.commandLine.appendSwitch('disable-site-isolation-trials')
   app.commandLine.appendSwitch('--ignore-certificate-errors', 'true')
 }
 
 async function ready() {
   try {
     if (dev()) {
-      (await import('electron-debug')).default()
+      require('electron-debug')()
+
       const {
         REACT_DEVELOPER_TOOLS,
         REDUX_DEVTOOLS,
@@ -72,7 +73,6 @@ async function ready() {
     await bootstrap(argv)
   }
   catch (err) {
-    console.error(err)
     app.exit(-1)
   }
 }
