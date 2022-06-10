@@ -1,4 +1,3 @@
-/* eslint-disable import/no-mutable-exports */
 import { URL } from 'url'
 import path from 'path'
 import { dev, win } from 'common/electron-common/environment'

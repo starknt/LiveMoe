@@ -2,11 +2,8 @@ import { app, protocol } from 'electron'
 import minimist from 'minimist'
 import { dev, production, win } from 'common/electron-common/environment'
 import { Emitter, Event } from '@livemoe/utils'
-import applicationLogger from 'common/electron-common/applicationLogger'
 import bootstrap from './bootstrap'
 import 'common/locales'
-
-applicationLogger.error(`Is Dev ${dev()}`)
 
 const skipArgv = dev() ? 4 : 2
 
@@ -17,7 +14,7 @@ const gotSingleInstanceLock = Event.toPromise(getSingleInstanceLock.event)
 const onReady = Event.fromNodeEventEmitter<void>(app, 'ready')
 
 async function exceptionHandler() {
-  process.on('uncaughtException', err => applicationLogger.error(err))
+  process.on('uncaughtException', err => console.error(err))
 
   process.on('SIGTERM', () => {
     if (win()) {
@@ -53,14 +50,15 @@ async function beforeReady() {
     // app.setPath('userData', resolve);
   }
 
-  app.commandLine.appendSwitch('disable-site-isolation-trials')
+  // app.commandLine.appendSwitch('disable-site-isolation-trials')
   app.commandLine.appendSwitch('--ignore-certificate-errors', 'true')
 }
 
 async function ready() {
   try {
     if (dev()) {
-      (await import('electron-debug')).default()
+      require('electron-debug')()
+
       const {
         REACT_DEVELOPER_TOOLS,
         REDUX_DEVTOOLS,
@@ -75,7 +73,6 @@ async function ready() {
     await bootstrap(argv)
   }
   catch (err) {
-    applicationLogger.error(err)
     app.exit(-1)
   }
 }
@@ -85,7 +82,7 @@ async function exit(err: Error) {
     console.error(err)
 
   if (production())
-    applicationLogger.error(err)
+    console.error(err)
 
   app.exit(-1)
 }

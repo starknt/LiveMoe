@@ -1,26 +1,27 @@
 import path from 'path'
 import fs from 'fs'
-import { IPCService as Service } from '@livemoe/ipc'
+import type { IPCService } from '@livemoe/ipc'
 import type { IWallpaperConfiguration, IWallpaperConfigurationFile } from 'common/electron-common/wallpaperPlayer'
 import type { EventPreloadType } from 'common/electron-common/windows'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
-import type { Server as IPCMainServer } from '@livemoe/ipc/main'
+import { InjectedService } from '@livemoe/ipc/main'
 import type { IApplicationContext } from 'electron-main/common/application'
 import { Emitter, Event, createCancelablePromise, generateUuid } from '@livemoe/utils'
 import { FileHelper } from 'common/electron-main/fileHelper'
 import template from 'art-template'
 import { resolveArtTemplate } from 'electron-main/utils'
 import type { IApplicationConfiguration } from 'common/electron-common/application'
-import { extract } from 'common/electron-main/zip'
 import { app } from 'electron'
 import fsExtra from 'fs-extra'
 import trash from 'trash'
 import type { ChangeRepositoryEvent, MoveRepositoryEvent } from 'common/electron-common/wallpaper.service'
+import { extract } from 'electron-main/common/zip'
 
 export default class WallpaperService {
   private readonly channelName = 'lm:wallpaper'
 
-  private readonly service = new Service()
+  @InjectedService('lm:wallpaper')
+  private readonly service!: IPCService
 
   private readonly onCreateStartEmitter = new Emitter<string>()
 
@@ -46,13 +47,11 @@ export default class WallpaperService {
 
   readonly onCreateEnd = this.onCreateEndedEmitter.event
 
-  constructor(private readonly server: IPCMainServer, private readonly context: IApplicationContext) {
+  constructor(private readonly context: IApplicationContext) {
     this.registerListener()
   }
 
   registerListener() {
-    this.server.registerChannel(this.channelName, this.service)
-
     this.context.registerMessageHandler(this.channelName, (type, preload) => {
       switch (type) {
         case WINDOW_MESSAGE_TYPE.WINDOW_CALL:
@@ -102,8 +101,6 @@ export default class WallpaperService {
   }
 
   dispatchListenerEvent(preload: EventPreloadType) {
-    console.log('dispatchListenerEvent', preload)
-
     switch (preload.event) {
       case 'create:start':
         return this.onCreateStart

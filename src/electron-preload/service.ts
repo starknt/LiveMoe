@@ -1,7 +1,6 @@
 import * as is from 'common/electron-common/environment'
 import { contextBridge, ipcRenderer } from 'electron'
-import { Client as IPCRendererServer } from '@livemoe/ipc/renderer'
-import { retry } from '@livemoe/utils'
+import { IPCRenderServer } from '@livemoe/ipc/renderer'
 import createDatabaseService from './services/dbService'
 import createWindowsService from './services/windowService'
 import createWallpaperPlayerService from './services/wallpaperPlayerService'
@@ -22,27 +21,15 @@ import { when } from './helper'
 // 6. 任务栏服务
 // 7. 窗口托盘服务
 // 8. 更新服务
-async function getAllMainServiceChannel(server: IPCRendererServer) {
-  const dbService = await retry(async() => server.getChannel('lm:db'), 50, 2)
-  const windowsService = await retry(async() =>
-    server.getChannel('lm:windows'),
-  50, 2,
-  )
-  const wallpaperPlayerService = await retry(async() =>
-    server.getChannel('lm:wallpaper:player'),
-  50, 2,
-  )
-  const applicationService = await retry(async() =>
-    server.getChannel('lm:application'),
-  50, 2,
-  )
-  const trayService = await retry(async() => server.getChannel('lm:tray'), 50, 2)
-
-  const guiService = await retry(async() => server.getChannel('lm:gui'), 50, 2)
-
-  const wallpaperService = await retry(async() => server.getChannel('lm:wallpaper'), 50, 2)
-
-  const updateService = await retry(async() => server.getChannel('lm:update'), 50, 2)
+async function getAllMainServiceChannel(server: IPCRenderServer) {
+  const dbService = server.getChannel('lm:db')
+  const windowsService = server.getChannel('lm:windows')
+  const wallpaperPlayerService = server.getChannel('lm:wallpaper:player')
+  const applicationService = server.getChannel('lm:application')
+  const trayService = server.getChannel('lm:tray')
+  const guiService = server.getChannel('lm:gui')
+  const wallpaperService = server.getChannel('lm:wallpaper')
+  const updateService = server.getChannel('lm:update')
 
   return {
     dbService,
@@ -74,7 +61,7 @@ async function injectMainService(ctx: string) {
 
   console.info(`正在注入服务, 当前服务上下文为: ${ctx}!!!`)
 
-  const server = new IPCRendererServer(ctx, ipcRenderer)
+  const server = new IPCRenderServer(ctx)
 
   const {
     dbService,

@@ -1,5 +1,4 @@
 import path from 'node:path'
-import applicationLogger from 'common/electron-common/applicationLogger'
 import type { Event } from '@livemoe/utils'
 import { Emitter } from '@livemoe/utils'
 import type { IDestroyable } from 'electron-main/common/lifecycle'
@@ -31,9 +30,7 @@ export default class WallpaperResourceWatcher implements IDestroyable {
 
   private watcher: Chokidar.FSWatcher | null = null
 
-  constructor(
-    private readonly context: IApplicationContext,
-  ) {
+  constructor(private readonly context: IApplicationContext) {
     this.resourcePath = this.context.core.getApplicationConfiguration().resourcePath
 
     this.initalize()
@@ -81,11 +78,9 @@ export default class WallpaperResourceWatcher implements IDestroyable {
       })
       .on('ready', () => {
         this.ready = true
-
-        applicationLogger.info('wallpaper watcher ready')
       })
       .on('error', error =>
-        applicationLogger.error(`[LiveMoe ResouceWatcher] error: ${error}`),
+        console.error(`[LiveMoe ResouceWatcher] error: ${error}`),
       )
   }
 

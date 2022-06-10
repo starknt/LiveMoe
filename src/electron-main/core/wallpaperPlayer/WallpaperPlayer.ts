@@ -1,9 +1,8 @@
 import { type Display, globalShortcut, ipcMain, screen } from 'electron'
-import applicationLogger from 'common/electron-common/applicationLogger'
 import { Emitter, Event, debounce } from '@livemoe/utils'
 import type { IWallpaperPlayerPlayListChangeEvent } from 'common/electron-common/wallpaperPlayer'
 import { DEFAULT_CONFIGURATION, DEFAULT_PLAY_RUNTIME_CONFIGURATION, type IWallpaperConfiguration, type IWallpaperPlayProgress, type IWallpaperPlayerConfiguration, type IWallpaperPlayerMode, type PlayerRuntimeConfiguration } from 'common/electron-common/wallpaperPlayer'
-import type { Server as IPCMainServer } from '@livemoe/ipc/main'
+import type { IPCMainServer } from '@livemoe/ipc/main'
 import { type IWallpaperFailLoadEvent, type IWallpaperPlayer, validateWallpaperConfiguration } from 'electron-main/common/wallpaperPlayer'
 import WallpaperPlayerWindow from 'electron-main/windows/WallpaperPlayerWindow'
 import { dev, win } from 'common/electron-common/environment'
@@ -460,11 +459,11 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
 
     // 准备加载壁纸
     this.application.context.lifecycle.onBeforeLoad(() => {
-      applicationLogger.info('准备加载壁纸壁纸资源')
+      console.info('准备加载壁纸壁纸资源')
     })
 
     this.application.context.lifecycle.onLoad(() => {
-      applicationLogger.info('壁纸资源加载中...')
+      console.info('壁纸资源加载中...')
     })
 
     // 壁纸资源加载完毕
@@ -716,7 +715,7 @@ export default class WallpaperPlayer implements IWallpaperPlayer {
   }
 
   private async initWallpaperWindow() {
-    applicationLogger.info('wallpaper list: ', this.playlist.length)
+    console.info('wallpaper list: ', this.playlist.length)
 
     const configuration = this.rtConfiguration.wallpaperConfiguration
 
