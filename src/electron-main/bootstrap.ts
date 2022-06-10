@@ -3,7 +3,7 @@ import { app } from 'electron'
 import { InstantiationService, ServiceCollection, SyncDescriptor } from '@livemoe/core'
 import Application from './Application'
 import { EnviromentService, IEnviromentService } from './core/services/environmentService'
-import { ILoggerService, LoggerService } from './core/services/log'
+import { ILoggerService, LoggerService } from './common/log'
 
 function registerListener() {
   app.on('before-quit', () => {

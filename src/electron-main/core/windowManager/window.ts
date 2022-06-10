@@ -1,6 +1,6 @@
 import { createDecorator } from '@livemoe/core'
 import type { IWindow } from 'electron-main/common/windows'
-import { ILoggerService } from '../services/log'
+import { ILoggerService } from '../../common/log'
 import type { IWindowOptions } from './WindowPool'
 
 export interface IWindowService {

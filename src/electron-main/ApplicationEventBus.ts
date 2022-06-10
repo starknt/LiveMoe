@@ -5,8 +5,8 @@ import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import type { IPCMainServer } from '@livemoe/ipc/main'
 import { InjectedServer, InjectedService } from '@livemoe/ipc/main'
 import { Event } from '@livemoe/utils'
+import { ILoggerService } from 'electron-main/common/log'
 import type { IApplicationEventBus } from './common/application'
-import { ILoggerService } from './core/services/log'
 
 export interface IEventListener {
   (event: WINDOW_MESSAGE_TYPE, preload: EventPreloadType): void | Promise<any> | Event<any>

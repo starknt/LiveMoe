@@ -12,7 +12,7 @@ import { retry } from 'common/electron-common/utils'
 import { INativeService } from 'electron-main/common/native'
 import type Application from 'electron-main/Application'
 import { IFileService } from 'electron-main/common/file'
-import { ILoggerService } from '../services/log'
+import { ILoggerService } from 'electron-main/common/log'
 import WallpaperResourceWatcher from './wallpaperResourceWatcher'
 
 export default class WallpaperLoader implements IDestroyable {

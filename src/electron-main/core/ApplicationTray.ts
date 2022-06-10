@@ -9,7 +9,7 @@ import type { IPCService } from '@livemoe/ipc'
 import { resolveGlobalAssets } from 'electron-main/utils'
 import { WINDOW_MESSAGE_TYPE } from 'common/electron-common/windows'
 import { Emitter, Event } from '@livemoe/utils'
-import { ILoggerService } from './services/log'
+import { ILoggerService } from 'electron-main/common/log'
 
 export default class ApplicationTray implements IDestroyable {
   private static readonly channelName = 'lm:tray'

@@ -2,7 +2,7 @@ import { Injectable, createDecorator } from '@livemoe/core'
 import type { Event, IDisposable } from '@livemoe/utils'
 import { Disposable, Emitter } from '@livemoe/utils'
 import { toErrorMessage } from 'common/electron-common/error'
-import { IEnviromentService } from './environmentService'
+import { IEnviromentService } from '../core/services/environmentService'
 
 export const enum LogLevel {
   Trace,

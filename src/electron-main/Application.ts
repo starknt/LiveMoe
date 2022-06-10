@@ -30,7 +30,7 @@ import ApplicationService from './core/services'
 import PluginManager from './core/pluginCore/PluginManager'
 import UpdateManager from './core/UpdateManager'
 import { IEnviromentService } from './core/services/environmentService'
-import { ILoggerService } from './core/services/log'
+import { ILoggerService } from './common/log'
 import { FileService, IFileService } from './common/file'
 import { INativeService, NativeService } from './common/native'
 
